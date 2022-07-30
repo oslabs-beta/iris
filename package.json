@@ -22,6 +22,7 @@
   "homepage": "https://github.com/blee3395/OSP#readme",
   "dependencies": {
     "avsc": "^5.7.4",
+    "kafkajs": "^2.1.0",
     "node-rdkafka": "^2.13.0"
   }
 }
