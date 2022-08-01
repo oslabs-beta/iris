@@ -13,8 +13,6 @@ client.collectDefaultMetrics({
     register
 });
 
-
-
 app.get('/metrics/', async (req, res) => {
     res.setHeader('Content-Type', register.contentType);
     const data = await register.getSingleMetricAsString('node_process_cpu_user_seconds_total');
