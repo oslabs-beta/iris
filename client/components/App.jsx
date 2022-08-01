@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 const App = (props) => {
 
   return (
-    <div></div>
+    <div><h2>Hi</h2></div>
   )
 
 }

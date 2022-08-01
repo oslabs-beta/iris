@@ -1,7 +1,7 @@
-import express from 'express'
-import path from 'path'
-import http from 'http'
-import { Server } from 'socket.io'
+const express = require('express')
+const path = require('path')
+const http = require('http')
+const { Server } = require('socket.io')
 
 const PORT = 8080
 
