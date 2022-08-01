@@ -1,4 +1,4 @@
-{
+const mock6h = {
     "status": "success",
     "data": {
         "resultType": "matrix",
@@ -4865,3 +4865,5 @@
         ]
     }
 }
+
+module.exports = mock6h;

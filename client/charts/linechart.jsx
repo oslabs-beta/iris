@@ -1,8 +1,8 @@
 import React, { Component, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import axios from 'axios';
-import mock1h from './dummyData/mockData_1h.json' assert {type: 'json'};
-import mock6h from './dummyData/mockData_6h.json' assert {type: 'json'};
+import mock1h from './dummyData/mockData_1h';
+import mock6h from './dummyData/mockData_6h';
 
 // no need for axios request, will be passed as props later
 
@@ -52,7 +52,7 @@ function LineGraph(props) {
     return <Line id="graph" data={lineChartMetric} />;
 }
 
-export default LineGraph;
+module.exports = LineGraph;
 
 
 /*
