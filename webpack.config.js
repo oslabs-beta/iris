@@ -1,5 +1,5 @@
-import path from 'path';
-import HtmlWebpackPlugin from 'html-webpack-plugin'
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
   entry: './client/index.js',
@@ -8,7 +8,7 @@ module.exports = {
       template: path.resolve(__dirname, '/index.html'),
       filename: 'index.html'
     }), 
-    "@babel/plugin-transform-modules-commonjs"
+    // "@babel/plugin-transform-modules-commonjs"
   ],
   devtool: 'inline-source-map',
   devServer: {
