@@ -8,7 +8,7 @@ const PORT = 8080
 const app = express();
 const server = http.createServer(app)
 const io = new Server(server)
-const __dirname = path.resolve()
+// const __dirname = path.resolve()
 
 app.get('/', (req, res) => {
     res.status(200).sendFile(path.resolve(__dirname, './index.html'));
