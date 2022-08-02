@@ -7,7 +7,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, 'index.html'),
       filename: 'index.html'
-    }),
+    }), 
     // "@babel/plugin-transform-modules-commonjs"
   ],
   devtool: 'inline-source-map',

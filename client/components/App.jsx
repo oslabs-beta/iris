@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
-import LineChart from '../charts/LineChart.jsx'
+import GraphContainer from '../charts/containers/GraphContainer.jsx';
 
+import '../stylesheets/application.scss';
 
-const App = (props) => {
+function App(props){
 
   return (
     <>
       <div><h2>Hi</h2></div>
-      <LineChart />
+      <GraphContainer />
     </>
-
   )
 
 }

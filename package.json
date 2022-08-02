@@ -1,8 +1,8 @@
 {
-  "name": "osp",
+  "name": "iris",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A monitoring suite that provides insights on health metrics of your Kafka broker",
+  "main": "webpack.config.js",
   "scripts": {
     "dev": "NODE_ENV=development nodemon server/server.js & NODE_ENV=development webpack serve --open ",
     "start": "nodemon server/server.js",
@@ -12,33 +12,34 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/blee3395/OSP.git"
+    "url": "git+https://github.com/blee3395/iris.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/blee3395/OSP/issues"
+    "url": "https://github.com/blee3395/iris/issues"
   },
-  "homepage": "https://github.com/blee3395/OSP#readme",
+  "homepage": "https://github.com/blee3395/iris#readme",
   "dependencies": {
     "@babel/core": "^7.18.10",
     "@babel/preset-env": "^7.18.10",
     "@babel/preset-react": "^7.18.6",
     "avsc": "^5.7.4",
     "babel-loader": "^8.2.5",
+    "chartjs": "^0.3.24",
     "css-loader": "^6.7.1",
     "eslint": "^8.21.0",
     "express": "^4.18.1",
     "html-webpack-plugin": "^5.5.0",
     "kafkajs": "^2.1.0",
-    "node-rdkafka": "^2.13.0",
     "nodemon": "^2.0.19",
     "path": "^0.12.7",
-    "prom-client": "^14.0.1",
     "react": "^18.2.0",
     "react-chartjs-2": "^4.3.1",
     "react-router-dom": "^6.3.0",
+    "sass": "^1.54.0",
+    "sass-loader": "^13.0.2",
     "socket.io": "^4.5.1",
     "style-loader": "^3.3.1",
     "webpack": "^5.74.0",

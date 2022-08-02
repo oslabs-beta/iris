@@ -2,8 +2,8 @@ import React, { Component, useState, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
 // import Chart from 'chart.js/auto';
 // import axios from 'axios';
-import mock1h from './dummyData/mockData_1h';
-import mock6h from './dummyData/mockData_6h';
+import mock1h from '../dummyData/mockData_1h';
+import mock6h from '../dummyData/mockData_6h';
 
 // no need for axios request, will be passed as props later
 
@@ -20,11 +20,10 @@ function LineChart(props) {
         ]
     });
 
-    useEffect(() => {
-        // manipulate our 1 hour data for now
-        // we need to convert our unix timestamps to regular time stamps
+    function convertKafkatoChart (kafkaData) {
+         // we need to convert our unix timestamps to regular time stamps
         // need to create an array to house our metrics, correlated to specific time stamp
-        const results = mock1h.data.result; // results here is an array
+        const results = kafkaData.data.result; // results here is an array
         const topicData = {};
 
         // Assign information in topicData to have a header of 'topic' (key)
@@ -34,11 +33,10 @@ function LineChart(props) {
                 topicData[results[j].metric.topic] = results[j].values;
             }
         }
-
+        
         // need to update for labels (time) and data (metric)
-
         // parse through valueArray and house our timestampArr and metricsArr
-        const threeLineCharts = []
+        const lineChartData = []
         const timestampArr = [];
         let metricsArr = [];
         // iterating through out object
@@ -52,25 +50,32 @@ function LineChart(props) {
                 }
                 metricsArr.push(Number(value[i][1]));
             }
-            threeLineCharts.push({
+            lineChartData.push({
                 label: topic,
                 data: metricsArr
             });
+            // reset for next topic
             metricsArr = [];
         }
+        return [timestampArr, lineChartData]
+    }
+
+    useEffect(() => {
+        const [timestampArr, lineChartData] = convertKafkatoChart(mock1h)
 
         // set our state - updateLine with our new time stamps and metrics data
         updateLine({
             // labels will be for date -> most likely going to do a cache arr as date.time
             labels: timestampArr,
-            datasets: threeLineCharts // this is an array of 3 subarrays -> subarray [line data]
+            datasets: lineChartData // this is an array of 3 subarrays -> subarray [line data]
         });
     }, [])
+    
     return <Line id="graph" data={lineChartMetric} />;
 }
 
 export default LineChart;
-
+// module.exports = LineChart;
 
 /*
 
