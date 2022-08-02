@@ -1,7 +1,7 @@
 console.log('consumer running')
 
-import { Kafka } from "kafkajs"
-import eventInteger from '../eventTypes/eventInteger.js';
+const { Kafka } = require("kafkajs")
+const eventInteger = require('../eventTypes/eventInteger.js')
 
 
 const kafka = new Kafka({
@@ -11,14 +11,14 @@ const kafka = new Kafka({
 
 const consumer = kafka.consumer({groupId:'iris'})
 
-await consumer.connect()
+consumer.connect()
 
-await consumer.subscribe({
+consumer.subscribe({
   topics:['test1', 'test2'],
   fromBeginning: true
 })
 
-await consumer.run({
+consumer.run({
   eachMessage: async({topic, partition, message}) => {
     if (topic === 'test1') {
       console.log('received message: ', eventInteger.fromBuffer(message.value))

@@ -1,6 +1,6 @@
-import avro from 'avsc';
+const avro = require('avsc')
 
-export default avro.Type.forSchema(
+const eventInteger = avro.Type.forSchema(
   {
     type: 'record',
     fields: [
@@ -11,4 +11,6 @@ export default avro.Type.forSchema(
     ]
   }
 );
+
+module.exports = eventInteger;
 
