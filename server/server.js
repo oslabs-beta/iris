@@ -10,7 +10,7 @@ const server = http.createServer(app)
 const io = new Server(server)
 
 app.get('/', (req, res) => {
-    res.status(200).sendFile(path.resolve(__dirname, './index.html'));
+    res.status(200).sendFile(path.resolve(__dirname, '../index.html'));
 });
 
 io.on('connection', socket => {
