@@ -1,17 +1,16 @@
-import express from 'express'
-import path from 'path'
-import http from 'http'
-import { Server } from 'socket.io'
+const express = require('express')
+const path = require('path')
+const http = require('http')
+const { Server } = require('socket.io')
 
 const PORT = 8080
 
 const app = express();
 const server = http.createServer(app)
 const io = new Server(server)
-const __dirname = path.resolve()
 
 app.get('/', (req, res) => {
-    res.status(200).sendFile(path.resolve(__dirname, './index.html'));
+    res.status(200).sendFile(path.resolve(__dirname, '../index.html'));
 });
 
 io.on('connection', socket => {

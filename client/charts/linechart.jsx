@@ -1,6 +1,6 @@
 import React, { Component, useState, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
-import Chart from 'chart.js/auto';
+// import Chart from 'chart.js/auto';
 // import axios from 'axios';
 import mock1h from './dummyData/mockData_1h';
 import mock6h from './dummyData/mockData_6h';

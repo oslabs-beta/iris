@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "type":"module",
   "scripts": {
     "dev": "NODE_ENV=development nodemon server/server.js & NODE_ENV=development webpack serve --open ",
     "start": "nodemon server/server.js",
@@ -38,6 +37,7 @@
     "path": "^0.12.7",
     "prom-client": "^14.0.1",
     "react": "^18.2.0",
+    "react-chartjs-2": "^4.3.1",
     "react-router-dom": "^6.3.0",
     "socket.io": "^4.5.1",
     "style-loader": "^3.3.1",

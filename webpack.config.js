@@ -1,14 +1,14 @@
-import path from 'path';
-import HtmlWebpackPlugin from 'html-webpack-plugin'
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
-  entry: './client/index.js',
+  entry: path.resolve(__dirname, './client/index.js'),
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, '/index.html'),
+      template: path.resolve(__dirname, 'index.html'),
       filename: 'index.html'
-    }), 
-    "@babel/plugin-transform-modules-commonjs"
+    }),
+    // "@babel/plugin-transform-modules-commonjs"
   ],
   devtool: 'inline-source-map',
   devServer: {
@@ -35,7 +35,7 @@ module.exports = {
       {
         test: /\.jsx?/,
         // exclude: /(node_modules)/,
-        exclude: path.resolve(__dirname, './node_modules'),
+        exclude: path.resolve(__dirname, '../node_modules'),
         use: {
           loader: 'babel-loader',
           options: {
