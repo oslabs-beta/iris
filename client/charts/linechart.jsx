@@ -20,11 +20,10 @@ function LineChart(props) {
         ]
     });
 
-    useEffect(() => {
-        // manipulate our 1 hour data for now
-        // we need to convert our unix timestamps to regular time stamps
+    function convertKafkatoChart (kafkaData) {
+         // we need to convert our unix timestamps to regular time stamps
         // need to create an array to house our metrics, correlated to specific time stamp
-        const results = mock1h.data.result; // results here is an array
+        const results = kafkaData.data.result; // results here is an array
         const topicData = {};
 
         // Assign information in topicData to have a header of 'topic' (key)
@@ -34,9 +33,8 @@ function LineChart(props) {
                 topicData[results[j].metric.topic] = results[j].values;
             }
         }
-
+        
         // need to update for labels (time) and data (metric)
-
         // parse through valueArray and house our timestampArr and metricsArr
         const threeLineCharts = []
         const timestampArr = [];
@@ -56,8 +54,15 @@ function LineChart(props) {
                 label: topic,
                 data: metricsArr
             });
+            // reset for next topic
             metricsArr = [];
         }
+        return [timestampArr, threeLineCharts]
+    }
+
+    
+    useEffect(() => {
+        const [timestampArr, threeLineCharts] = convertKafkatoChart(mock1h)
 
         // set our state - updateLine with our new time stamps and metrics data
         updateLine({
@@ -66,11 +71,12 @@ function LineChart(props) {
             datasets: threeLineCharts // this is an array of 3 subarrays -> subarray [line data]
         });
     }, [])
+    
     return <Line id="graph" data={lineChartMetric} />;
 }
 
 export default LineChart;
-
+// module.exports = LineChart;
 
 /*
 
