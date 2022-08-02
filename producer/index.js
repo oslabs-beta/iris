@@ -1,7 +1,7 @@
 console.log('producer running')
 
-import { Kafka } from "kafkajs"
-import eventInteger from '../eventTypes/eventInteger.js';
+const { Kafka } = require("kafkajs")
+const eventInteger = require('../eventTypes/eventInteger.js')
 
 const kafka = new Kafka({
   clientId:'iris',
