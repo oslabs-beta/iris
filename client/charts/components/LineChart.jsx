@@ -1,12 +1,10 @@
 import React, { Component, useState, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
-// import Chart from 'chart.js/auto';
-// import axios from 'axios';
+import Chart from 'chart.js/auto';
 import mock1h from '../dummyData/mockData_1h';
 import mock6h from '../dummyData/mockData_6h';
 
 // no need for axios request, will be passed as props later
-
 function LineChart(props) {
     const [lineChartMetric, updateLine] = useState({
         // labels will be for date -> most likely going to do a cache arr as date.time
@@ -75,7 +73,6 @@ function LineChart(props) {
 }
 
 export default LineChart;
-// module.exports = LineChart;
 
 /*
 

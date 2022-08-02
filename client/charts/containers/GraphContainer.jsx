@@ -2,13 +2,10 @@ import React, { Component } from 'react';
 import LineChart from '../components/LineChart.jsx';
 
 function GraphContainer(props) {
-
-
   // return our render
   // need 2 drop downs -> 1) metrics, 2) timeframe
   return (
-
-    <div id = 'graphContainer'>
+    <div id='graphContainer'>
       {/* metrics */}
       <div class="dropdown">
         <button class="dropbtn">Metrics</button>
@@ -29,7 +26,7 @@ function GraphContainer(props) {
         </div>
       </div>
 
-      <LineChart/>
+      <LineChart />
     </div>
   )
 }
