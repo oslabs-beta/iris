@@ -17,7 +17,7 @@ module.exports = {
       publicPath: '/'
     },
     proxy: {
-      // '/': 'http://localhost:3000',
+      '/': 'http://localhost:8080',
       // '/signup': 'http://localhost:3000',
       // '/createPost': 'http://localhost:3000',
       compress: true,

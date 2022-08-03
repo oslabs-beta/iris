@@ -70,8 +70,6 @@ app.post('/', (req,res) => {
     res.status(200).send('Metric and timeFrame changed')
 })
 
-
-
 const queryData = async (metric, timeFrame) => {
     const res = await fetch(`http://localhost:9090/api/v1/query?query=${metric}[${timeFrame}]`)
     // console.log('Response from fetch: ', res)
