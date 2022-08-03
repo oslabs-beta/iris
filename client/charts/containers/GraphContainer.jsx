@@ -41,12 +41,14 @@ function GraphContainer(props) {
       }
     }
 
+    console.log('reqBody: ',reqBody)
+
     await fetch('/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(reqBody)
       })
-      .then(data => data.json())
+      // .then(data => data.json())
       .then((formattedData) => {
           console.log(formattedData)
           results = formattedData;
