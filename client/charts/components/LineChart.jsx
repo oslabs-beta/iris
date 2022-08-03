@@ -4,8 +4,12 @@ import Chart from 'chart.js/auto';
 import mock1h from '../dummyData/mockData_1h';
 import mock6h from '../dummyData/mockData_6h';
 
+
 // no need for axios request, will be passed as props later
 function LineChart(props) {
+    // deconstruct chartData
+    const { chartData } = props;
+
     const [lineChartMetric, updateLine] = useState({
         // labels will be for date -> most likely going to do a cache arr as date.time
         labels: ['filler'],
@@ -31,7 +35,7 @@ function LineChart(props) {
     function convertKafkatoChart (kafkaData) {
          // we need to convert our unix timestamps to regular time stamps
         // need to create an array to house our metrics, correlated to specific time stamp
-        const results = kafkaData.data.result; // results here is an array
+        const results = kafkaData; // results here is an array
         const topicData = {};
 
         // Assign information in topicData to have a header of 'topic' (key)
@@ -73,7 +77,9 @@ function LineChart(props) {
     }
 
     useEffect(() => {
-        const [timestampArr, lineChartData] = convertKafkatoChart(mock6h)
+        // for mockdata
+        // const [timestampArr, lineChartData] = convertKafkatoChart(mock1h.data.result)
+        const [timestampArr, lineChartData] = convertKafkatoChart(chartData)
 
         // set our state - updateLine with our new time stamps and metrics data
         updateLine({
@@ -81,7 +87,7 @@ function LineChart(props) {
             labels: timestampArr,
             datasets: lineChartData // this is an array of 3 subarrays -> subarray [line data]
         });
-    }, [])
+    }, [props])
     
     return <Line id="graph" data={lineChartMetric} />;
 }

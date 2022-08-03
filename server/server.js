@@ -4,25 +4,33 @@ const path = require('path')
 const http = require('http')
 const { Server } = require('socket.io')
 const { urlencoded } = require('express')
-// const cors = require('cors')
+const cors = require('cors')
 const PORT = 8080
+// const io = require('socket.io');
 
 const app = express();
+app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({extended : true}))
 
 //define metric and timeFrame. 
 // Default chart 001 with 
 let chartsData = {
-    '001': {
+    '1': {
         metric: 'kafka_server_broker_topic_metrics_bytesinpersec_rate',
         timeFrame : '5m', 
     }
 }
 
-//creating socket.io connection
 const server = http.createServer(app)
-const io = new Server(server)
+// const io = new Server(server)
+const io = require('socket.io')(server, {
+    cors: {
+        origin: "*",
+    },
+    // transports: ['xhr-polling'] // throwing xhr polling error on frontend?
+})
+// creating socket.io connection
 
 
 // Send index.html at app load
@@ -34,8 +42,8 @@ io.on('connection', async (socket) => {
     console.log('a user connected')
     for (const [chartID, query] of Object.entries(chartsData)){
         const data = await queryData(query.metric, query.timeFrame)
-        console.log('query.metric, ' , query.metric, 'query Time frame,', query.timeFrame)
-        console.log('Data from queryData, server.js: ', data, chartID)
+        // console.log('query.metric, ' , query.metric, 'query Time frame,', query.timeFrame)
+        // console.log('Data from queryData, server.js: ', data, chartID)
         socket.emit(chartID, data) //Broadcast data from query on topic of chartID
     }
 
@@ -43,11 +51,12 @@ io.on('connection', async (socket) => {
         // function to query data
         for (const [chartID, query] of Object.entries(chartsData)){
             const data = await queryData(query.metric, query.timeFrame)
-            console.log('query.metric, ' , query.metric, 'query Time frame,', query.timeFrame)
-            console.log('Data from queryData, server.js: ', data, chartID)
+            // console.log('query.metric, ' , query.metric, 'query Time frame,', query.timeFrame)
+            // console.log('Data from queryData, server.js: ', data, chartID)
             socket.emit(chartID, data) //Broadcast data from query on topic of chartID
+            socket.on("disconnect", () => console.log("Socket disconnect")) // disconnects socket to grab new metric data
         }
-    }, 15000) // socket.emit will send the data every fifteen second. 
+    }, 1000) // socket.emit will send the data every fifteen second. 
 })
 
 io.on('connect_error', (err) => {
@@ -71,10 +80,11 @@ app.post('/', (req,res) => {
 })
 
 const queryData = async (metric, timeFrame) => {
+    // console.log('queryData inputs: ', metric, timeFrame)
     const res = await fetch(`http://localhost:9090/api/v1/query?query=${metric}[${timeFrame}]`)
     // console.log('Response from fetch: ', res)
     const data = await res.json()
-    // console.log('data in line 67 inside server.js', data)
+    // console.log('data in line 87 inside server.js', data)
 
     switch (metric){
         case 'kafka_server_broker_topic_metrics_bytesinpersec_rate':
@@ -89,10 +99,10 @@ const queryData = async (metric, timeFrame) => {
         case 'kafka_server_replica_manager_failedisrupdatespersec':
         case 'scrape_duration_seconds': // no topic at all => frontEnd will default to "job": "kafka"
         case 'scrape_samples_scraped': // no topic at all => frontEnd will default to "job": "kafka"
-            console.log('switch case ', metric, data.data.result)    
+            // console.log('switch case ', metric, data.data.result)    
             return data.data.result
         case 'kafka_server_request_handler_avg_idle_percent': // no topic at all => frontEnd will default to "job": "kafka"
-            console.log('kafka_server_request_handler_avg_idle_percent: ', [data.data.result[4]])
+            // console.log('kafka_server_request_handler_avg_idle_percent: ', [data.data.result[4]])
             return [data.data.result[4]]
     }
 }
