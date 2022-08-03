@@ -4,7 +4,20 @@ import LineChart from '../components/LineChart.jsx';
 
 function GraphContainer(props) {
   // handle onChange for dropdown
+  
+  // const id = [001,002,003,004,005,006,007,008,009,010];
+  // const ranNums = [];
+  // let i = id.length;
+  // let j = 0;
 
+  // while (i--) {
+  //     j = Math.floor(Math.random() * (i+1));
+  //     ranNums.push(id[j]);
+  //     id.splice(j,1);
+  // }
+
+  // console.log('random number', ranNums);
+  
   async function handleClick() {
     // store for return
     let results;
@@ -13,8 +26,24 @@ function GraphContainer(props) {
     const metrics = JSON.parse(document.getElementById('metric').value);
     const timeFrame = JSON.parse(document.getElementById('timeframe').value);
 
-    if (metrics === 'noChoice' || timeFrame === 'noChoice') { 
-      alert("Must Choose a Metric")
+
+    // logic is wrong but we'll fix
+    if (metrics === 'noChoice' && timeFrame === 'noChoice') { 
+      alert("Must Choose a Metric and Timeframe")
+    }
+    else if (metrics === 'noChoice' && timeFrame !== 'noChoice') {
+      const reqBody = {
+        metric: metrics,
+        timeFrame: '1m',
+        chartID: ranNums
+      }
+    }
+    else if (metrics !== 'noChoice' && timeFrame === 'noChoice') {
+      const reqBody = {
+        metric: 'kafka_server_replica_fetcher_manager_maxlag_value',
+        timeFrame: timeFrame,
+        // chartID: , need to implement this somehow
+      }
     }
     else {
       const reqBody = {
