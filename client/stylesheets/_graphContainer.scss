@@ -1,0 +1,21 @@
+#graphContainer {
+  display: grid;
+  grid-template-areas: "dropdown"
+                        "graph";
+
+  .selectDropdown {
+    display: flex;
+    justify-content: flex-start;
+
+    grid-area: dropdown;
+    display: inline-block;
+    position: relative;
+    text-align: center;
+    margin-top: 2%;
+  }
+
+  #graph {
+    grid-area: graph;
+  }
+
+}

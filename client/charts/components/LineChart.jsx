@@ -2,8 +2,8 @@ import React, { Component, useState, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
 import Chart from 'chart.js/auto';
 // import axios from 'axios';
-import mock1h from './dummyData/mockData_1h';
-import mock6h from './dummyData/mockData_6h';
+import mock1h from '../dummyData/mockData_1h';
+import mock6h from '../dummyData/mockData_6h';
 
 // no need for axios request, will be passed as props later
 
@@ -19,6 +19,16 @@ function LineChart(props) {
             }
         ]
     });
+
+    // function to generate random colors for our chartjs lines
+    function getRandomColor() {
+        let letters = '0123456789ABCDEF'.split('');
+        let color = '#';
+        for (let i = 0; i < 6; i++ ) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
 
     function convertKafkatoChart (kafkaData) {
          // we need to convert our unix timestamps to regular time stamps
@@ -36,39 +46,42 @@ function LineChart(props) {
         
         // need to update for labels (time) and data (metric)
         // parse through valueArray and house our timestampArr and metricsArr
-        const threeLineCharts = []
+        const lineChartData = []
         const timestampArr = [];
         let metricsArr = [];
+        let timeArrBuilt = false;
         // iterating through out object
         for (let [topic, value] of Object.entries(topicData)) {
-            let timeArrBuilt = false;
             for (let i = 0; i < value.length; i++) { // { topic: [timestamp , another time] }
                 if (!timeArrBuilt) {
                     timestampArr.push(
-                        new Date(Number(value[i][0]) * 1000).toLocaleString() // mult by 1000 given value comes in as seconds
+                        new Date(Number(value[i][0]) * 1000).toLocaleTimeString() // mult by 1000 given value comes in as seconds
                     );
                 }
                 metricsArr.push(Number(value[i][1]));
             }
-            threeLineCharts.push({
+            // given times for all metrics are the same after pull, only aggregate once
+            timeArrBuilt = true;
+
+            lineChartData.push({
                 label: topic,
-                data: metricsArr
+                data: metricsArr,
+                borderColor: getRandomColor()
             });
             // reset for next topic
             metricsArr = [];
         }
-        return [timestampArr, threeLineCharts]
+        return [timestampArr, lineChartData]
     }
 
-    
     useEffect(() => {
-        const [timestampArr, threeLineCharts] = convertKafkatoChart(mock1h)
+        const [timestampArr, lineChartData] = convertKafkatoChart(mock6h)
 
         // set our state - updateLine with our new time stamps and metrics data
         updateLine({
             // labels will be for date -> most likely going to do a cache arr as date.time
             labels: timestampArr,
-            datasets: threeLineCharts // this is an array of 3 subarrays -> subarray [line data]
+            datasets: lineChartData // this is an array of 3 subarrays -> subarray [line data]
         });
     }, [])
     
