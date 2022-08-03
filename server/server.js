@@ -3,20 +3,22 @@ const fetch = require('node-fetch')
 const path = require('path')
 const http = require('http')
 const { Server } = require('socket.io')
+const { urlencoded } = require('express')
 // const cors = require('cors')
 const PORT = 8080
 
 const app = express();
+app.use(express.json())
+app.use(express.urlencoded({extended : true}))
 
 //define metric and timeFrame. 
 // Default chart 001 with 
-const chartsData = {
+let chartsData = {
     '001': {
         metric: 'kafka_server_broker_topic_metrics_bytesinpersec_rate',
         timeFrame : '5m', 
     }
 }
-
 
 //creating socket.io connection
 const server = http.createServer(app)
@@ -28,12 +30,20 @@ app.get('/', (req, res) => {
     res.status(200).sendFile(path.resolve(__dirname, '../index.html'));
 });
 
-io.on('connection', (socket) => {
+io.on('connection', async (socket) => {
     console.log('a user connected')
+    for (const [chartID, query] of Object.entries(chartsData)){
+        const data = await queryData(query.metric, query.timeFrame)
+        console.log('query.metric, ' , query.metric, 'query Time frame,', query.timeFrame)
+        console.log('Data from queryData, server.js: ', data, chartID)
+        socket.emit(chartID, data) //Broadcast data from query on topic of chartID
+    }
+
     setInterval(async () => {
         // function to query data
         for (const [chartID, query] of Object.entries(chartsData)){
             const data = await queryData(query.metric, query.timeFrame)
+            console.log('query.metric, ' , query.metric, 'query Time frame,', query.timeFrame)
             console.log('Data from queryData, server.js: ', data, chartID)
             socket.emit(chartID, data) //Broadcast data from query on topic of chartID
         }
@@ -48,23 +58,25 @@ io.on('connect_error', (err) => {
 
 // Reassign metric and timeframe based on OnChange event from frontEnd
 app.post('/', (req,res) => {
-    metric = req.body.metric;
-    timeFrame = req.body.timeFrame;
-    chartID = req.body.chartID // 002. 003
-    console.log('metric, timeFrame in line 47 inside server.js', metric, timeFrame, chartID)
+    const metric = req.body.metric;
+    const timeFrame = req.body.timeFrame;
+    const chartID = req.body.chartID 
+    
+    const updatedChart = {}
+    updatedChart[chartID] = { metric: metric, timeFrame: timeFrame }
+    chartsData = Object.assign(chartsData, updatedChart)
+    // console.log('chartsData object assign, ' , chartsData)
+    // console.log('metric, timeFrame in line 64 inside server.js', metric, timeFrame, chartID)
     res.status(200).send('Metric and timeFrame changed')
 })
-
-// Handle deleting chart requests
-
 
 
 
 const queryData = async (metric, timeFrame) => {
     const res = await fetch(`http://localhost:9090/api/v1/query?query=${metric}[${timeFrame}]`)
-    console.log('Response from fetch: ', res)
+    // console.log('Response from fetch: ', res)
     const data = await res.json()
-    console.log('data in line 67 inside server.js', data)
+    // console.log('data in line 67 inside server.js', data)
 
     switch (metric){
         case 'kafka_server_broker_topic_metrics_bytesinpersec_rate':
