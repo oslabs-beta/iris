@@ -4,7 +4,6 @@ import LineChart from '../components/LineChart.jsx';
 import io from 'socket.io-client';
 import mock1h from '../dummyData/mockData_1h';
 
-
 const socket = io();
 
 function GraphContainer(props) {
