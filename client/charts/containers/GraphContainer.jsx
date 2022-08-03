@@ -6,19 +6,6 @@ import mock1h from '../dummyData/mockData_1h';
 
 const socket = io();
 
-socket.on('connect', () => {
-  console.log('socket connected')
-});
-
-socket.on(chartID, (data) => {
-  setChartData(data)
-  console.log('after setting chartData: ', chartData)
-});
-
-socket.on('connect_error', (err) => {
-  console.log(`connect_error due to ${err.message}`);
-});
-
 function GraphContainer(props) {
   // Exposed props.chartID when creating chart at Page Level Component
   // Use dummy value of '1' for unit testing
@@ -26,6 +13,19 @@ function GraphContainer(props) {
   const chartID = '1'
 
   const [chartData, setChartData] = useState(mock1h.data.result);
+
+  socket.on('connect', () => {
+    console.log('socket connected')
+  });
+
+  socket.on(chartID, (data) => {
+    setChartData(data)
+    console.log('after setting chartData: ', chartData)
+  });
+
+  socket.on('connect_error', (err) => {
+    console.log(`connect_error due to ${err.message}`);
+  });
 
   async function handleClick() {
     // store for return
