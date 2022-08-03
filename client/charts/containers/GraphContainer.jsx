@@ -1,43 +1,78 @@
-import React, { Component, useState } from 'react';
+import React, { Component, useState, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
 import LineChart from '../components/LineChart.jsx';
+import io from 'socket.io-client';
+
+const socket = io();
 
 function GraphContainer(props) {
   
+  // const chartID = props.chartID
+  const chartID = '1'
+  // const socket = io.connect(`http://localhost:8081`)
+  
+  const [chartData, setChartData] = useState([]);
+
+  useEffect(() => {
+    socket.on('connect', () => {
+      console.log('socket connected')
+    });
+
+    socket.on(chartID, async (data) => {
+      // console.log('Socket incoming data: ' + Object.entries(data[0]));
+      await setChartData(data)
+      console.log('after setting chartData: ', chartData)
+    });
+    
+    socket.on('connect_error', (err) => {
+      console.log(`connect_error due to ${err.message}`);
+    });
+  }, []);
+
+  // console.log("socket, " , socket)
+  
+  // socket.on('connection', (socket) => {
+  //   console.log('GraphContainer socket connect ChartID: ', chartID)
+  //   socket.on(chartID, (data) => {
+  //     console.log('Socket incoming data: ' + data.json());
+  //   });
+  // });
+
+
   async function handleClick() {
     // store for return
     let results;
 
     // grab metric by pulling value from our select id
     const metrics = document.getElementById('metric').value;
-    const timeFrame = document.getElementById('timeframe').value;
+    const timeFrame = document.getElementById('timeframe').value; 
 
     let reqBody;
 
     // logic is wrong but we'll fix
     if (metrics === 'noChoice' && timeFrame === 'noChoice') { 
-      alert("Must Choose a Metric and Timeframe")
+      alert("Must Choose a Metric and Timeframe") 
       return;
     }
     else if (metrics === 'noChoice' && timeFrame !== 'noChoice') {
       reqBody = {
         metric: metrics,
-        timeFrame: '1m',
-        chartID: '001'
+        timeFrame: '5m',
+        chartID: '1'
       }
     }
     else if (metrics !== 'noChoice' && timeFrame === 'noChoice') {
       reqBody = {
         metric: 'kafka_server_replica_fetcher_manager_maxlag_value',
         timeFrame: timeFrame,
-        chartID: '001'
+        chartID: '1'
       }
     }
     else {
       reqBody = {
         metric: metrics,
         timeFrame: timeFrame,
-        chartID: '001'
+        chartID: '1'
       }
     }
 
@@ -51,12 +86,11 @@ function GraphContainer(props) {
       // .then(data => data.json())
       .then((formattedData) => {
           console.log(formattedData)
-          results = formattedData;
+          // results = formattedData;
       })
       .catch(err => {
           console.log('Error thrown in POST request in graphContainer: ', err)
       })
-
     return results;
   }
 
@@ -107,7 +141,7 @@ function GraphContainer(props) {
         </select>
       </div>
 
-      <LineChart/>
+      <LineChart chartData={chartData}/>
     </div>
   )
 }
