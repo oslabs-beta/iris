@@ -54,8 +54,9 @@ io.on('connection', async (socket) => {
             // console.log('query.metric, ' , query.metric, 'query Time frame,', query.timeFrame)
             // console.log('Data from queryData, server.js: ', data, chartID)
             socket.emit(chartID, data) //Broadcast data from query on topic of chartID
+            socket.on("disconnect", () => console.log("Socket disconnect")) // disconnects socket to grab new metric data
         }
-    }, 5000) // socket.emit will send the data every fifteen second. 
+    }, 1000) // socket.emit will send the data every fifteen second. 
 })
 
 io.on('connect_error', (err) => {
@@ -98,10 +99,10 @@ const queryData = async (metric, timeFrame) => {
         case 'kafka_server_replica_manager_failedisrupdatespersec':
         case 'scrape_duration_seconds': // no topic at all => frontEnd will default to "job": "kafka"
         case 'scrape_samples_scraped': // no topic at all => frontEnd will default to "job": "kafka"
-            console.log('switch case ', metric, data.data.result)    
+            // console.log('switch case ', metric, data.data.result)    
             return data.data.result
         case 'kafka_server_request_handler_avg_idle_percent': // no topic at all => frontEnd will default to "job": "kafka"
-            console.log('kafka_server_request_handler_avg_idle_percent: ', [data.data.result[4]])
+            // console.log('kafka_server_request_handler_avg_idle_percent: ', [data.data.result[4]])
             return [data.data.result[4]]
     }
 }
