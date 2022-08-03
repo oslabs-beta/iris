@@ -18,6 +18,16 @@ function LineChart(props) {
         ]
     });
 
+    // function to generate random colors for our chartjs lines
+    function getRandomColor() {
+        let letters = '0123456789ABCDEF'.split('');
+        let color = '#';
+        for (let i = 0; i < 6; i++ ) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+
     function convertKafkatoChart (kafkaData) {
          // we need to convert our unix timestamps to regular time stamps
         // need to create an array to house our metrics, correlated to specific time stamp
@@ -37,20 +47,24 @@ function LineChart(props) {
         const lineChartData = []
         const timestampArr = [];
         let metricsArr = [];
+        let timeArrBuilt = false;
         // iterating through out object
         for (let [topic, value] of Object.entries(topicData)) {
-            let timeArrBuilt = false;
             for (let i = 0; i < value.length; i++) { // { topic: [timestamp , another time] }
                 if (!timeArrBuilt) {
                     timestampArr.push(
-                        new Date(Number(value[i][0]) * 1000).toLocaleString() // mult by 1000 given value comes in as seconds
+                        new Date(Number(value[i][0]) * 1000).toLocaleTimeString() // mult by 1000 given value comes in as seconds
                     );
                 }
                 metricsArr.push(Number(value[i][1]));
             }
+            // given times for all metrics are the same after pull, only aggregate once
+            timeArrBuilt = true;
+
             lineChartData.push({
                 label: topic,
-                data: metricsArr
+                data: metricsArr,
+                borderColor: getRandomColor()
             });
             // reset for next topic
             metricsArr = [];
@@ -59,7 +73,7 @@ function LineChart(props) {
     }
 
     useEffect(() => {
-        const [timestampArr, lineChartData] = convertKafkatoChart(mock1h)
+        const [timestampArr, lineChartData] = convertKafkatoChart(mock6h)
 
         // set our state - updateLine with our new time stamps and metrics data
         updateLine({
