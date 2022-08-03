@@ -5,6 +5,7 @@ import Chart from 'chart.js/auto';
 import mock1h from '../dummyData/mockData_1h';
 import mock6h from '../dummyData/mockData_6h';
 
+
 // no need for axios request, will be passed as props later
 
 function LineChart(props) {
