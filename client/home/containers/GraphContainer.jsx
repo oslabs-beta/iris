@@ -1,6 +1,6 @@
 import React, { Component, useState, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
-import LineChart from '../components/LineChart.jsx';
+import LineChart from '../components/charts/LineChart.jsx';
 import io from 'socket.io-client';
 import mock1h from '../dummyData/mockData_1h';
 
@@ -9,8 +9,8 @@ const socket = io();
 function GraphContainer(props) {
   // Exposed props.chartID when creating chart at Page Level Component
   // Use dummy value of '1' for unit testing
-  // const chartID = props.chartID
-  const chartID = '1'
+  // const { chartID } = props;
+  const chartID = '1';
 
   const [chartData, setChartData] = useState(mock1h.data.result);
 
@@ -20,7 +20,7 @@ function GraphContainer(props) {
 
   socket.on(chartID, (data) => {
     setChartData(data)
-    console.log('after setting chartData: ', chartData)
+    // console.log('after setting chartData: ', chartData)
   });
 
   socket.on('connect_error', (err) => {
@@ -28,39 +28,63 @@ function GraphContainer(props) {
   });
 
   async function handleClick() {
-    // store for return
-    let results;
 
     // grab metric by pulling value from our select id
     const metrics = document.getElementById('metric').value;
     const timeFrame = document.getElementById('timeframe').value;
 
-    let reqBody = {
-      metric: 'kafka_server_replica_fetcher_manager_maxlag_value',
-      timeFrame: '5m',
-      chartID: '1'
-    };
+    // function for later when we figure out how to rework logic
+    // function (metrics, timeFrame) {
+
+    // }
+
+    let reqBody;
 
     // FIX CHART ID 
     if (metrics === '' && timeFrame === '') {
       alert("Must Choose a Metric and Timeframe")
       return;
     }
-    else if (metrics !== '' && timeFrame === '') {
-      reqBody.metric = metrics;
-    }
-    else if (metrics === '' && timeFrame !== '') {
-      reqBody.timeFrame = timeFrame;
-    }
-    else {
-      reqBody.metric = {
+    if (metrics !== '' && timeFrame === '') {
+      reqBody = {
         metric: metrics,
-        timeFrame: timeFrame,
-        chartID: '1'
+        timeFrame: '5m',
+        chartID: chartID
       }
     }
+    else if (metrics === '' && timeFrame !== '') {
+      reqBody = {
+        metric: 'kafka_server_replica_fetcher_manager_maxlag_value',
+        timeFrame: timeFrame,
+        chartID: chartID
+      }
+    }
+    else {
+      reqBody = {
+        metric: metrics,
+        timeFrame: timeFrame,
+        chartID: chartID
+      }
+    }
+    // if (metrics === '' && timeFrame === '') {
+    //   alert("Must Choose a Metric and Timeframe")
+    //   return;
+    // }
+    // if (metrics !== '' && timeFrame === '') {
+    //   reqBody.metric = document.getElementById('metric').value;
+    // }
+    // if (metrics === '' && timeFrame !== '') {
+    //   reqBody.timeFrame = document.getElementById('timeframe').value;
+    // }
+    // if (metrics !== '' && timeFrame !== '') {
+    //   reqBody.metric = {
+    //     metric: document.getElementById('metric').value,
+    //     timeFrame: document.getElementById('timeframe').value,
+    //     chartID: '1'
+    //   }
+    // }
 
-    console.log('reqBody: ', reqBody)
+    // console.log('reqBody: ', reqBody)
 
     await fetch('/', {
       method: 'POST',
@@ -73,7 +97,9 @@ function GraphContainer(props) {
       .catch(err => {
         console.log('Error thrown in POST request in graphContainer: ', err)
       })
-    return results;
+
+    // breakout of function
+    return;
   }
 
   // return our render
@@ -110,7 +136,7 @@ function GraphContainer(props) {
 
         {/* timeframe */}
         <select id='timeframe' onChange={handleClick}>
-          <option value="noChoice">Timeframe</option>
+          <option value="">Timeframe</option>
           <option value="1m">1m</option>
           <option value="5m">5m</option>
           <option value="15m">15m</option>
@@ -124,6 +150,7 @@ function GraphContainer(props) {
       </div>
 
       <LineChart chartData={chartData} />
+
     </div>
   )
 }
