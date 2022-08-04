@@ -19,7 +19,7 @@ function GraphContainer(props) {
     console.log('socket connected')
   });
 
-  socket.on(chartID, (data) => {
+  socket.on(chartID, (data) => { 
     setChartData(data)
     console.log('after setting chartData: ', chartData)
   });
@@ -65,7 +65,7 @@ function GraphContainer(props) {
       }
     }
 
-    console.log('reqBody: ',reqBody)
+    // console.log('reqBody: ',reqBody)
 
     await fetch('/', {
       method: 'POST',

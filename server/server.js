@@ -107,24 +107,6 @@ const queryData = async (metric, timeFrame) => {
     }
 }
 
-/*
-"metric": {
-"__name__": "kafka_server_request_handler_avg_idle_percent",
-"aggregate": "Count",
-"env": "cluster-demo",
-"instance": "jmx-kafka:5556",
-"job": "kafka",
-"service": "kafka-broker"
-*/
-
-/*
-This is for scrape metrics:
-
-"metric": {
-"__name__": "scrape_samples_scraped",
-"instance": "jmx-kafka:5556",
-"job": "kafka"
- */
 
 server.listen(PORT, () => console.log('Listening on Port', PORT))
 
