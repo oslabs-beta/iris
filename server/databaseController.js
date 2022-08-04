@@ -29,26 +29,13 @@ dbController.add_bytesinpersec_rate = async () => {
         const time = element[0];
         const value = element[1];
         const key = `${identifier}%${metric}%${time}`;
-        
-        if (i !== result.values.length - 1) {
-          body += `(${key}, 
-                    ${identifier},
-                    ${metric}, 
-                    ${time}, 
-                    ${value}
-                    ), `
-        }
-        else {
-          body += `(${key}, 
-                    ${identifier}, 
-                    ${metric}, 
-                    ${time}, 
-                    ${value}
-                    ); `
-        }
+        body += `('${key}', '${identifier}', '${metric}', ${time}, ${value}), `
       }
     }
   })
+
+  body = body.slice(0,body.length-2)
+  body+=';'
   
   console.log('dbQuery body: ', body)
   
