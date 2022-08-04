@@ -1,21 +1,27 @@
-import React, { Component } from 'react';
+import React, { Component, useState, useEffect } from 'react';
 import GraphContainer from './GraphContainer.jsx';
 
 function HomeContainer(props) {
     // implement adding new graphs logic 
+    // always want one graph
+    const [currentGraphs, setGraphs] = useState([<GraphContainer chartID={'1'} />]);
 
-    async function handleClick() {
+    // function that will create new graphs onClick button id = newGraph
+    function createGraph() {
+        const holder = [...currentGraphs];
+        console.log('holder, ', String(currentGraphs.length + 1))
+        holder.push(<GraphContainer chartID={String(currentGraphs.length + 1)} />);
+        setGraphs(holder)
 
-
-    }
+    };
 
     return (
-        <>
-        <button id='newGraph'></button>
-            <GraphContainer />
-        </>
-    )
+        <div className='homePage'>
+            <button id='newGraph' onClick={createGraph}>Add a Graph</button>
+            <div id='graphFeed'>{currentGraphs}</div>
+        </div>
 
+    )
 }
 
 export default HomeContainer;

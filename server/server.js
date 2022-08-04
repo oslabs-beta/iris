@@ -43,7 +43,7 @@ io.on('connection', async (socket) => {
     for (const [chartID, query] of Object.entries(chartsData)){
         const data = await queryData(query.metric, query.timeFrame)
         // console.log('query.metric, ' , query.metric, 'query Time frame,', query.timeFrame)
-        // console.log('Data from queryData, server.js: ', data, chartID)
+        console.log('Data from queryData, server.js: ', data, chartID)
         socket.emit(chartID, data) //Broadcast data from query on topic of chartID
     }
 
@@ -56,7 +56,7 @@ io.on('connection', async (socket) => {
             socket.emit(chartID, data) //Broadcast data from query on topic of chartID
             socket.on("disconnect", () => console.log("Socket disconnect")) // disconnects socket to grab new metric data
         }
-    }, 1000) // socket.emit will send the data every fifteen second. 
+    }, 10000) // socket.emit will send the data every fifteen second. 
 })
 
 io.on('connect_error', (err) => {
