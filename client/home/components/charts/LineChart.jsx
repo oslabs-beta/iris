@@ -1,13 +1,11 @@
 import React, { Component, useState, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
 import Chart from 'chart.js/auto';
-// import axios from 'axios';
-import mock1h from '../dummyData/mockData_1h';
-import mock6h from '../dummyData/mockData_6h';
+import mock1h from '../../dummyData/mockData_1h';
+import mock6h from '../../dummyData/mockData_6h';
 
 
 // no need for axios request, will be passed as props later
-
 function LineChart(props) {
     // deconstruct chartData
     const { chartData } = props;
@@ -28,15 +26,19 @@ function LineChart(props) {
     function getRandomColor() {
         let letters = '0123456789ABCDEF'.split('');
         let color = '#';
-        for (let i = 0; i < 6; i++ ) {
+        for (let i = 0; i < 6; i++) {
             color += letters[Math.floor(Math.random() * 16)];
         }
         return color;
     }
 
-    function convertKafkatoChart (kafkaData) {
-         // we need to convert our unix timestamps to regular time stamps
+    function convertKafkatoChart(kafkaData) {
+        // if kafkadata is null
+        if (!kafkaData) return [[], []];
+
+        // we need to convert our unix timestamps to regular time stamps
         // need to create an array to house our metrics, correlated to specific time stamp
+        // console.log('kafkadata:', kafkaData)
         const results = kafkaData; // results here is an array
         const topicData = {};
 
@@ -47,7 +49,7 @@ function LineChart(props) {
                 topicData[results[j].metric.topic] = results[j].values;
             }
         }
-        
+
         // need to update for labels (time) and data (metric)
         // parse through valueArray and house our timestampArr and metricsArr
         const lineChartData = []
@@ -90,12 +92,11 @@ function LineChart(props) {
             datasets: lineChartData // this is an array of 3 subarrays -> subarray [line data]
         });
     }, [props])
-    
+
     return <Line id="graph" data={lineChartMetric} />;
 }
 
 export default LineChart;
-// module.exports = LineChart;
 
 /*
 

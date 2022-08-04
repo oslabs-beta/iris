@@ -2,10 +2,10 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
-  entry: './client/index.js',
+  entry: path.resolve(__dirname, './client/index.js'),
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, '/index.html'),
+      template: path.resolve(__dirname, 'index.html'),
       filename: 'index.html'
     }), 
     // "@babel/plugin-transform-modules-commonjs"
@@ -40,7 +40,7 @@ module.exports = {
       {
         test: /\.jsx?/,
         // exclude: /(node_modules)/,
-        exclude: path.resolve(__dirname, './node_modules'),
+        exclude: path.resolve(__dirname, '../node_modules'),
         use: {
           loader: 'babel-loader',
           options: {
@@ -51,7 +51,18 @@ module.exports = {
       {
         test: /\.s?css$/,
         use: ['style-loader', 'css-loader', 'sass-loader']
-      }
+      },
+      {
+        test: /\.png$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              mimetype: 'image/png',
+            },
+          },
+        ],
+      },
     ]
   }
 
