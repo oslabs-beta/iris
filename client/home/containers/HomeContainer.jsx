@@ -12,6 +12,24 @@ function HomeContainer(props) {
         console.log('holder, ', String(currentGraphs.length + 1))
         holder.push(<GraphContainer chartID={String(currentGraphs.length + 1)} />);
         setGraphs(holder)
+
+        const reqBody = {
+            metric: 'kafka_server_broker_topic_metrics_bytesinpersec_rate',
+            timeFrame: '5m',
+            chartID: String(currentGraphs.length + 1)
+        }
+
+        fetch('/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(reqBody)
+        })
+            .then((formattedData) => {
+                console.log(formattedData)
+            })
+            .catch(err => {
+                console.log('Error thrown in POST request in graphContainer: ', err)
+            })
     };
 
     return (
