@@ -1,96 +1,583 @@
 const db = require('./databaseModel.js');
 const fetch = require('node-fetch')
 
-const dbController = {
-  lastTimeStamp: 0,
-}
+const dbController = {}
 
-// let lastTimeStamp = 0
-// if (currTime > lastTimeStamp) {
-//   lastTimeStamp = currTime
-// }
-
-dbController.add_bytesinpersec_rate = async () => {
-  const res = await fetch(`http://localhost:9090/api/v1/query?query=kafka_server_broker_topic_metrics_bytesinpersec_rate[5m]`)
-  const data = await res.json()
-  
-  let body = `
-    INSERT INTO iris_database(key, identifier, metric, time, value)
-    VALUES `;
-  //key = identifier + metric + time 
-  const results = data.data.result;
-  console.log('Fetch results, ', results)
-  
-  results.forEach(result => {
-    if (result.metric.topic) {
-      const identifier = result.metric.topic;
-      const metric = result.metric.__name__;
-      for (let i = 0; i < result.values.length; i++) {
-        const element = result.values[i]
-        // result.values.forEach(element => {
-        const time = element[0];
-        if (time > this.lastTimeStamp) {
-          const value = element[1];
-          const key = `${identifier}%${metric}%${time}`;
-          body += `('${key}', '${identifier}', '${metric}', ${time}, ${value}), `
-          this.lastTimeStamp = time
+dbController.add_bytesinpersec_rate = (lastTimeStamp) => {
+  return fetch(`http://localhost:9090/api/v1/query?query=kafka_server_broker_topic_metrics_bytesinpersec_rate[5m]`)
+    .then(res => res.json())
+    .then(data => {
+      let body = `
+        INSERT INTO iris_database(key, identifier, metric, time, value)
+        VALUES `;
+      //key = identifier + metric + time 
+      const results = data.data.result;
+      // console.log('first run', lastTimeStamp)
+      let time;
+      results.forEach(result => {
+        if (result.metric.topic) {
+          const identifier = result.metric.topic;
+          const metric = result.metric.__name__;
+          for (let i = 0; i < result.values.length; i++) {
+            const element = result.values[i] // element = [time, value]
+            time = element[0];
+            if (time > lastTimeStamp) { // 0 -> 1659801332.432 
+              // console.log('time:', time,'timeStamp:', lastTimeStamp)
+              const value = element[1];
+              const key = `${identifier}%${metric}%${time}`;
+              body += `('${key}', '${identifier}', '${metric}', ${time}, ${value}), `
+            }
+          }
         }
-      }
-    }
-  })
+      })
 
-  body = body.slice(0,body.length-2)
-  body+=';'
-  
-  console.log('dbQuery body: ', body)
-  
-  db.query(body, (err, result) => {
-    if (err) {
-      console.log(err, 'Caught add character error');
-      return
-    }
-    console.log('finished Adding Data');
-    return
-  });
+      // Remove ', ' from last added string value
+      body = body.slice(0,body.length-2)
+      body+=';'
+      
+      // Handle if there are no available data to record and db.query tries to write an empty body
+      if (body[body.length-2] === ')') {
+        db.query(body, (err,res) => {
+          if (err) {
+            console.log(err.stack)
+          } else {
+            console.log('Successfully written to db')
+            // console.log('newTimeStamp: ', time)
+          }
+        })
+        return time
+      } 
+      else {
+        console.log('no new data uploaded to db at timeStamp: ', lastTimeStamp)
+        return lastTimeStamp 
+      }
+    })
 };
 
-dbController.add_bytesinpersec_rate()
+dbController.add_failedpartitionscount_value = (lastTimeStamp) => {
+  return fetch(`http://localhost:9090/api/v1/query?query=kafka_server_replica_fetcher_manager_failedpartitionscount_value[5m]`)
+    .then(res => res.json())
+    .then(data => {
+      let body = `
+        INSERT INTO iris_database(key, identifier, metric, time, value)
+        VALUES `;
+      //key = identifier + metric + time 
+      const results = data.data.result;
+      // console.log('first run', lastTimeStamp)
+      let time;
+      results.forEach(result => {
+        const identifier = result.metric.client_id;
+        const metric = result.metric.__name__;
+        for (let i = 0; i < result.values.length; i++) {
+          const element = result.values[i] // element = [time, value]
+          time = element[0];
+          if (time > lastTimeStamp) { // 0 -> 1659801332.432 
+            // console.log('time:', time,'timeStamp:', lastTimeStamp)
+            const value = element[1];
+            const key = `${identifier}%${metric}%${time}`;
+            body += `('${key}', '${identifier}', '${metric}', ${time}, ${value}), `
+          }
+        }
+      })
 
-/*
-SELECT * 
-FROM iris_database 
-AS ib 
-WHERE ib.identifier = 'test1'
-AND ib.metric = 'kafka_server_broker_topic_metrics_bytesinpersec_rate'
-AND ib.time > 0 
-AND ib.time <= 1659647417.471
-*/
+      // Remove ', ' from last added string value
+      body = body.slice(0,body.length-2)
+      body+=';'
+
+      // Handle if there are no available data to record and db.query tries to write an empty body
+      if (body[body.length-2] === ')') {
+        db.query(body, (err,res) => {
+          if (err) {
+            console.log(err.stack)
+          } else {
+            console.log('Successfully written to db')
+            // console.log('newTimeStamp: ', time)
+          }
+        })
+      } 
+      else {
+        console.log('no new data uploaded to db at timeStamp: ', lastTimeStamp)
+      }
+    })
+};
+
+dbController.add_maxlag_value = (lastTimeStamp) => {
+  return fetch(`http://localhost:9090/api/v1/query?query=kafka_server_replica_fetcher_manager_maxlag_value[5m]`)
+    .then(res => res.json())
+    .then(data => {
+      let body = `
+        INSERT INTO iris_database(key, identifier, metric, time, value)
+        VALUES `;
+      //key = identifier + metric + time 
+      const results = data.data.result;
+      // console.log('first run', lastTimeStamp)
+      let time;
+      results.forEach(result => {
+        const identifier = result.metric.client_id;
+        const metric = result.metric.__name__;
+        for (let i = 0; i < result.values.length; i++) {
+          const element = result.values[i] // element = [time, value]
+          time = element[0];
+          if (time > lastTimeStamp) { // 0 -> 1659801332.432 
+            // console.log('time:', time,'timeStamp:', lastTimeStamp)
+            const value = element[1];
+            const key = `${identifier}%${metric}%${time}`;
+            body += `('${key}', '${identifier}', '${metric}', ${time}, ${value}), `
+          }
+        }
+      })
+
+      // Remove ', ' from last added string value
+      body = body.slice(0,body.length-2)
+      body+=';'
+      
+      // Handle if there are no available data to record and db.query tries to write an empty body
+      if (body[body.length-2] === ')') {
+        db.query(body, (err,res) => {
+          if (err) {
+            console.log(err.stack)
+          } else {
+            console.log('Successfully written to db')
+            // console.log('newTimeStamp: ', time)
+          }
+        })
+      } 
+      else {
+        console.log('no new data uploaded to db at timeStamp: ', lastTimeStamp)
+      }
+    })
+};
+
+dbController.add_offlinereplicacount = (lastTimeStamp) => {
+  return fetch(`http://localhost:9090/api/v1/query?query=kafka_server_replica_manager_offlinereplicacount[5m]`)
+    .then(res => res.json())
+    .then(data => {
+      let body = `
+        INSERT INTO iris_database(key, identifier, metric, time, value)
+        VALUES `;
+      //key = identifier + metric + time 
+      const results = data.data.result;
+      // console.log('first run', lastTimeStamp)
+      let time;
+      results.forEach(result => {
+        const identifier = result.metric.service;
+        const metric = result.metric.__name__;
+        for (let i = 0; i < result.values.length; i++) {
+          const element = result.values[i] // element = [time, value]
+          time = element[0];
+          if (time > lastTimeStamp) { // 0 -> 1659801332.432 
+            // console.log('time:', time,'timeStamp:', lastTimeStamp)
+            const value = element[1];
+            const key = `${identifier}%${metric}%${time}`;
+            body += `('${key}', '${identifier}', '${metric}', ${time}, ${value}), `
+          }
+        }
+      })
+
+      // Remove ', ' from last added string value
+      body = body.slice(0,body.length-2)
+      body+=';'
+      
+      // Handle if there are no available data to record and db.query tries to write an empty body
+      if (body[body.length-2] === ')') {
+        db.query(body, (err,res) => {
+          if (err) {
+            console.log(err.stack)
+          } else {
+            console.log('Successfully written to db')
+            // console.log('newTimeStamp: ', time)
+          }
+        })
+      } 
+      else {
+        console.log('no new data uploaded to db at timeStamp: ', lastTimeStamp)
+      }
+    })
+};
+
+dbController.add_bytesoutpersec_rate = (lastTimeStamp) => {
+  return fetch(`http://localhost:9090/api/v1/query?query=kafka_server_broker_topic_metrics_bytesoutpersec_rate[5m]`)
+    .then(res => res.json())
+    .then(data => {
+      let body = `
+        INSERT INTO iris_database(key, identifier, metric, time, value)
+        VALUES `;
+      //key = identifier + metric + time 
+      const results = data.data.result;
+      // console.log('first run', lastTimeStamp)
+      let time;
+      results.forEach(result => {
+        if (result.metric.topic) {
+        const identifier = result.metric.topic;
+        const metric = result.metric.__name__;
+        for (let i = 0; i < result.values.length; i++) {
+          const element = result.values[i] // element = [time, value]
+          time = element[0];
+          if (time > lastTimeStamp) { // 0 -> 1659801332.432 
+            // console.log('time:', time,'timeStamp:', lastTimeStamp)
+            const value = element[1];
+            const key = `${identifier}%${metric}%${time}`;
+            body += `('${key}', '${identifier}', '${metric}', ${time}, ${value}), `
+          }
+        }
+      }
+    })
+
+      // Remove ', ' from last added string value
+      body = body.slice(0,body.length-2)
+      body+=';'
+      
+      // Handle if there are no available data to record and db.query tries to write an empty body
+      if (body[body.length-2] === ')') {
+        db.query(body, (err,res) => {
+          if (err) {
+            console.log(err.stack)
+          } else {
+            console.log('Successfully written to db')
+            // console.log('newTimeStamp: ', time)
+          }
+        })
+      } 
+      else {
+        console.log('no new data uploaded to db at timeStamp: ', lastTimeStamp)
+      }
+    })
+};
+
+dbController.add_messagesinpersec_rate = (lastTimeStamp) => {
+  return fetch(`http://localhost:9090/api/v1/query?query=kafka_server_broker_topic_metrics_messagesinpersec_rate[5m]`)
+    .then(res => res.json())
+    .then(data => {
+      let body = `
+        INSERT INTO iris_database(key, identifier, metric, time, value)
+        VALUES `;
+      //key = identifier + metric + time 
+      const results = data.data.result;
+      // console.log('first run', lastTimeStamp)
+      let time;
+      results.forEach(result => {
+        if (result.metric.topic) {
+          const identifier = result.metric.topic;
+          const metric = result.metric.__name__;
+          for (let i = 0; i < result.values.length; i++) {
+            const element = result.values[i] // element = [time, value]
+            time = element[0];
+            if (time > lastTimeStamp) { // 0 -> 1659801332.432 
+              // console.log('time:', time,'timeStamp:', lastTimeStamp)
+              const value = element[1];
+              const key = `${identifier}%${metric}%${time}`;
+              body += `('${key}', '${identifier}', '${metric}', ${time}, ${value}), `
+            }
+          }
+        }
+      })
+
+      // Remove ', ' from last added string value
+      body = body.slice(0,body.length-2)
+      body+=';'
+      
+      // Handle if there are no available data to record and db.query tries to write an empty body
+      if (body[body.length-2] === ')') {
+        db.query(body, (err,res) => {
+          if (err) {
+            console.log(err.stack)
+          } else {
+            console.log('Successfully written to db')
+            // console.log('newTimeStamp: ', time)
+          }
+        })
+      } 
+      else {
+        console.log('no new data uploaded to db at timeStamp: ', lastTimeStamp)
+      }
+    })
+};
+
+dbController.add_replicationbytesinpersec_rate = (lastTimeStamp) => {
+  return fetch(`http://localhost:9090/api/v1/query?query=kafka_server_broker_topic_metrics_replicationbytesinpersec_rate[5m]`)
+    .then(res => res.json())
+    .then(data => {
+      let body = `
+        INSERT INTO iris_database(key, identifier, metric, time, value)
+        VALUES `;
+      //key = identifier + metric + time 
+      const results = data.data.result;
+      // console.log('first run', lastTimeStamp)
+      let time;
+      results.forEach(result => {
+        const identifier = result.metric.service;
+        const metric = result.metric.__name__;
+        for (let i = 0; i < result.values.length; i++) {
+          const element = result.values[i] // element = [time, value]
+          time = element[0];
+          if (time > lastTimeStamp) { // 0 -> 1659801332.432 
+            // console.log('time:', time,'timeStamp:', lastTimeStamp)
+            const value = element[1];
+            const key = `${identifier}%${metric}%${time}`;
+            body += `('${key}', '${identifier}', '${metric}', ${time}, ${value}), `
+          }
+        }
+      })
+
+      // Remove ', ' from last added string value
+      body = body.slice(0,body.length-2)
+      body+=';'
+      
+      // Handle if there are no available data to record and db.query tries to write an empty body
+      if (body[body.length-2] === ')') {
+        db.query(body, (err,res) => {
+          if (err) {
+            console.log(err.stack)
+          } else {
+            console.log('Successfully written to db')
+            // console.log('newTimeStamp: ', time)
+          }
+        })
+      } 
+      else {
+        console.log('no new data uploaded to db at timeStamp: ', lastTimeStamp)
+      }
+    })
+};
+
+dbController.add_underreplicatedpartitions = (lastTimeStamp) => {
+  return fetch(`http://localhost:9090/api/v1/query?query=kafka_server_replica_manager_underreplicatedpartitions[5m]`)
+    .then(res => res.json())
+    .then(data => {
+      let body = `
+        INSERT INTO iris_database(key, identifier, metric, time, value)
+        VALUES `;
+      //key = identifier + metric + time 
+      const results = data.data.result;
+      // console.log('first run', lastTimeStamp)
+      let time;
+      results.forEach(result => {
+        const identifier = result.metric.service;
+        const metric = result.metric.__name__;
+        for (let i = 0; i < result.values.length; i++) {
+          const element = result.values[i] // element = [time, value]
+          time = element[0];
+          if (time > lastTimeStamp) { // 0 -> 1659801332.432 
+            // console.log('time:', time,'timeStamp:', lastTimeStamp)
+            const value = element[1];
+            const key = `${identifier}%${metric}%${time}`;
+            body += `('${key}', '${identifier}', '${metric}', ${time}, ${value}), `
+          }
+        }
+      })
+
+      // Remove ', ' from last added string value
+      body = body.slice(0,body.length-2)
+      body+=';'
+      
+      // Handle if there are no available data to record and db.query tries to write an empty body
+      if (body[body.length-2] === ')') {
+        db.query(body, (err,res) => {
+          if (err) {
+            console.log(err.stack)
+          } else {
+            console.log('Successfully written to db')
+            // console.log('newTimeStamp: ', time)
+          }
+        })
+      } 
+      else {
+        console.log('no new data uploaded to db at timeStamp: ', lastTimeStamp)
+      }
+    })
+};
+
+dbController.add_failedisrupdatespersec = (lastTimeStamp) => {
+  return fetch(`http://localhost:9090/api/v1/query?query=kafka_server_replica_manager_failedisrupdatespersec[5m]`)
+    .then(res => res.json())
+    .then(data => {
+      let body = `
+        INSERT INTO iris_database(key, identifier, metric, time, value)
+        VALUES `;
+      //key = identifier + metric + time 
+      const results = data.data.result;
+      // console.log('first run', lastTimeStamp)
+      let time;
+      results.forEach(result => {
+        const identifier = result.metric.aggregate;
+        const metric = result.metric.__name__;
+        for (let i = 0; i < result.values.length; i++) {
+          const element = result.values[i] // element = [time, value]
+          time = element[0];
+          if (time > lastTimeStamp) { // 0 -> 1659801332.432 
+            // console.log('time:', time,'timeStamp:', lastTimeStamp)
+            const value = element[1];
+            const key = `${identifier}%${metric}%${time}`;
+            body += `('${key}', '${identifier}', '${metric}', ${time}, ${value}), `
+          }
+        }
+      })
+
+      // Remove ', ' from last added string value
+      body = body.slice(0,body.length-2)
+      body+=';'
+      
+      // Handle if there are no available data to record and db.query tries to write an empty body
+      if (body[body.length-2] === ')') {
+        db.query(body, (err,res) => {
+          if (err) {
+            console.log(err.stack)
+          } else {
+            console.log('Successfully written to db')
+            // console.log('newTimeStamp: ', time)
+          }
+        })
+      } 
+      else {
+        console.log('no new data uploaded to db at timeStamp: ', lastTimeStamp)
+      }
+    })
+};
+
+dbController.add_scrapedurationseconds = (lastTimeStamp) => {
+  return fetch(`http://localhost:9090/api/v1/query?query=scrape_duration_seconds[5m]`)
+    .then(res => res.json())
+    .then(data => {
+      let body = `
+        INSERT INTO iris_database(key, identifier, metric, time, value)
+        VALUES `;
+      //key = identifier + metric + time 
+      const results = data.data.result;
+      // console.log('first run', lastTimeStamp)
+      let time;
+      results.forEach(result => {
+        const identifier = result.metric.job;
+        const metric = result.metric.__name__;
+        for (let i = 0; i < result.values.length; i++) {
+          const element = result.values[i] // element = [time, value]
+          time = element[0];
+          if (time > lastTimeStamp) { // 0 -> 1659801332.432 
+            // console.log('time:', time,'timeStamp:', lastTimeStamp)
+            const value = element[1];
+            const key = `${identifier}%${metric}%${time}`;
+            body += `('${key}', '${identifier}', '${metric}', ${time}, ${value}), `
+          }
+        }
+      })
+
+      // Remove ', ' from last added string value
+      body = body.slice(0,body.length-2)
+      body+=';'
+      
+      // Handle if there are no available data to record and db.query tries to write an empty body
+      if (body[body.length-2] === ')') {
+        db.query(body, (err,res) => {
+          if (err) {
+            console.log(err.stack)
+          } else {
+            console.log('Successfully written to db')
+            // console.log('newTimeStamp: ', time)
+          }
+        })
+      } 
+      else {
+        console.log('no new data uploaded to db at timeStamp: ', lastTimeStamp)
+      }
+    })
+};
+
+dbController.add_scrape_samples_scraped = (lastTimeStamp) => {
+  return fetch(`http://localhost:9090/api/v1/query?query=scrape_samples_scraped[5m]`)
+    .then(res => res.json())
+    .then(data => {
+      let body = `
+        INSERT INTO iris_database(key, identifier, metric, time, value)
+        VALUES `;
+      //key = identifier + metric + time 
+      const results = data.data.result;
+      // console.log('first run', lastTimeStamp)
+      let time;
+      results.forEach(result => {
+        const identifier = result.metric.job;
+        const metric = result.metric.__name__;
+        for (let i = 0; i < result.values.length; i++) {
+          const element = result.values[i] // element = [time, value]
+          time = element[0];
+          if (time > lastTimeStamp) { // 0 -> 1659801332.432 
+            // console.log('time:', time,'timeStamp:', lastTimeStamp)
+            const value = element[1];
+            const key = `${identifier}%${metric}%${time}`;
+            body += `('${key}', '${identifier}', '${metric}', ${time}, ${value}), `
+          }
+        }
+      })
+
+      // Remove ', ' from last added string value
+      body = body.slice(0,body.length-2)
+      body+=';'
+      
+      // Handle if there are no available data to record and db.query tries to write an empty body
+      if (body[body.length-2] === ')') {
+        db.query(body, (err,res) => {
+          if (err) {
+            console.log(err.stack)
+          } else {
+            console.log('Successfully written to db')
+            // console.log('newTimeStamp: ', time)
+          }
+        })
+      } 
+      else {
+        console.log('no new data uploaded to db at timeStamp: ', lastTimeStamp)
+      }
+    })
+};
+
+dbController.add_requesthandleraverageidlepercent = (lastTimeStamp) => {
+  return fetch(`http://localhost:9090/api/v1/query?query=kafka_server_request_handler_avg_idle_percent[5m]`)
+    .then(res => res.json())
+    .then(data => {
+      let body = `
+        INSERT INTO iris_database(key, identifier, metric, time, value)
+        VALUES `;
+      //key = identifier + metric + time 
+      const results = data.data.result;
+      // console.log('first run', lastTimeStamp)
+      let time;
+      results.forEach(result => {
+        const identifier = result.metric.aggregate;
+        const metric = result.metric.__name__;
+        for (let i = 0; i < result.values.length; i++) {
+          const element = result.values[i] // element = [time, value]
+          time = element[0];
+          if (time > lastTimeStamp) { // 0 -> 1659801332.432 
+            // console.log('time:', time,'timeStamp:', lastTimeStamp)
+            const value = element[1];
+            const key = `${identifier}%${metric}%${time}`;
+            body += `('${key}', '${identifier}', '${metric}', ${time}, ${value}), `
+          }
+        }
+      })
+
+      // Remove ', ' from last added string value
+      body = body.slice(0,body.length-2)
+      body+=';'
+      
+      // Handle if there are no available data to record and db.query tries to write an empty body
+      if (body[body.length-2] === ')') {
+        db.query(body, (err,res) => {
+          if (err) {
+            console.log(err.stack)
+          } else {
+            console.log('Successfully written to db')
+            // console.log('newTimeStamp: ', time)
+          }
+        })
+      } 
+      else {
+        console.log('no new data uploaded to db at timeStamp: ', lastTimeStamp)
+      }
+    })
+};
+
+module.exports = dbController;
 
 
-
-
-//copy = ${}
-
-/*
-starWarsController.addCharacter = (req, res, next) => {
-  // write code here
-  const nc = req.body;
-  const sqlAddCharacter = `
-  INSERT INTO people (name, gender,species_id, birth_year, 
-    eye_color, skin_color, hair_color, mass, height, homeworld_id)
-     VALUES ('${nc.name}', '${nc.gender}', '${nc.species_id}','${nc.birth_year}','${nc.eye_color}'
-     ,'${nc.skin_color}','${nc.hair_color}','${nc.mass}','${nc.height}','${nc.homeworld_id}')  
-  people_name = input('people name:')
-  INSERT INTO people (name)
-     VALUES (people_name)
-  `;
-  db.query(sqlAddCharacter);
-  db.query('SELECT * FROM people ORDER BY people._id DESC LIMIT 1 ').then(
-    (data) => {
-      console.log('data:', data.rows);
-    }
-  );
- */
 
 // switch (metric){
 //   case 'kafka_server_broker_topic_metrics_bytesinpersec_rate':
