@@ -56,7 +56,7 @@ io.on('connection', async (socket) => {
             socket.emit(chartID, data) //Broadcast data from query on topic of chartID
             socket.on("disconnect", () => console.log("Socket disconnect")) // disconnects socket to grab new metric data
         }
-    }, 10000) // socket.emit will send the data every fifteen second. 
+    }, 5000) // socket.emit will send the data every fifteen second. 
 })
 
 io.on('connect_error', (err) => {
