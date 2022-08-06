@@ -1,7 +1,9 @@
 const db = require('./databaseModel.js');
 const fetch = require('node-fetch')
 
-const dbController = {}
+const dbController = {
+  lastTimeStamp: 0,
+}
 
 // let lastTimeStamp = 0
 // if (currTime > lastTimeStamp) {
@@ -27,9 +29,12 @@ dbController.add_bytesinpersec_rate = async () => {
         const element = result.values[i]
         // result.values.forEach(element => {
         const time = element[0];
-        const value = element[1];
-        const key = `${identifier}%${metric}%${time}`;
-        body += `('${key}', '${identifier}', '${metric}', ${time}, ${value}), `
+        if (time > this.lastTimeStamp) {
+          const value = element[1];
+          const key = `${identifier}%${metric}%${time}`;
+          body += `('${key}', '${identifier}', '${metric}', ${time}, ${value}), `
+          this.lastTimeStamp = time
+        }
       }
     }
   })
@@ -50,6 +55,18 @@ dbController.add_bytesinpersec_rate = async () => {
 };
 
 dbController.add_bytesinpersec_rate()
+
+/*
+SELECT * 
+FROM iris_database 
+AS ib 
+WHERE ib.identifier = 'test1'
+AND ib.metric = 'kafka_server_broker_topic_metrics_bytesinpersec_rate'
+AND ib.time > 0 
+AND ib.time <= 1659647417.471
+*/
+
+
 
 
 //copy = ${}

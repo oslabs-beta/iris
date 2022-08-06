@@ -100,7 +100,7 @@ function GraphContainer(props) {
           {/* <option value="kafka_jvm_heap_usage" >Kafka JVM Heap Usage</option >
           <option value="kafka_jvm_non_heap_usage" >Kafka JVM Non-Heap Usage</option> */}
           <option value="kafka_server_broker_topic_metrics_messagesinpersec_rate" >Kafka Broker Topic Metrics Messages In Per Sec</option>
-          <option value="kafka_network_request_metrics_time_ms" >{`Kafka Network Request Time (ms)`}</option >
+          {/* <option value="kafka_network_request_metrics_time_ms" >{`Kafka Network Request Time (ms)`}</option > */}
           <option value="kafka_server_broker_topic_metrics_replicationbytesinpersec_rate" >Kafka Broker Topic Metrics replication bytes In Per Sec</option>
           <option value="kafka_server_replica_manager_underreplicatedpartitions" >Kafka Replica Manager Under Replicated Partitions</option>
           <option value="kafka_server_replica_manager_failedisrupdatespersec" >Kafka Replica Manager Failed Updates Per Second</option>
