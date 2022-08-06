@@ -12,7 +12,6 @@ function HomeContainer(props) {
         console.log('holder, ', String(currentGraphs.length + 1))
         holder.push(<GraphContainer chartID={String(currentGraphs.length + 1)} />);
         setGraphs(holder)
-
     };
 
     return (
@@ -20,8 +19,7 @@ function HomeContainer(props) {
             <button id='newGraph' onClick={createGraph}>Add a Graph</button>
             <div id='graphFeed'>{currentGraphs}</div>
         </div>
-
     )
-}
+};
 
 export default HomeContainer;

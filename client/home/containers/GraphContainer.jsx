@@ -11,7 +11,6 @@ function GraphContainer(props) {
   // Use dummy value of '1' for unit testing
   const { chartID } = props;
   // const chartID = '1';
-  // 
   const [chartData, setChartData] = useState(mock1h.data.result);
 
   console.log(chartID);
@@ -31,13 +30,12 @@ function GraphContainer(props) {
 
   async function handleChange(e) {
     // grab metric by pulling value from our select id
-    const metrics = e.target.value;
-    const timeFrame = e.target.value;
-    console.log('e.target', metric, timeFrame)
+    const metrics = e.target.parentNode.querySelector('#metric').value;
+    const timeFrame = e.target.parentNode.querySelector('#timeframe').value;
+    console.log('e.target', metrics, timeFrame)
 
     // function for later when we figure out how to rework logic
     // function (metrics, timeFrame) {
-
     // }
 
     let reqBody;
