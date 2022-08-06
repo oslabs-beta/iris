@@ -99,6 +99,16 @@ setInterval(async () => {
   }, 6000)    
   
 }, 15000)
+//------------------------------------------------------------------------------------------------------------//
+//Post request to frontend to show historical data for each Metric Chart
+app.post('/historicalData', 
+  dbController.getHistoricalData, 
+  (req, res) => {
+    const { chartID } = req.body
+    io.emit(chartID, res.locals.historicalData)
+    res.status(200).json(res.locals.historicalData)
+})
+
 
 //------------------------------------------------------------------------------------------------------------//
 // Reassign metric and timeframe based on OnChange event from frontEnd

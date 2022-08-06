@@ -1,7 +1,51 @@
 const db = require('./databaseModel.js');
 const fetch = require('node-fetch')
 
+const keys = {
+  // metric: identifier
+  kafka_server_broker_topic_metrics_bytesinpersec_rate: 'topic',
+  kafka_server_replica_fetcher_manager_failedpartitionscount_value: 'client_id',
+  // TODO: Insert other metric key pairs
+}
+
 const dbController = {}
+
+dbController.getHistoricalData = (req, res) => {
+  const {metric, timeStart, timeEnd} = req.body
+  
+  const body = `SELECT * 
+    FROM iris_database AS ib
+    WHERE ib.time >= ${timeStart} 
+      AND ib.time <= ${timeEnd}
+      AND ib.metric = '${metric}'
+  `
+
+  db.query(body, (err, result) => {
+    if (err) {
+      return next(err);
+    }
+    console.log(result);
+    // TODO: Format the data to pass in to the frontend graph
+    /**
+     * results: [
+     *  {
+     *    metric: {
+     *      keys[metric]: identifier
+     *    },
+     *    values : [
+     *      [time, value],
+     *      [time, value], 
+     *       ...
+     *    ]
+     *  }
+     * ]
+     */
+
+    res.locals.historicalData = result
+    return next();
+  });
+}
+
 
 dbController.add_bytesinpersec_rate = (lastTimeStamp) => {
   return fetch(`http://localhost:9090/api/v1/query?query=kafka_server_broker_topic_metrics_bytesinpersec_rate[5m]`)
@@ -110,7 +154,6 @@ dbController.add_maxlag_value = (lastTimeStamp) => {
         VALUES `;
       //key = identifier + metric + time 
       const results = data.data.result;
-      // console.log('first run', lastTimeStamp)
       let time;
       results.forEach(result => {
         const identifier = result.metric.client_id;
@@ -119,7 +162,6 @@ dbController.add_maxlag_value = (lastTimeStamp) => {
           const element = result.values[i] // element = [time, value]
           time = element[0];
           if (time > lastTimeStamp) { // 0 -> 1659801332.432 
-            // console.log('time:', time,'timeStamp:', lastTimeStamp)
             const value = element[1];
             const key = `${identifier}%${metric}%${time}`;
             body += `('${key}', '${identifier}', '${metric}', ${time}, ${value}), `
@@ -138,7 +180,6 @@ dbController.add_maxlag_value = (lastTimeStamp) => {
             console.log(err.stack)
           } else {
             console.log('Successfully written to db')
-            // console.log('newTimeStamp: ', time)
           }
         })
       } 
