@@ -9,33 +9,33 @@ const socket = io();
 function GraphContainer(props) {
   // Exposed props.chartID when creating chart at Page Level Component
   // Use dummy value of '1' for unit testing
-  // const { chartID } = props;
-  const chartID = '1';
-
+  const { chartID } = props;
+  // const chartID = '1';
   const [chartData, setChartData] = useState(mock1h.data.result);
+
+  console.log(chartID);
 
   socket.on('connect', () => {
     console.log('socket connected')
   });
 
-  socket.on(chartID, (data) => {
+  socket.on(chartID, (data) => { 
     setChartData(data)
-    // console.log('after setting chartData: ', chartData)
+    console.log('after setting chartData: ', chartData)
   });
 
   socket.on('connect_error', (err) => {
     console.log(`connect_error due to ${err.message}`);
   });
 
-  async function handleClick() {
-
+  async function handleChange(e) {
     // grab metric by pulling value from our select id
-    const metrics = document.getElementById('metric').value;
-    const timeFrame = document.getElementById('timeframe').value;
+    const metrics = e.target.parentNode.querySelector('#metric').value;
+    const timeFrame = e.target.parentNode.querySelector('#timeframe').value;
+    console.log('e.target', metrics, timeFrame)
 
     // function for later when we figure out how to rework logic
     // function (metrics, timeFrame) {
-
     // }
 
     let reqBody;
@@ -84,7 +84,7 @@ function GraphContainer(props) {
     //   }
     // }
 
-    // console.log('reqBody: ', reqBody)
+    console.log('reqBody: ', reqBody)
 
     await fetch('/', {
       method: 'POST',
@@ -109,7 +109,7 @@ function GraphContainer(props) {
 
       <div className="selectDropdown">
         {/* metrics */}
-        <select id='metric' onChange={handleClick}>
+        <select id='metric' onChange={(e) => handleChange(e)}>
           <option value="">Metric</option>
           {/* histogram unless specified both hist/pie */}
           <option value="kafka_server_replica_fetcher_manager_maxlag_value" >Kafka Replica Fetcher Manager Max Lag</option >
@@ -121,7 +121,7 @@ function GraphContainer(props) {
           {/* <option value="kafka_jvm_heap_usage" >Kafka JVM Heap Usage</option >
           <option value="kafka_jvm_non_heap_usage" >Kafka JVM Non-Heap Usage</option> */}
           <option value="kafka_server_broker_topic_metrics_messagesinpersec_rate" >Kafka Broker Topic Metrics Messages In Per Sec</option>
-          <option value="kafka_network_request_metrics_time_ms" >{`Kafka Network Request Time (ms)`}</option >
+          {/* <option value="kafka_network_request_metrics_time_ms" >{`Kafka Network Request Time (ms)`}</option > */}
           <option value="kafka_server_broker_topic_metrics_replicationbytesinpersec_rate" >Kafka Broker Topic Metrics replication bytes In Per Sec</option>
           <option value="kafka_server_replica_manager_underreplicatedpartitions" >Kafka Replica Manager Under Replicated Partitions</option>
           <option value="kafka_server_replica_manager_failedisrupdatespersec" >Kafka Replica Manager Failed Updates Per Second</option>
@@ -135,7 +135,7 @@ function GraphContainer(props) {
         </select>
 
         {/* timeframe */}
-        <select id='timeframe' onChange={handleClick}>
+        <select id='timeframe' onChange={(e) => handleChange(e)}>
           <option value="">Timeframe</option>
           <option value="1m">1m</option>
           <option value="5m">5m</option>

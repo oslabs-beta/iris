@@ -48,6 +48,15 @@ function LineChart(props) {
             if (results[j].metric.topic) {
                 topicData[results[j].metric.topic] = results[j].values;
             }
+            else if (results[j].metric.aggregate) {
+                topicData[results[j].metric.aggregate] = results[j].values;
+            }
+            else if (results[j].metric.client_id) {
+                topicData[results[j].metric.client_id] = results[j].values;
+            }
+            else if (results[j].metric.service) {
+                topicData[results[j].metric.service] = results[j].values;
+            }
         }
 
         // need to update for labels (time) and data (metric)
