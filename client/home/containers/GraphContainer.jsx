@@ -30,7 +30,7 @@ function GraphContainer(props) {
   // functionality to change graph here -> dropdown to select from different graphs
   // dynamic update
   async function handleChartChange(e) {
-
+    console.log('handleChartChange: ', e.target.value);
   }
 
   async function handleDynamicMetrics(e) {
@@ -145,6 +145,11 @@ function GraphContainer(props) {
           <option value="12h">12h</option>
         </select>
 
+        <select id='graphChoice' onChange={(e) => handleChartChange(e)}>
+          <option value="line">Line Chart</option>
+          <option value="bar">Bar Chart</option>
+          <option value="pie">Pie Chart</option>
+        </select>
       </div>
 
       {/* <select id='historicalTime' onChange={(e) => handleHistoricalMetrics(e)}>
