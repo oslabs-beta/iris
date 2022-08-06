@@ -1,16 +1,16 @@
 import React, { Component, useState, useEffect } from 'react';
-import { Line } from 'react-chartjs-2';
+import { Line, Bar } from 'react-chartjs-2';
 import Chart from 'chart.js/auto';
 import mock1h from '../../dummyData/mockData_1h';
 import mock6h from '../../dummyData/mockData_6h';
 
 
 // no need for axios request, will be passed as props later
-function LineChart(props) {
+function Graph(props) {
     // deconstruct chartData
     const { chartData } = props;
 
-    const [lineChartMetric, updateLine] = useState({
+    const [GraphMetric, updateGraph] = useState({
         // labels will be for date -> most likely going to do a cache arr as date.time
         labels: ['filler'],
         datasets: [
@@ -19,7 +19,10 @@ function LineChart(props) {
                 data: [0],
                 borderColor: "gray"
             }
-        ]
+        ],
+        // config: {
+        //     type: type,
+        // }
     });
 
     // function to generate random colors for our chartjs lines
@@ -52,7 +55,7 @@ function LineChart(props) {
 
         // need to update for labels (time) and data (metric)
         // parse through valueArray and house our timestampArr and metricsArr
-        const lineChartData = []
+        const GraphData = []
         const timestampArr = [];
         let metricsArr = [];
         let timeArrBuilt = false;
@@ -69,7 +72,7 @@ function LineChart(props) {
             // given times for all metrics are the same after pull, only aggregate once
             timeArrBuilt = true;
 
-            lineChartData.push({
+            GraphData.push({
                 label: topic,
                 data: metricsArr,
                 borderColor: getRandomColor()
@@ -77,26 +80,29 @@ function LineChart(props) {
             // reset for next topic
             metricsArr = [];
         }
-        return [timestampArr, lineChartData]
+        return [timestampArr, GraphData]
     }
 
     useEffect(() => {
         // for mockdata
-        // const [timestampArr, lineChartData] = convertKafkatoChart(mock1h.data.result)
-        const [timestampArr, lineChartData] = convertKafkatoChart(chartData)
+        // const [timestampArr, GraphData] = convertKafkatoChart(mock1h.data.result)
+        const [timestampArr, GraphData] = convertKafkatoChart(chartData)
 
-        // set our state - updateLine with our new time stamps and metrics data
-        updateLine({
+        // set our state - updateGraph with our new time stamps and metrics data
+        updateGraph({
             // labels will be for date -> most likely going to do a cache arr as date.time
             labels: timestampArr,
-            datasets: lineChartData // this is an array of 3 subarrays -> subarray [line data]
+            datasets: GraphData, // this is an array of 3 subarrays -> subarray [line data]
+            // config: `${type}` // figure it out later for refactor
         });
+
+        console.log(GraphMetric)
     }, [props])
 
-    return <Line id="graph" data={lineChartMetric} />;
+    return <Line id="graph" data={GraphMetric} />;
 }
 
-export default LineChart;
+export default Graph;
 
 /*
 
@@ -115,7 +121,7 @@ async function getNewMetrics(metric) {
         .catch(err => console.log(`some error occurred while grabbing data from ${metric}: ${err}`));
 
     // modify for time and metrics - boilerplate for now
-    updateLine({
+    updateGraph({
         // labels will be for date -> most likely going to do a cache arr as date.time
         labels: Object.keys(currMetrics).reverse(),
         datasets: [{

@@ -4,13 +4,15 @@ import GraphContainer from './GraphContainer.jsx';
 function HomeContainer(props) {
     // implement adding new graphs logic 
     // always want one graph
-    const [currentGraphs, setGraphs] = useState([<GraphContainer chartID={'1'} />]);
+    const [currentGraphs, setGraphs] = useState([]);
 
     // function that will create new graphs onClick button id = newGraph
-    function createGraph() {
+    function createGraph(e) {
+        // const type = e.target.id.slice(3);
+        // console.log('type', type)
         const holder = [...currentGraphs];
         console.log('holder, ', String(currentGraphs.length + 1))
-        holder.push(<GraphContainer chartID={String(currentGraphs.length + 1)} />);
+        holder.push(<GraphContainer chartID={String(currentGraphs.length + 1)} key = {`graphContainer${currentGraphs.length + 1}`}/>);
         setGraphs(holder)
 
         const reqBody = {
@@ -34,7 +36,8 @@ function HomeContainer(props) {
 
     return (
         <div className='homePage'>
-            <button id='newGraph' onClick={createGraph}>Add a Graph</button>
+            <button id='newGraphContainer' onClick={(e) => createGraph(e)}>Add a Graph</button>
+            {/* <button id='newBar' onClick={(e) => createGraph(e)}>Add a Histogram</button> */}
             <div id='graphFeed'>{currentGraphs}</div>
         </div>
     )
