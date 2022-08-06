@@ -1,19 +1,19 @@
 import React, { Component, useState, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
-import LineChart from '../components/LineChart.jsx';
+import LineChart from '../components/charts/LineChart.jsx';
 import io from 'socket.io-client';
 import mock1h from '../dummyData/mockData_1h';
-
 
 const socket = io();
 
 function GraphContainer(props) {
   // Exposed props.chartID when creating chart at Page Level Component
   // Use dummy value of '1' for unit testing
-  // const chartID = props.chartID
-  const chartID = '1'
-  
+  const { chartID } = props;
+  // const chartID = '1';
   const [chartData, setChartData] = useState(mock1h.data.result);
+
+  console.log(chartID);
 
   socket.on('connect', () => {
     console.log('socket connected')
@@ -23,62 +23,83 @@ function GraphContainer(props) {
     setChartData(data)
     console.log('after setting chartData: ', chartData)
   });
-  
+
   socket.on('connect_error', (err) => {
     console.log(`connect_error due to ${err.message}`);
   });
 
-  async function handleClick() {
-    // store for return
-    let results;
-
+  async function handleChange(e) {
     // grab metric by pulling value from our select id
-    const metrics = document.getElementById('metric').value;
-    const timeFrame = document.getElementById('timeframe').value; 
+    const metrics = e.target.parentNode.querySelector('#metric').value;
+    const timeFrame = e.target.parentNode.querySelector('#timeframe').value;
+    console.log('e.target', metrics, timeFrame)
+
+    // function for later when we figure out how to rework logic
+    // function (metrics, timeFrame) {
+    // }
 
     let reqBody;
 
-    // logic is wrong but we'll fix
-    if (metrics === 'noChoice' && timeFrame === 'noChoice') { 
-      alert("Must Choose a Metric and Timeframe") 
+    // FIX CHART ID 
+    if (metrics === '' && timeFrame === '') {
+      alert("Must Choose a Metric and Timeframe")
       return;
     }
-    else if (metrics !== 'noChoice' && timeFrame === 'noChoice') {
+    if (metrics !== '' && timeFrame === '') {
       reqBody = {
         metric: metrics,
         timeFrame: '5m',
-        chartID: '1'
+        chartID: chartID
       }
     }
-    else if (metrics === 'noChoice' && timeFrame !== 'noChoice') {
+    else if (metrics === '' && timeFrame !== '') {
       reqBody = {
         metric: 'kafka_server_replica_fetcher_manager_maxlag_value',
         timeFrame: timeFrame,
-        chartID: '1'
+        chartID: chartID
       }
     }
     else {
       reqBody = {
         metric: metrics,
         timeFrame: timeFrame,
-        chartID: '1'
+        chartID: chartID
       }
     }
+    // if (metrics === '' && timeFrame === '') {
+    //   alert("Must Choose a Metric and Timeframe")
+    //   return;
+    // }
+    // if (metrics !== '' && timeFrame === '') {
+    //   reqBody.metric = document.getElementById('metric').value;
+    // }
+    // if (metrics === '' && timeFrame !== '') {
+    //   reqBody.timeFrame = document.getElementById('timeframe').value;
+    // }
+    // if (metrics !== '' && timeFrame !== '') {
+    //   reqBody.metric = {
+    //     metric: document.getElementById('metric').value,
+    //     timeFrame: document.getElementById('timeframe').value,
+    //     chartID: '1'
+    //   }
+    // }
 
-    // console.log('reqBody: ',reqBody)
+    console.log('reqBody: ', reqBody)
 
     await fetch('/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(reqBody)
-      })
+    })
       .then((formattedData) => {
-          console.log(formattedData)
+        console.log(formattedData)
       })
       .catch(err => {
-          console.log('Error thrown in POST request in graphContainer: ', err)
+        console.log('Error thrown in POST request in graphContainer: ', err)
       })
-    return results;
+
+    // breakout of function
+    return;
   }
 
   // return our render
@@ -88,8 +109,8 @@ function GraphContainer(props) {
 
       <div className="selectDropdown">
         {/* metrics */}
-        <select id='metric' onChange={handleClick}>
-          <option value="noChoice">Metric</option>
+        <select id='metric' onChange={(e) => handleChange(e)}>
+          <option value="">Metric</option>
           {/* histogram unless specified both hist/pie */}
           <option value="kafka_server_replica_fetcher_manager_maxlag_value" >Kafka Replica Fetcher Manager Max Lag</option >
           <option value="kafka_server_request_handler_avg_idle_percent" >Kafka Request Handler Average Idle Percentage</option>
@@ -100,7 +121,7 @@ function GraphContainer(props) {
           {/* <option value="kafka_jvm_heap_usage" >Kafka JVM Heap Usage</option >
           <option value="kafka_jvm_non_heap_usage" >Kafka JVM Non-Heap Usage</option> */}
           <option value="kafka_server_broker_topic_metrics_messagesinpersec_rate" >Kafka Broker Topic Metrics Messages In Per Sec</option>
-          <option value="kafka_network_request_metrics_time_ms" >{`Kafka Network Request Time (ms)`}</option >
+          {/* <option value="kafka_network_request_metrics_time_ms" >{`Kafka Network Request Time (ms)`}</option > */}
           <option value="kafka_server_broker_topic_metrics_replicationbytesinpersec_rate" >Kafka Broker Topic Metrics replication bytes In Per Sec</option>
           <option value="kafka_server_replica_manager_underreplicatedpartitions" >Kafka Replica Manager Under Replicated Partitions</option>
           <option value="kafka_server_replica_manager_failedisrupdatespersec" >Kafka Replica Manager Failed Updates Per Second</option>
@@ -114,8 +135,8 @@ function GraphContainer(props) {
         </select>
 
         {/* timeframe */}
-        <select id='timeframe' onChange = {handleClick}>
-          <option value="noChoice">Timeframe</option>
+        <select id='timeframe' onChange={(e) => handleChange(e)}>
+          <option value="">Timeframe</option>
           <option value="1m">1m</option>
           <option value="5m">5m</option>
           <option value="15m">15m</option>
@@ -128,7 +149,8 @@ function GraphContainer(props) {
         </select>
       </div>
 
-      <LineChart chartData={chartData}/>
+      <LineChart chartData={chartData} />
+
     </div>
   )
 }
