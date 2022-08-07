@@ -55,3 +55,15 @@ services:
      - ./etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     command: "--config.file=/etc/prometheus/prometheus.yml"
     container_name: prometheus
+#   postgres:
+#     image: postgres:10.3
+#     restart: always
+#     environment:
+#       - POSTGRES_USER=iris_admin
+#       - POSTGRES_PASSWORD=password
+#     volumes:
+#       - postgres:/var/lib/postgresql/data
+#     ports:
+#       - '5432:5432'
+# volumes:
+#   postgres:
