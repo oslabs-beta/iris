@@ -1,11 +1,16 @@
 import React, { Component, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import testlogo from '../assets/IRIS.png'
+import irisLogo from '../assets/IRIS_logo_v1.png'
+import irisName from '../assets/IRIS_name_v1.png'
 
 function NavBar() {
     return (
         <nav className='navbar'>
-            <a href='/' className='site-title'><img src={testlogo} id = "iris-logo"/>IRIS</a>
+            <div className="logo">
+                <a href='/' className='site-logo'><img src={irisLogo} id = "iris-logo"/></a>
+                <a href='/' className='site-title'><img src={irisName} id = "iris-logo"/></a>
+            </div>
+
             <ul>
                 <li>
                     <a href='/home'>Metrics</a>
