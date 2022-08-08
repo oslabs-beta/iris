@@ -1,36 +1,56 @@
 body {
   height: 100vh;
-  background: linear-gradient(0deg, rgba(74,48,54,1) 16%, rgba(156,96,104,1) 41%, rgba(214,170,153,1) 67%, rgba(207,168,155,1) 82%, rgba(163,163,177,1) 100%);
+  background: linear-gradient(0deg, rgba(74, 48, 54, 1) 16%, rgba(156, 96, 104, 1) 41%, rgba(214, 170, 153, 1) 67%, rgba(207, 168, 155, 1) 82%, rgba(163, 163, 177, 1) 100%);
   background-attachment: fixed;
-  .homePage {
+
+  #homePage {
     margin-top: 70px;
-    button#newGraph {
-      position: fixed;
-      right: 2%;
-      border: none;
-      background: none;
-      &:hover {
+
+    display: flex;
+    flex-direction: flex-start;
+
+
+    #leftPane {
+      width: 25%;
+    }
+
+    #rightPane {
+      width: 75%;
+
+      button#newGraph {
+        position: fixed;
+        right: 2%;
+        border: none;
+        background: none;
+
         &:hover {
-          transform: scale(1.1);
-          transition-duration: 300ms;
-          cursor: pointer;
-        }
-        &:not(:hover) {
+          &:hover {
+            transform: scale(1.1);
+            transition-duration: 300ms;
+            cursor: pointer;
+          }
+
+          &:not(:hover) {
             transition-duration: 600ms;
+          }
+        }
+      }
+
+      #graphFeed {
+        padding: 0% 5%;
+        display: grid;
+        grid: auto / repeat(2, 1fr);
+        gap: 8px;
+
+        #graphContainer:nth-child(3n+1) {
+          grid-column: span 2;
+        }
+
+        #graphContainer:nth-child(3n) {
+          grid-column: span 1;
         }
       }
     }
-    #graphFeed {
-      padding: 0% 10%;
-      display: grid;
-      grid: auto / repeat(2, 1fr);
-      gap: 8px;
-      #graphContainer:nth-child(3n+1) {
-        grid-column: span 2;
-      }
-      #graphContainer:nth-child(3n){
-        grid-column: span 1;
-      }
-    }
+
   }
 }

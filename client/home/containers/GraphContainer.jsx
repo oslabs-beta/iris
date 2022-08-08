@@ -13,13 +13,13 @@ function GraphContainer(props) {
   // const chartID = '1';
   const [chartData, setChartData] = useState(mock1h.data.result);
 
-  console.log(chartID);
+  // console.log(chartID);
 
   socket.on('connect', () => {
     console.log('socket connected')
   });
 
-  socket.on(chartID, (data) => { 
+  socket.on(chartID, (data) => {
     setChartData(data)
     console.log('after setting chartData: ', chartData)
   });
@@ -147,6 +147,11 @@ function GraphContainer(props) {
           <option value="6h">6h</option>
           <option value="12h">12h</option>
         </select>
+
+        {/* historical timeframe
+        leave as input fields for now */}
+
+
       </div>
 
       <LineChart chartData={chartData} />
