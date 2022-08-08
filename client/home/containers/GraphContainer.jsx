@@ -12,7 +12,7 @@ function GraphContainer(props) {
   // const chartID = '1';
   const [chartData, setChartData] = useState(mock1h.data.result);
 
-  console.log(chartID);
+  // console.log(chartID);
 
   socket.on('connect', () => {
     console.log('socket connected')
@@ -118,7 +118,7 @@ function GraphContainer(props) {
           {/* <option value="kafka_jvm_heap_usage" >Kafka JVM Heap Usage</option >
           <option value="kafka_jvm_non_heap_usage" >Kafka JVM Non-Heap Usage</option> */}
           <option value="kafka_server_broker_topic_metrics_messagesinpersec_rate" >Kafka Broker Topic Metrics Messages In Per Sec</option>
-          <option value="kafka_network_request_metrics_time_ms" >{`Kafka Network Request Time (ms)`}</option >
+          {/* <option value="kafka_network_request_metrics_time_ms" >{`Kafka Network Request Time (ms)`}</option > */}
           <option value="kafka_server_broker_topic_metrics_replicationbytesinpersec_rate" >Kafka Broker Topic Metrics replication bytes In Per Sec</option>
           <option value="kafka_server_replica_manager_underreplicatedpartitions" >Kafka Replica Manager Under Replicated Partitions</option>
           <option value="kafka_server_replica_manager_failedisrupdatespersec" >Kafka Replica Manager Failed Updates Per Second</option>
@@ -144,19 +144,13 @@ function GraphContainer(props) {
           <option value="6h">6h</option>
           <option value="12h">12h</option>
         </select>
-
-        <select id='graphChoice' onChange={(e) => handleChartChange(e)}>
-          <option value="line">Line Chart</option>
-          <option value="bar">Bar Chart</option>
-          <option value="pie">Pie Chart</option>
-        </select>
       </div>
 
       {/* <select id='historicalTime' onChange={(e) => handleHistoricalMetrics(e)}>
         <option value="timeStart"></option>
         <option value="timeEnd"></option>
       </select> */}
-{/* 
+      {/* 
       <form>
         <label for="start-time">Start Time:</label>
         <input type="text" id="starttime" name="starttime" value="12:00:00AM"></input>

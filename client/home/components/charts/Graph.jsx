@@ -10,7 +10,11 @@ function Graph(props) {
     // deconstruct chartData
     const { chartData } = props;
 
+<<<<<<< HEAD:client/home/components/charts/LineChart.jsx
+    const [chartMetric, updateLine] = useState({
+=======
     const [GraphMetric, updateGraph] = useState({
+>>>>>>> 7518d7cf773dec310c315a92beb2a0114ce3fa33:client/home/components/charts/Graph.jsx
         // labels will be for date -> most likely going to do a cache arr as date.time
         labels: ['filler'],
         datasets: [
@@ -20,9 +24,12 @@ function Graph(props) {
                 borderColor: "gray"
             }
         ],
+<<<<<<< HEAD:client/home/components/charts/LineChart.jsx
+=======
         // config: {
         //     type: type,
         // }
+>>>>>>> 7518d7cf773dec310c315a92beb2a0114ce3fa33:client/home/components/charts/Graph.jsx
     });
 
     // function to generate random colors for our chartjs lines
@@ -50,6 +57,15 @@ function Graph(props) {
         for (let j = 0; j < results.length; j++) {
             if (results[j].metric.topic) {
                 topicData[results[j].metric.topic] = results[j].values;
+            }
+            else if (results[j].metric.aggregate) {
+                topicData[results[j].metric.aggregate] = results[j].values;
+            }
+            else if (results[j].metric.client_id) {
+                topicData[results[j].metric.client_id] = results[j].values;
+            }
+            else if (results[j].metric.service) {
+                topicData[results[j].metric.service] = results[j].values;
             }
         }
 
@@ -92,6 +108,41 @@ function Graph(props) {
         updateGraph({
             // labels will be for date -> most likely going to do a cache arr as date.time
             labels: timestampArr,
+<<<<<<< HEAD:client/home/components/charts/LineChart.jsx
+            datasets: lineChartData, // this is an array of 3 subarrays -> subarray [line data]
+        });
+
+    }, [props])
+
+    const options = {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: 'TOP SECRET: ITAR RESTRICTED DATA',
+            },
+        },
+        background: 'rgba(0, 54, 0, 1)',
+    }
+    // return new Chart('LineChart', {
+    //     id: 'LineChart',
+    //     type: 'line',
+    //     data: chartMetric,
+    //     options: options
+    // })
+
+    return (
+        <>
+            <Line id="lineChart" options={options} data={chartMetric} />
+        </>
+    )
+}
+
+export default LineChart;
+=======
             datasets: GraphData, // this is an array of 3 subarrays -> subarray [line data]
             // config: `${type}` // figure it out later for refactor
         });
@@ -137,3 +188,4 @@ async function getNewMetrics(metric) {
 setInterval(getNewMetrics(metric), 3000);
 
 */
+>>>>>>> 7518d7cf773dec310c315a92beb2a0114ce3fa33:client/home/components/charts/Graph.jsx

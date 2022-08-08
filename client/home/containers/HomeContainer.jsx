@@ -1,7 +1,15 @@
 import React, { Component, useState, useEffect } from 'react';
-import GraphContainer from './GraphContainer.jsx';
+import RightPane from './RightPane.jsx';
+import LeftPane from './LeftPane.jsx';
+
 
 function HomeContainer(props) {
+<<<<<<< HEAD
+    return (
+        <div id='homePage'>
+            <LeftPane />
+            <RightPane />
+=======
     // implement adding new graphs logic 
     // always want one graph
     const [currentGraphs, setGraphs] = useState([]);
@@ -39,6 +47,7 @@ function HomeContainer(props) {
             <button id='newGraphContainer' onClick={(e) => createGraph(e)}>Add a Graph</button>
             {/* <button id='newBar' onClick={(e) => createGraph(e)}>Add a Histogram</button> */}
             <div id='graphFeed'>{currentGraphs}</div>
+>>>>>>> 7518d7cf773dec310c315a92beb2a0114ce3fa33
         </div>
     )
 };
