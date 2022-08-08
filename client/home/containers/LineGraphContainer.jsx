@@ -5,7 +5,7 @@ import mock1h from '../dummyData/mockData_1h';
 
 const socket = io();
 
-function GraphContainer(props) {
+function LineGraphContainer(props) {
   // Exposed props.chartID when creating chart at Page Level Component
   // Use dummy value of '1' for unit testing
   const { chartID } = props;
@@ -26,12 +26,6 @@ function GraphContainer(props) {
   socket.on('connect_error', (err) => {
     console.log(`connect_error due to ${err.message}`);
   });
-
-  // functionality to change graph here -> dropdown to select from different graphs
-  // dynamic update
-  async function handleChartChange(e) {
-    console.log('handleChartChange: ', e.target.value);
-  }
 
   async function handleDynamicMetrics(e) {
     // grab metric by pulling value from our select id
@@ -90,14 +84,14 @@ function GraphContainer(props) {
     return;
   }
 
-  async function handleHistoricalMetrics(e) {
-    console.log('starting historical metric fetch')
+  // async function handleHistoricalMetrics(e) {
+  //   console.log('starting historical metric fetch')
 
-    const startTime = e.target.parentNode.querySelector('#starttime').value
-    const endTime = e.target.parentNode.querySelector('#endtime').value
+  //   const startTime = e.target.parentNode.querySelector('#starttime').value
+  //   const endTime = e.target.parentNode.querySelector('#endtime').value
 
-    console.log(startTime, endTime)
-  }
+  //   console.log(startTime, endTime)
+  // }
 
   // return our render
   // need 2 drop downs -> 1) metrics, 2) timeframe
@@ -168,4 +162,4 @@ function GraphContainer(props) {
   )
 }
 
-export default GraphContainer;
+export default LineGraphContainer;
