@@ -1,5 +1,5 @@
 import React, { Component, useState, useEffect } from 'react';
-import Graph from '../components/charts/Graph.jsx';
+import LineChart from '../components/charts/LineChart.jsx';
 import io from 'socket.io-client';
 import mock1h from '../dummyData/mockData_1h';
 
@@ -162,7 +162,7 @@ function GraphContainer(props) {
       {/* historical timeframe to post */}
       {/* drop in nice clock or calender from api or we make */}
 
-      <Graph chartData={chartData} />
+      <LineChart chartData={chartData} />
 
     </div>
   )

@@ -1,16 +1,16 @@
 import React, { Component, useState, useEffect } from 'react';
-import { Line, Bar } from 'react-chartjs-2';
+import { Line, Bar, Pie } from 'react-chartjs-2';
 import Chart from 'chart.js/auto';
 import mock1h from '../../dummyData/mockData_1h';
 import mock6h from '../../dummyData/mockData_6h';
 
 
 // no need for axios request, will be passed as props later
-function Graph(props) {
+function LineChart(props) {
     // deconstruct chartData
     const { chartData } = props;
 
-    const [GraphMetric, updateGraph] = useState({
+    const [chartMetric, updateLine] = useState({
         // labels will be for date -> most likely going to do a cache arr as date.time
         labels: ['filler'],
         datasets: [
@@ -20,10 +20,10 @@ function Graph(props) {
                 borderColor: "gray"
             }
         ],
-        // config: {
-        //     type: type,
-        // }
     });
+
+    // state to render chart each time
+    const [currentChart, updateChart] = useState(<Line id="graph" options={options} data={chartMetric} />);
 
     // function to generate random colors for our chartjs lines
     function getRandomColor() {
@@ -64,7 +64,7 @@ function Graph(props) {
 
         // need to update for labels (time) and data (metric)
         // parse through valueArray and house our timestampArr and metricsArr
-        const GraphData = []
+        const lineChartData = []
         const timestampArr = [];
         let metricsArr = [];
         let timeArrBuilt = false;
@@ -81,68 +81,78 @@ function Graph(props) {
             // given times for all metrics are the same after pull, only aggregate once
             timeArrBuilt = true;
 
-            GraphData.push({
+            lineChartData.push({
                 label: topic,
+                // type: handleChartChange(),
                 data: metricsArr,
                 borderColor: getRandomColor()
             });
             // reset for next topic
             metricsArr = [];
         }
-        return [timestampArr, GraphData]
+        return [timestampArr, lineChartData]
+    }
+
+    async function handleChartChange(e) {
+        const chartType = e.target.value
+        console.log('Chart will change to: ', chartType);
+
+        if (chartType === 'line') {
+            // update state to config for line
+            updateChart(<Line id="graph" options={options} data={chartMetric} />)
+        }
+        else if (chartType === 'bar') {
+            // update state to config for bar
+            updateChart(<Bar id="graph" options={options} data={chartMetric} />)
+        }
+        else if (chartType === 'pie') {
+            // update state to config for pie
+            updateChart(<Pie id="graph" options={options} data={chartMetric} />)
+        }
+        // update our state with new config
+        // return currentChart;
     }
 
     useEffect(() => {
         // for mockdata
-        // const [timestampArr, GraphData] = convertKafkatoChart(mock1h.data.result)
-        const [timestampArr, GraphData] = convertKafkatoChart(chartData)
+        // const [timestampArr, lineChartData] = convertKafkatoChart(mock1h.data.result)
+        const [timestampArr, lineChartData] = convertKafkatoChart(chartData)
 
-        // set our state - updateGraph with our new time stamps and metrics data
-        updateGraph({
+        // set our state - updateLine with our new time stamps and metrics data
+        updateLine({
             // labels will be for date -> most likely going to do a cache arr as date.time
             labels: timestampArr,
-            datasets: GraphData, // this is an array of 3 subarrays -> subarray [line data]
-            // config: `${type}` // figure it out later for refactor
+            datasets: lineChartData, // this is an array of 3 subarrays -> subarray [line data]
+            // type: currentChart
         });
 
-        console.log(GraphMetric)
     }, [props])
 
-    return <Line id="graph" data={GraphMetric} />;
+    const options = {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: 'TOP SECRET: ITAR RESTRICTED DATA',
+            },
+        },
+        background: 'rgba(0, 54, 0, 1)',
+    }
+    // return new Chart('graph', {
+    //     id: 'graph',
+    //     type: 'line',
+    //     data: chartMetric,
+    //     options: options
+    // })
+
+    return (
+        <>
+            <Line id='graph' options={options} data={chartMetric} />
+        </>
+    )
 }
 
-export default Graph;
-
-/*
-
-// metrics housed in state and also for our chartjs plots
-const [currMetrics, setMetrics] = useState();
-
-// grab data - currently dummyData from process_cpu_user_seconds_total
-// fetch request to our query - using prom client
-const metric = 'process_cpu_user_seconds_total'
-async function getNewMetrics(metric) {
-    let data = [];
-
-    // need the endpoint - most likely will be {ip}:5556/query..{metric}
-    axios.get(`localhost:5556/${metric}`)
-        .then(data => setMetrics(data))
-        .catch(err => console.log(`some error occurred while grabbing data from ${metric}: ${err}`));
-
-    // modify for time and metrics - boilerplate for now
-    updateGraph({
-        // labels will be for date -> most likely going to do a cache arr as date.time
-        labels: Object.keys(currMetrics).reverse(),
-        datasets: [{
-            label: 'Price',
-            data: Object.values(currMetrics).map(data => Number.data),
-            borderColor: "gray",
-        }],
-    })
-
-}
-
-//metric will be modifiable
-setInterval(getNewMetrics(metric), 3000);
-
-*/
+export default LineChart;
