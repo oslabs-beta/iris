@@ -1,5 +1,5 @@
 // const db = require('./databaseModel.js');
-const db = require('./pg.js');
+const db = require('./pg.ts');
 const fetch = require('node-fetch')
 
 const keys = {

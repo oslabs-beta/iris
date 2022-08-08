@@ -102,7 +102,27 @@ function LineChart(props) {
         });
     }, [props])
 
-    return <Line id="graph" data={lineChartMetric} />;
+    const options = {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top',
+          },
+          title: {
+            display: true,
+            text: 'TOP SECRET: ITAR RESTRICTED DATA',
+          },
+        },
+        background: 'rgba(0, 54, 0, 1)',
+    }
+    // return new Chart('graph', {
+    //     id: 'graph',
+    //     type: 'line',
+    //     data: lineChartMetric,
+    //     options: options
+    // })
+
+    return <Line id="graph" options={options} data={lineChartMetric} />;
 }
 
 export default LineChart;
