@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Switch, Route, Redirect, Routes } from 'react-router-dom';
-
 import HomeContainer from './home/containers/HomeContainer.jsx';
 import NavBar from './home/components/NavBar.jsx';
 
@@ -11,7 +10,6 @@ import './stylesheets/application.scss';
 // import Signup from './Signup.jsx';
 // import HomeContainer from './HomeContainer.jsx';
 // import GraphContainer'./GraphContainer.jsx';
-
 
 function App(props) {
 

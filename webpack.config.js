@@ -34,7 +34,9 @@ module.exports = {
     path: path.resolve(__dirname, 'build'),
     clean: true
   },
-
+  resolve: {
+    extensions: ['.tsx', '.ts','.jsx', '.js', ],
+  },
   module: {
     rules: [
       {
@@ -47,6 +49,11 @@ module.exports = {
             presets: ['@babel/preset-env', '@babel/preset-react']
           }
         }
+      },
+      {
+        test: /\.ts(x)?$/,
+        loader: 'ts-loader',
+        exclude: /node_modules/,
       },
       {
         test: /\.s?css$/,
