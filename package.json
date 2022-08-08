@@ -25,6 +25,7 @@
     "@babel/core": "^7.18.10",
     "@babel/preset-env": "^7.18.10",
     "@babel/preset-react": "^7.18.6",
+    "@prisma/client": "^4.1.1",
     "avsc": "^5.7.4",
     "aws-sdk": "^2.1188.0",
     "babel-loader": "^8.2.5",

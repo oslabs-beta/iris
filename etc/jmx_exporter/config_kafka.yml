@@ -453,6 +453,10 @@ rules:
   # JVM Memory
   - pattern: java.lang<type=Memory><HeapMemoryUsage>(\w*)
     name: kafka_jvm_heap_usage
+    # TEST***********
+    type: HISTOGRAM
+    buckets: [1, 2, 3]
+    # ENDTEST ********
     labels:
       type: $1
       service: kafka-broker
