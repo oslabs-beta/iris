@@ -1,18 +1,18 @@
 import React, { Component, useState, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
-import GraphContainer from './GraphContainer';
-import LineChart from '../components/charts/LineChart.jsx';
+import LineGraphContainer from './LineGraphContainer';
+// import LineChart from '../components/charts/LineChart.jsx';
 
 function RightPane(props) {
     // implement adding new graphs logic 
     // always want one graph
-    const [currentGraphs, setGraphs] = useState([<GraphContainer chartID={'1'} />]);
+    const [currentGraphs, setGraphs] = useState([<LineGraphContainer chartID={'1'} />]);
 
     // function that will create new graphs onClick button id = newGraph
     function createGraph() {
         const holder = [...currentGraphs];
         console.log('holder, ', String(currentGraphs.length + 1))
-        holder.push(<GraphContainer chartID={String(currentGraphs.length + 1)} />);
+        holder.push(<LineGraphContainer chartID={String(currentGraphs.length + 1)} />);
         setGraphs(holder)
 
         const reqBody = {

@@ -22,9 +22,6 @@ function LineChart(props) {
         ],
     });
 
-    // state to render chart each time
-    const [currentChart, updateChart] = useState(<Line id="graph" options={options} data={chartMetric} />);
-
     // function to generate random colors for our chartjs lines
     function getRandomColor() {
         let letters = '0123456789ABCDEF'.split('');
@@ -83,7 +80,6 @@ function LineChart(props) {
 
             lineChartData.push({
                 label: topic,
-                // type: handleChartChange(),
                 data: metricsArr,
                 borderColor: getRandomColor()
             });
@@ -93,37 +89,15 @@ function LineChart(props) {
         return [timestampArr, lineChartData]
     }
 
-    async function handleChartChange(e) {
-        const chartType = e.target.value
-        console.log('Chart will change to: ', chartType);
-
-        if (chartType === 'line') {
-            // update state to config for line
-            updateChart(<Line id="graph" options={options} data={chartMetric} />)
-        }
-        else if (chartType === 'bar') {
-            // update state to config for bar
-            updateChart(<Bar id="graph" options={options} data={chartMetric} />)
-        }
-        else if (chartType === 'pie') {
-            // update state to config for pie
-            updateChart(<Pie id="graph" options={options} data={chartMetric} />)
-        }
-        // update our state with new config
-        // return currentChart;
-    }
-
     useEffect(() => {
         // for mockdata
         // const [timestampArr, lineChartData] = convertKafkatoChart(mock1h.data.result)
         const [timestampArr, lineChartData] = convertKafkatoChart(chartData)
-
         // set our state - updateLine with our new time stamps and metrics data
         updateLine({
             // labels will be for date -> most likely going to do a cache arr as date.time
             labels: timestampArr,
             datasets: lineChartData, // this is an array of 3 subarrays -> subarray [line data]
-            // type: currentChart
         });
 
     }, [props])
@@ -141,16 +115,10 @@ function LineChart(props) {
         },
         background: 'rgba(0, 54, 0, 1)',
     }
-    // return new Chart('graph', {
-    //     id: 'graph',
-    //     type: 'line',
-    //     data: chartMetric,
-    //     options: options
-    // })
 
     return (
         <>
-            <Line id='graph' options={options} data={chartMetric} />
+            <Line id='lineGraph' options={options} data={chartMetric} />
         </>
     )
 }
