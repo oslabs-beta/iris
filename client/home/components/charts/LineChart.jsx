@@ -48,6 +48,15 @@ function LineChart(props) {
             if (results[j].metric.topic) {
                 topicData[results[j].metric.topic] = results[j].values;
             }
+            else if (results[j].metric.aggregate) {
+                topicData[results[j].metric.aggregate] = results[j].values;
+            }
+            else if (results[j].metric.client_id) {
+                topicData[results[j].metric.client_id] = results[j].values;
+            }
+            else if (results[j].metric.service) {
+                topicData[results[j].metric.service] = results[j].values;
+            }
         }
 
         // need to update for labels (time) and data (metric)
@@ -93,7 +102,27 @@ function LineChart(props) {
         });
     }, [props])
 
-    return <Line id="graph" data={lineChartMetric} />;
+    const options = {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top',
+          },
+          title: {
+            display: true,
+            text: 'TOP SECRET: ITAR RESTRICTED DATA',
+          },
+        },
+        background: 'rgba(0, 54, 0, 1)',
+    }
+    // return new Chart('graph', {
+    //     id: 'graph',
+    //     type: 'line',
+    //     data: lineChartMetric,
+    //     options: options
+    // })
+
+    return <Line id="graph" options={options} data={lineChartMetric} />;
 }
 
 export default LineChart;
