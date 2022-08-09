@@ -1,0 +1,50 @@
+#graphContainer {
+  font-family: Garet Book;
+  display: grid;
+  grid-template-areas: "dropdown"
+    "graph";
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.7);
+  margin: 8px;
+
+  .selectDropdown {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    grid-area: dropdown;
+    text-align: center;
+    margin-top: 2%;
+
+    select {
+      font-family: Garet Book;
+      border: 1px solid rgb(43, 43, 43);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.286);
+
+      &#metric {
+        width: 65%;
+        margin-right: 2%;
+      }
+
+      &#timeFrame {
+        width: 25%;
+      }
+
+      &:focus {
+        outline: none;
+      }
+    }
+
+    #deleteButton {
+      align-self: flex-end;
+      justify-content: flex-start;
+
+    }
+  }
+
+  #lineGraph {
+    grid-area: graph;
+
+  }
+
+}
