@@ -63,7 +63,7 @@ io.on('connection', async (socket) => {
     socket.emit('kafka_jvm_non_heap_usage', JVMNonHeapUsage)
     // console.log('Data after first socket connection for JVM_Heap:' , JVMHeapUsage[0].values)
     // console.log('Data after first socket connection for JVM_Non_Heap:' , JVMNonHeapUsage[0].values)
-    socket.on("disconnect", () => console.log("Socket disconnect"))
+    // socket.on("disconnect", () => console.log("Socket disconnect"))
 
     //query and emit data for linecharts
     for (const [chartID, query] of Object.entries(chartsData)) {
