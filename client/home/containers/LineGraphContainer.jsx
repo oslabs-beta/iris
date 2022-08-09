@@ -10,10 +10,8 @@ function LineGraphContainer(props) {
   // Exposed props.chartID when creating chart at Page Level Component
   // Use dummy value of '1' for unit testing
   const { chartID } = props;
-  // const chartID = '1';
   const [chartData, setChartData] = useState(mock1h.data.result);
 
-  // console.log(chartID);
 
   socket.on('connect', () => {
     console.log('socket connected')
@@ -21,7 +19,6 @@ function LineGraphContainer(props) {
 
   socket.on(chartID, (data) => {
     setChartData(data)
-    // console.log('after setting chartData: ', chartData)
   });
 
   socket.on('connect_error', (err) => {
@@ -32,11 +29,6 @@ function LineGraphContainer(props) {
     // grab metric by pulling value from our select id
     const metrics = e.target.parentNode.querySelector('#metric').value;
     const timeFrame = e.target.parentNode.querySelector('#timeframe').value;
-    console.log('e.target', metrics, timeFrame)
-
-    // function for later when we figure out how to rework logic
-    // function (metrics, timeFrame) {
-    // }
 
     let reqBody;
 
@@ -89,27 +81,24 @@ function LineGraphContainer(props) {
     // need to target the chart with chartID 
     // more like deleting graphContainer
     const chartToDelete = e.target.parentNode.parentNode
-    // console.log('chartID: ', chartID)
-    // console.log(chartToDelete);
-
     // remove from DOM
     chartToDelete.remove();
 
     console.log(JSON.stringify({ chartID: chartID }));
 
     // fetch request with POST to backend so backend can process the socket.off    
-    // fetch('/delete', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ chartID: chartID })
-    // })
-    //   .then((response) => {
-    //     console.log(response)
-    //   })
-    //   .catch(err => {
-    //     console.log('Error thrown in POST request  in graphContainer: ', err)
-    //   })
-
+    fetch('/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chartID: chartID })
+    })
+      .then(res => res.json())
+      .then((data) => {
+        console.log(data)
+      })
+      .catch(err => {
+        console.log('Error thrown in POST request  in graphContainer: ', err)
+      })
     // no return;
   }
 

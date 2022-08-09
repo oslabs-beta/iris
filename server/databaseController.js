@@ -21,7 +21,7 @@ const keys = {
 const dbController = {}
 
 dbController.getHistoricalData = (req, res) => {
-  const {metric, timeStart, timeEnd} = req.body
+  const { metric, timeStart, timeEnd } = req.body
 
   const body = `SELECT * 
     FROM iris_database AS ib
@@ -85,24 +85,24 @@ dbController.add_bytesinpersec_rate = (lastTimeStamp) => {
       })
 
       // Remove ', ' from last added string value
-      body = body.slice(0,body.length-2)
-      body+=';'
-      
+      body = body.slice(0, body.length - 2)
+      body += ';'
+
       // Handle if there are no available data to record and db.query tries to write an empty body
-      if (body[body.length-2] === ')') {
-        db.query(body, (err,res) => {
+      if (body[body.length - 2] === ')') {
+        db.query(body, (err, res) => {
           if (err) {
-            console.log(err.stack)
+            console.log('Error in dbController.add_bytesinpersec_rate: cannot overwrite data in AWS')
           } else {
             console.log('Successfully written to db')
             // console.log('newTimeStamp: ', time)
           }
         })
         return time
-      } 
+      }
       else {
         console.log('no new data uploaded to db at timeStamp: ', lastTimeStamp)
-        return lastTimeStamp 
+        return lastTimeStamp
       }
     })
 };
@@ -134,20 +134,20 @@ dbController.add_failedpartitionscount_value = (lastTimeStamp) => {
       })
 
       // Remove ', ' from last added string value
-      body = body.slice(0,body.length-2)
-      body+=';'
+      body = body.slice(0, body.length - 2)
+      body += ';'
 
       // Handle if there are no available data to record and db.query tries to write an empty body
-      if (body[body.length-2] === ')') {
-        db.query(body, (err,res) => {
+      if (body[body.length - 2] === ')') {
+        db.query(body, (err, res) => {
           if (err) {
-            console.log(err.stack)
+            console.log('Error in dbController.add_failedpartitionscount_value: cannot overwrite data in AWS')
           } else {
             console.log('Successfully written to db')
             // console.log('newTimeStamp: ', time)
           }
         })
-      } 
+      }
       else {
         console.log('no new data uploaded to db at timeStamp: ', lastTimeStamp)
       }
@@ -179,19 +179,19 @@ dbController.add_maxlag_value = (lastTimeStamp) => {
       })
 
       // Remove ', ' from last added string value
-      body = body.slice(0,body.length-2)
-      body+=';'
-      
+      body = body.slice(0, body.length - 2)
+      body += ';'
+
       // Handle if there are no available data to record and db.query tries to write an empty body
-      if (body[body.length-2] === ')') {
-        db.query(body, (err,res) => {
+      if (body[body.length - 2] === ')') {
+        db.query(body, (err, res) => {
           if (err) {
-            console.log(err.stack)
+            console.log('Error in dbController.add_maxlag_value: cannot overwrite data in AWS')
           } else {
             console.log('Successfully written to db')
           }
         })
-      } 
+      }
       else {
         console.log('no new data uploaded to db at timeStamp: ', lastTimeStamp)
       }
@@ -225,20 +225,20 @@ dbController.add_offlinereplicacount = (lastTimeStamp) => {
       })
 
       // Remove ', ' from last added string value
-      body = body.slice(0,body.length-2)
-      body+=';'
-      
+      body = body.slice(0, body.length - 2)
+      body += ';'
+
       // Handle if there are no available data to record and db.query tries to write an empty body
-      if (body[body.length-2] === ')') {
-        db.query(body, (err,res) => {
+      if (body[body.length - 2] === ')') {
+        db.query(body, (err, res) => {
           if (err) {
-            console.log(err.stack)
+            console.log('Error in dbController.add_offlinereplicacount: cannot overwrite data in AWS')
           } else {
             console.log('Successfully written to db')
             // console.log('newTimeStamp: ', time)
           }
         })
-      } 
+      }
       else {
         console.log('no new data uploaded to db at timeStamp: ', lastTimeStamp)
       }
@@ -258,36 +258,36 @@ dbController.add_bytesoutpersec_rate = (lastTimeStamp) => {
       let time;
       results.forEach(result => {
         if (result.metric.topic) {
-        const identifier = result.metric.topic;
-        const metric = result.metric.__name__;
-        for (let i = 0; i < result.values.length; i++) {
-          const element = result.values[i] // element = [time, value]
-          time = element[0];
-          if (time > lastTimeStamp) { // 0 -> 1659801332.432 
-            // console.log('time:', time,'timeStamp:', lastTimeStamp)
-            const value = element[1];
-            const key = `${identifier}%${metric}%${time}`;
-            body += `('${key}', '${identifier}', '${metric}', ${time}, ${value}), `
+          const identifier = result.metric.topic;
+          const metric = result.metric.__name__;
+          for (let i = 0; i < result.values.length; i++) {
+            const element = result.values[i] // element = [time, value]
+            time = element[0];
+            if (time > lastTimeStamp) { // 0 -> 1659801332.432 
+              // console.log('time:', time,'timeStamp:', lastTimeStamp)
+              const value = element[1];
+              const key = `${identifier}%${metric}%${time}`;
+              body += `('${key}', '${identifier}', '${metric}', ${time}, ${value}), `
+            }
           }
         }
-      }
-    })
+      })
 
       // Remove ', ' from last added string value
-      body = body.slice(0,body.length-2)
-      body+=';'
-      
+      body = body.slice(0, body.length - 2)
+      body += ';'
+
       // Handle if there are no available data to record and db.query tries to write an empty body
-      if (body[body.length-2] === ')') {
-        db.query(body, (err,res) => {
+      if (body[body.length - 2] === ')') {
+        db.query(body, (err, res) => {
           if (err) {
-            console.log(err.stack)
+            console.log('Error in dbController.add_bytesoutpersec_rate: cannot overwrite data in AWS')
           } else {
             console.log('Successfully written to db')
             // console.log('newTimeStamp: ', time)
           }
         })
-      } 
+      }
       else {
         console.log('no new data uploaded to db at timeStamp: ', lastTimeStamp)
       }
@@ -323,20 +323,20 @@ dbController.add_messagesinpersec_rate = (lastTimeStamp) => {
       })
 
       // Remove ', ' from last added string value
-      body = body.slice(0,body.length-2)
-      body+=';'
-      
+      body = body.slice(0, body.length - 2)
+      body += ';'
+
       // Handle if there are no available data to record and db.query tries to write an empty body
-      if (body[body.length-2] === ')') {
-        db.query(body, (err,res) => {
+      if (body[body.length - 2] === ')') {
+        db.query(body, (err, res) => {
           if (err) {
-            console.log(err.stack)
+            console.log('Error in dbController.add_messagesinpersec_rate: ,cannot overwrite data in AWS')
           } else {
             console.log('Successfully written to db')
             // console.log('newTimeStamp: ', time)
           }
         })
-      } 
+      }
       else {
         console.log('no new data uploaded to db at timeStamp: ', lastTimeStamp)
       }
@@ -370,20 +370,20 @@ dbController.add_replicationbytesinpersec_rate = (lastTimeStamp) => {
       })
 
       // Remove ', ' from last added string value
-      body = body.slice(0,body.length-2)
-      body+=';'
-      
+      body = body.slice(0, body.length - 2)
+      body += ';'
+
       // Handle if there are no available data to record and db.query tries to write an empty body
-      if (body[body.length-2] === ')') {
-        db.query(body, (err,res) => {
+      if (body[body.length - 2] === ')') {
+        db.query(body, (err, res) => {
           if (err) {
-            console.log(err.stack)
+            console.log('Error in dbController.add_replicationbytesinpersec_rate: cannot overwrite data in AWS')
           } else {
             console.log('Successfully written to db')
             // console.log('newTimeStamp: ', time)
           }
         })
-      } 
+      }
       else {
         console.log('no new data uploaded to db at timeStamp: ', lastTimeStamp)
       }
@@ -417,20 +417,20 @@ dbController.add_underreplicatedpartitions = (lastTimeStamp) => {
       })
 
       // Remove ', ' from last added string value
-      body = body.slice(0,body.length-2)
-      body+=';'
-      
+      body = body.slice(0, body.length - 2)
+      body += ';'
+
       // Handle if there are no available data to record and db.query tries to write an empty body
-      if (body[body.length-2] === ')') {
-        db.query(body, (err,res) => {
+      if (body[body.length - 2] === ')') {
+        db.query(body, (err, res) => {
           if (err) {
-            console.log(err.stack)
+            console.log('Error in dbController.add_underreplicatedpartitions: cannot overwrite data in AWS')
           } else {
             console.log('Successfully written to db')
             // console.log('newTimeStamp: ', time)
           }
         })
-      } 
+      }
       else {
         console.log('no new data uploaded to db at timeStamp: ', lastTimeStamp)
       }
@@ -464,20 +464,20 @@ dbController.add_failedisrupdatespersec = (lastTimeStamp) => {
       })
 
       // Remove ', ' from last added string value
-      body = body.slice(0,body.length-2)
-      body+=';'
-      
+      body = body.slice(0, body.length - 2)
+      body += ';'
+
       // Handle if there are no available data to record and db.query tries to write an empty body
-      if (body[body.length-2] === ')') {
-        db.query(body, (err,res) => {
+      if (body[body.length - 2] === ')') {
+        db.query(body, (err, res) => {
           if (err) {
-            console.log(err.stack)
+            console.log('dbController.add_failedisrupdatespersec: cannot overwrite data in AWS')
           } else {
             console.log('Successfully written to db')
             // console.log('newTimeStamp: ', time)
           }
         })
-      } 
+      }
       else {
         console.log('no new data uploaded to db at timeStamp: ', lastTimeStamp)
       }
@@ -511,20 +511,20 @@ dbController.add_scrapedurationseconds = (lastTimeStamp) => {
       })
 
       // Remove ', ' from last added string value
-      body = body.slice(0,body.length-2)
-      body+=';'
-      
+      body = body.slice(0, body.length - 2)
+      body += ';'
+
       // Handle if there are no available data to record and db.query tries to write an empty body
-      if (body[body.length-2] === ')') {
-        db.query(body, (err,res) => {
+      if (body[body.length - 2] === ')') {
+        db.query(body, (err, res) => {
           if (err) {
-            console.log(err.stack)
+            console.log('dbController.add_scrapedurationsecondscannot overwrite data in AWS')
           } else {
             console.log('Successfully written to db')
             // console.log('newTimeStamp: ', time)
           }
         })
-      } 
+      }
       else {
         console.log('no new data uploaded to db at timeStamp: ', lastTimeStamp)
       }
@@ -558,20 +558,20 @@ dbController.add_scrape_samples_scraped = (lastTimeStamp) => {
       })
 
       // Remove ', ' from last added string value
-      body = body.slice(0,body.length-2)
-      body+=';'
-      
+      body = body.slice(0, body.length - 2)
+      body += ';'
+
       // Handle if there are no available data to record and db.query tries to write an empty body
-      if (body[body.length-2] === ')') {
-        db.query(body, (err,res) => {
+      if (body[body.length - 2] === ')') {
+        db.query(body, (err, res) => {
           if (err) {
-            console.log(err.stack)
+            console.log('dbController.add_scrape_samples_scraped:cannot overwrite data in AWS')
           } else {
             console.log('Successfully written to db')
             // console.log('newTimeStamp: ', time)
           }
         })
-      } 
+      }
       else {
         console.log('no new data uploaded to db at timeStamp: ', lastTimeStamp)
       }
@@ -605,20 +605,20 @@ dbController.add_requesthandleraverageidlepercent = (lastTimeStamp) => {
       })
 
       // Remove ', ' from last added string value
-      body = body.slice(0,body.length-2)
-      body+=';'
-      
+      body = body.slice(0, body.length - 2)
+      body += ';'
+
       // Handle if there are no available data to record and db.query tries to write an empty body
-      if (body[body.length-2] === ')') {
-        db.query(body, (err,res) => {
+      if (body[body.length - 2] === ')') {
+        db.query(body, (err, res) => {
           if (err) {
-            console.log(err.stack)
+            console.log('Error in dbController.add_requesthandleraverageidlepercent: cannot overwrite data in AWS')
           } else {
             console.log('Successfully written to db')
             // console.log('newTimeStamp: ', time)
           }
         })
-      } 
+      }
       else {
         console.log('no new data uploaded to db at timeStamp: ', lastTimeStamp)
       }
@@ -627,24 +627,3 @@ dbController.add_requesthandleraverageidlepercent = (lastTimeStamp) => {
 
 module.exports = dbController;
 
-
-
-// switch (metric){
-//   case 'kafka_server_broker_topic_metrics_bytesinpersec_rate':
-//   case 'kafka_server_replica_fetcher_manager_failedpartitionscount_value':
-//   case 'kafka_server_replica_fetcher_manager_maxlag_value':
-//   case 'kafka_server_replica_manager_offlinereplicacount':
-//   case 'kafka_server_broker_topic_metrics_bytesinpersec_rate': // no topic for the result[0]
-//   case 'kafka_server_broker_topic_metrics_bytesoutpersec_rate': // no topic for the result[0]
-//   case 'kafka_server_broker_topic_metrics_messagesinpersec_rate': // no topic for the result[0]
-//   case 'kafka_server_broker_topic_metrics_replicationbytesinpersec_rate':
-//   case 'kafka_server_replica_manager_underreplicatedpartitions':
-//   case 'kafka_server_replica_manager_failedisrupdatespersec':
-//   case 'scrape_duration_seconds': // no topic at all => frontEnd will default to "job": "kafka"
-//   case 'scrape_samples_scraped': // no topic at all => frontEnd will default to "job": "kafka"
-//       // console.log('switch case ', metric, data.data.result)    
-//       return data.data.result
-//   case 'kafka_server_request_handler_avg_idle_percent': // no topic at all => frontEnd will default to "job": "kafka"
-//       // console.log('kafka_server_request_handler_avg_idle_percent: ', [data.data.result[4]])
-//       return [data.data.result[4]]
-// }
