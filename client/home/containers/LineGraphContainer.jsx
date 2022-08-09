@@ -1,34 +1,33 @@
 import React, { Component, useState, useEffect } from 'react';
-import { Line } from 'react-chartjs-2';
 import LineChart from '../components/charts/LineChart.jsx';
 import io from 'socket.io-client';
 import mock1h from '../dummyData/mockData_1h';
 
 const socket = io();
 
-function GraphContainer(props) {
+function LineGraphContainer(props) {
   // Exposed props.chartID when creating chart at Page Level Component
   // Use dummy value of '1' for unit testing
   const { chartID } = props;
   // const chartID = '1';
   const [chartData, setChartData] = useState(mock1h.data.result);
 
-  console.log(chartID);
+  // console.log(chartID);
 
   socket.on('connect', () => {
     console.log('socket connected')
   });
 
-  socket.on(chartID, (data) => { 
+  socket.on(chartID, (data) => {
     setChartData(data)
-    console.log('after setting chartData: ', chartData)
+    // console.log('after setting chartData: ', chartData)
   });
 
   socket.on('connect_error', (err) => {
     console.log(`connect_error due to ${err.message}`);
   });
 
-  async function handleChange(e) {
+  async function handleDynamicMetrics(e) {
     // grab metric by pulling value from our select id
     const metrics = e.target.parentNode.querySelector('#metric').value;
     const timeFrame = e.target.parentNode.querySelector('#timeframe').value;
@@ -66,23 +65,6 @@ function GraphContainer(props) {
         chartID: chartID
       }
     }
-    // if (metrics === '' && timeFrame === '') {
-    //   alert("Must Choose a Metric and Timeframe")
-    //   return;
-    // }
-    // if (metrics !== '' && timeFrame === '') {
-    //   reqBody.metric = document.getElementById('metric').value;
-    // }
-    // if (metrics === '' && timeFrame !== '') {
-    //   reqBody.timeFrame = document.getElementById('timeframe').value;
-    // }
-    // if (metrics !== '' && timeFrame !== '') {
-    //   reqBody.metric = {
-    //     metric: document.getElementById('metric').value,
-    //     timeFrame: document.getElementById('timeframe').value,
-    //     chartID: '1'
-    //   }
-    // }
 
     console.log('reqBody: ', reqBody)
 
@@ -102,6 +84,15 @@ function GraphContainer(props) {
     return;
   }
 
+  // async function handleHistoricalMetrics(e) {
+  //   console.log('starting historical metric fetch')
+
+  //   const startTime = e.target.parentNode.querySelector('#starttime').value
+  //   const endTime = e.target.parentNode.querySelector('#endtime').value
+
+  //   console.log(startTime, endTime)
+  // }
+
   // return our render
   // need 2 drop downs -> 1) metrics, 2) timeframe
   return (
@@ -109,7 +100,7 @@ function GraphContainer(props) {
 
       <div className="selectDropdown">
         {/* metrics */}
-        <select id='metric' onChange={(e) => handleChange(e)}>
+        <select id='metric' onChange={(e) => handleDynamicMetrics(e)}>
           <option value="">Metric</option>
           {/* histogram unless specified both hist/pie */}
           <option value="kafka_server_replica_fetcher_manager_maxlag_value" >Kafka Replica Fetcher Manager Max Lag</option >
@@ -135,7 +126,7 @@ function GraphContainer(props) {
         </select>
 
         {/* timeframe */}
-        <select id='timeframe' onChange={(e) => handleChange(e)}>
+        <select id='timeframe' onChange={(e) => handleDynamicMetrics(e)}>
           <option value="">Timeframe</option>
           <option value="1m">1m</option>
           <option value="5m">5m</option>
@@ -149,10 +140,26 @@ function GraphContainer(props) {
         </select>
       </div>
 
+      {/* <select id='historicalTime' onChange={(e) => handleHistoricalMetrics(e)}>
+        <option value="timeStart"></option>
+        <option value="timeEnd"></option>
+      </select> */}
+      {/* 
+      <form>
+        <label for="start-time">Start Time:</label>
+        <input type="text" id="starttime" name="starttime" value="12:00:00AM"></input>
+        <label for="end-time">End Time:</label>
+        <input type="text" id="endtime" name="endtime" value="12:00:00PM"></input>
+        <input type="submit" value="Submit" onSubmit={(e) => handleHistoricalMetrics(e)}></input>
+      </form>  */}
+
+      {/* historical timeframe to post */}
+      {/* drop in nice clock or calender from api or we make */}
+
       <LineChart chartData={chartData} />
 
     </div>
   )
 }
 
-export default GraphContainer;
+export default LineGraphContainer;

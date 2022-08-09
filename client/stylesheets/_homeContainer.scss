@@ -1,36 +1,68 @@
 body {
   height: 100vh;
-  background: linear-gradient(0deg, rgba(74,48,54,1) 16%, rgba(156,96,104,1) 41%, rgba(214,170,153,1) 67%, rgba(207,168,155,1) 82%, rgba(163,163,177,1) 100%);
+  background: linear-gradient(0deg, rgba(74, 48, 54, 1) 16%, rgba(156, 96, 104, 1) 41%, rgba(214, 170, 153, 1) 67%, rgba(207, 168, 155, 1) 82%, rgba(163, 163, 177, 1) 100%);
   background-attachment: fixed;
-  .homePage {
+
+  #homePage {
     margin-top: 70px;
-    button#newGraph {
+
+    display: flex;
+    flex-direction: flex-start;
+
+
+    #leftPane {
       position: fixed;
-      right: 2%;
-      border: none;
-      background: none;
-      &:hover {
+      width: 30%;
+      margin-left: 1%;
+      #barGraph {
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 8px;
+        margin-top: 5%;
+        padding: 8px;
+        canvas {
+          background: rgba(255, 255, 255, 0);
+          margin-top: 0%;
+        }
+      }
+    }
+
+    #rightPane {
+      width: 70%;
+      margin-left: 30%;
+      button#newGraph {
+        position: fixed;
+        right: 2%;
+        border: none;
+        background: none;
+
         &:hover {
-          transform: scale(1.1);
-          transition-duration: 300ms;
-          cursor: pointer;
-        }
-        &:not(:hover) {
+          &:hover {
+            transform: scale(1.1);
+            transition-duration: 300ms;
+            cursor: pointer;
+          }
+
+          &:not(:hover) {
             transition-duration: 600ms;
+          }
+        }
+      }
+
+      #graphFeed {
+        padding: 0% 5%;
+        display: grid;
+        grid: auto / repeat(2, 1fr);
+        gap: 8px;
+
+        #graphContainer:nth-child(3n+1) {
+          grid-column: span 2;
+        }
+
+        #graphContainer:nth-child(3n) {
+          grid-column: span 1;
         }
       }
     }
-    #graphFeed {
-      padding: 0% 10%;
-      display: grid;
-      grid: auto / repeat(2, 1fr);
-      gap: 8px;
-      #graphContainer:nth-child(3n+1) {
-        grid-column: span 2;
-      }
-      #graphContainer:nth-child(3n){
-        grid-column: span 1;
-      }
-    }
+
   }
 }
