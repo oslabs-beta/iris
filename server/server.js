@@ -43,13 +43,13 @@ const io = require('socket.io')(server, {
 // Connecting with Socket.io and sending data socket.emit to the front end
 io.on('connection', async (socket) => {
   console.log('a user connected')
-  const JVMHeapUsage = await getHistogram('kafka_jvm_heap_usage','1h', 20) 
-  const JVMNonHeapUsage = await getHistogram('kafka_jvm_non_heap_usage','1h', 20);
+  const JVMHeapUsage = await getHistogram('kafka_jvm_heap_usage', '1h', 20)
+  const JVMNonHeapUsage = await getHistogram('kafka_jvm_non_heap_usage', '1h', 20);
   socket.emit('kafka_jvm_heap_usage', JVMHeapUsage)
-    console.log('first connection for histogram - JVM HEAP line 49', JVMHeapUsage)
+  // console.log('first connection for histogram - JVM HEAP line 49', JVMHeapUsage)
   socket.emit('kafka_jvm_non_heap_usage', JVMNonHeapUsage)
-    console.log('first connection for histogram - JVM Non-HEAP line 51', JVMNonHeapUsage)
-  for (const [chartID, query] of Object.entries(chartsData)){
+  // console.log('first connection for histogram - JVM Non-HEAP line 51', JVMNonHeapUsage)
+  for (const [chartID, query] of Object.entries(chartsData)) {
     const data = await queryData(query.metric, query.timeFrame)
     socket.emit(chartID, data) //Broadcast data from query on topic of chartID
   }
@@ -57,19 +57,21 @@ io.on('connection', async (socket) => {
   // setInterval is for sending data to the frontend every X seconds.
   setInterval(async () => {
     // Query and emit data for JVM_HEAP_USAGE (HISTOGRAM) and JVM_NON_HEAP_USAGE (HISTOGRAM)
-    const JVMHeapUsage = await getHistogram('kafka_jvm_heap_usage','1h', 20) 
-    const JVMNonHeapUsage = await getHistogram('kafka_jvm_non_heap_usage','1h', 20);
+    const JVMHeapUsage = await getHistogram('kafka_jvm_heap_usage', '1h', 20)
+    const JVMNonHeapUsage = await getHistogram('kafka_jvm_non_heap_usage', '1h', 20);
     socket.emit('kafka_jvm_heap_usage', JVMHeapUsage)
     socket.emit('kafka_jvm_non_heap_usage', JVMNonHeapUsage)
-    console.log('Data after first socket connection for JVM_Heap:' , JVMHeapUsage)
-    
+    // console.log('Data after first socket connection for JVM_Heap:' , JVMHeapUsage[0].values)
+    // console.log('Data after first socket connection for JVM_Non_Heap:' , JVMNonHeapUsage[0].values)
+    socket.on("disconnect", () => console.log("Socket disconnect"))
+
     //query and emit data for linecharts
-    for (const [chartID, query] of Object.entries(chartsData)){
+    for (const [chartID, query] of Object.entries(chartsData)) {
       const data = await queryData(query.metric, query.timeFrame)
       socket.emit(chartID, data) //Broadcast data from query on topic of chartID
       socket.on("disconnect", () => console.log("Socket disconnect")) // disconnects socket to grab new metric data
     }
-  }, 5000) // socket.emit will send the data every five second. 
+  }, 10000) // socket.emit will send the data every five second. 
 })
 
 //------------------------------------------------------------------------------------------------------------//
@@ -79,41 +81,42 @@ io.on('connect_error', (err) => {
 });
 
 //------------------------------------------------------------------------------------------------------------//
+//*THIS BLOCKS ARE FOR ADDING METRICS DATA TO THE DATABASE */
 // Query data from API endpoint and write data to database
 // Existing database is not overwritten and does not present conflicts 
 // LastTimeStamp variable tracked to check the last time data was queried and written
-let lastTimeStamp = 0;
+// let lastTimeStamp = 0;
 //setInterval to query data and store in backend every 15s.
-setInterval(async () => {
-  setTimeout(async() => {
-    await dbController.add_failedpartitionscount_value(lastTimeStamp);
-    await dbController.add_maxlag_value(lastTimeStamp);
-    await dbController.add_bytesoutpersec_rate(lastTimeStamp);
-    // console.log('db after 0 sec')
-  }, 0)
+// setInterval(async () => {
+//   setTimeout(async () => {
+//     await dbController.add_failedpartitionscount_value(lastTimeStamp);
+//     await dbController.add_maxlag_value(lastTimeStamp);
+//     await dbController.add_bytesoutpersec_rate(lastTimeStamp);
+//     // console.log('db after 0 sec')
+//   }, 0)
 
-  setTimeout(async() => {
-    await dbController.add_messagesinpersec_rate(lastTimeStamp);
-    await dbController.add_replicationbytesinpersec_rate(lastTimeStamp);
-    await dbController.add_underreplicatedpartitions(lastTimeStamp);
-    // console.log('db after 2 sec')
-  }, 2000)
-  
-  setTimeout(async() => {
-    await dbController.add_failedisrupdatespersec(lastTimeStamp);
-    await dbController.add_scrapedurationseconds(lastTimeStamp);
-    await dbController.add_scrape_samples_scraped(lastTimeStamp);
-    // console.log('db after 4 sec')
-  }, 4000)
+//   setTimeout(async () => {
+//     await dbController.add_messagesinpersec_rate(lastTimeStamp);
+//     await dbController.add_replicationbytesinpersec_rate(lastTimeStamp);
+//     await dbController.add_underreplicatedpartitions(lastTimeStamp);
+//     // console.log('db after 2 sec')
+//   }, 2000)
 
-  setTimeout(async() => {
-    await dbController.add_requesthandleraverageidlepercent(lastTimeStamp)
-    lastTimeStamp = await dbController.add_bytesinpersec_rate(lastTimeStamp)
-    // console.log('in setInterval after dbController new time:', lastTimeStamp)
-    // console.log('db after 6 sec')
-  }, 6000)    
-  
-}, 15000)
+//   setTimeout(async () => {
+//     await dbController.add_failedisrupdatespersec(lastTimeStamp);
+//     await dbController.add_scrapedurationseconds(lastTimeStamp);
+//     await dbController.add_scrape_samples_scraped(lastTimeStamp);
+//     // console.log('db after 4 sec')
+//   }, 4000)
+
+//   setTimeout(async () => {
+//     await dbController.add_requesthandleraverageidlepercent(lastTimeStamp)
+//     lastTimeStamp = await dbController.add_bytesinpersec_rate(lastTimeStamp)
+//     // console.log('in setInterval after dbController new time:', lastTimeStamp)
+//     // console.log('db after 6 sec')
+//   }, 6000)
+
+// }, 60000)
 //------------------------------------------------------------------------------------------------------------//
 //Post request to frontend to show historical data for each Metric Chart
 app.post('/historicalData',
@@ -168,16 +171,16 @@ const queryData = async (metric, timeFrame) => {
 //Method to get histogram 
 const getHistogram = async (metric, timeFrame, numOfBins) => {
   const data = await queryData(metric, timeFrame); // data = [...[time,values]] 
-  data.sort((a,b) => a[1] - b[1]); //sort the data base on values
+  data.sort((a, b) => a[1] - b[1]); //sort the data base on values
   // console.log('data in getHistory-line 172: ' , data , 'and typeof' , typeof data[0][1])
   const minValue = Number(data[0][1])
-  const maxValue= Number(data[data.length - 1][1])
+  const maxValue = Number(data[data.length - 1][1])
   const binRange = (maxValue - minValue) / numOfBins;
-  console.log('inside getHistogram calculation: ', 'minValue:', minValue, 'maxValue:',  maxValue, 'binRange:',  binRange)
+  // console.log('inside getHistogram calculation: ', 'minValue:', minValue, 'maxValue:', maxValue, 'binRange:', binRange)
 
   const histogram = {}
   let sum = 0;
-  let currBin = Math.round(minValue+binRange);
+  let currBin = Math.round(minValue + binRange);
   data.forEach(num => {
     //finding the mean 
     sum += Number(num[1])
@@ -188,8 +191,8 @@ const getHistogram = async (metric, timeFrame, numOfBins) => {
     else currBin += Math.round(binRange)
   })
 
-  const avg = Math.round(sum/data.length)
-  console.log('avg to find mean', avg)
+  const avg = Math.round(sum / data.length)
+  // console.log('avg to find mean', avg)
   const results = [
     {
       metric: {
