@@ -4,7 +4,7 @@
   grid-template-areas: "dropdown"
     "graph";
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.746);
+  background: rgba(255, 255, 255, 0.7);
   margin: 8px;
 
   .selectDropdown {
@@ -33,6 +33,12 @@
       &:focus {
         outline: none;
       }
+    }
+
+    #deleteButton {
+      align-self: flex-end;
+      justify-content: flex-start;
+
     }
   }
 

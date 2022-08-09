@@ -5,7 +5,14 @@ const eventInteger = require('../eventTypes/eventInteger.js')
 
 const kafka = new Kafka({
   clientId:'iris',
-  brokers:['localhost:9092']
+  brokers:['localhost:9092'],
+  requestTimeout: 25000,
+  connectionTimeout: 3000,
+  retry: {
+    initialRetryTime: 100,
+    retries: 8
+  },
+  logLevel: 'logLevel.DEBUG'
 })
 
 const producer = kafka.producer({

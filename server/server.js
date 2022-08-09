@@ -43,15 +43,26 @@ const io = require('socket.io')(server, {
 // Connecting with Socket.io and sending data socket.emit to the front end
 io.on('connection', async (socket) => {
   console.log('a user connected')
+  //Histogram connection
   const JVMHeapUsage = await getHistogram('kafka_jvm_heap_usage', '1h', 20)
   const JVMNonHeapUsage = await getHistogram('kafka_jvm_non_heap_usage', '1h', 20);
   socket.emit('kafka_jvm_heap_usage', JVMHeapUsage)
-  // console.log('first connection for histogram - JVM HEAP line 49', JVMHeapUsage)
   socket.emit('kafka_jvm_non_heap_usage', JVMNonHeapUsage)
-  // console.log('first connection for histogram - JVM Non-HEAP line 51', JVMNonHeapUsage)
+  socket.on("disconnect", () => console.log("Socket disconnect for histogram first start up"))
+  //Piechart connection
+  const pieChartData = await getPieChart(['kafka_coordinator_group_metadata_manager_numgroups',
+    'kafka_coordinator_group_metadata_manager_numgroupsdead',
+    'kafka_coordinator_group_metadata_manager_numgroupsempty'
+  ])
+  // console.log('Data from getPieChart when connected: ', pieChartData)
+  socket.emit('pieChart', pieChartData);
+  socket.on("disconnect", () => console.log("Socket disconnect for piechart first start up"))
+
+  //Line chart connection
   for (const [chartID, query] of Object.entries(chartsData)) {
     const data = await queryData(query.metric, query.timeFrame)
     socket.emit(chartID, data) //Broadcast data from query on topic of chartID
+    socket.on("disconnect", () => console.log("Socket disconnect for linecharts first start up"))
   }
 
   // setInterval is for sending data to the frontend every X seconds.
@@ -61,15 +72,33 @@ io.on('connection', async (socket) => {
     const JVMNonHeapUsage = await getHistogram('kafka_jvm_non_heap_usage', '1h', 20);
     socket.emit('kafka_jvm_heap_usage', JVMHeapUsage)
     socket.emit('kafka_jvm_non_heap_usage', JVMNonHeapUsage)
-    // console.log('Data after first socket connection for JVM_Heap:' , JVMHeapUsage)
+    socket.on("disconnect", () => console.log("Socket disconnect for histogram"))
 
+    const pieChartData = await getPieChart(['kafka_coordinator_group_metadata_manager_numgroups',
+      'kafka_coordinator_group_metadata_manager_numgroupsdead',
+      'kafka_coordinator_group_metadata_manager_numgroupsempty'
+    ])
+    socket.emit('pieChart', pieChartData);
+    socket.on("disconnect", () => console.log("Socket disconnect for piechart"))
+
+    const queryObj = {}
     //query and emit data for linecharts
     for (const [chartID, query] of Object.entries(chartsData)) {
-      const data = await queryData(query.metric, query.timeFrame)
-      socket.emit(chartID, data) //Broadcast data from query on topic of chartID
-      socket.on("disconnect", () => console.log("Socket disconnect")) // disconnects socket to grab new metric data
+      const key = JSON.stringify(`${query.metric}+${query.timeFrame}`) // 'kafka_coordinator_group_metadata_manager_numgroups+5m'
+      console.log('key is :', key)
+      if (queryObj[key]) {
+        console.log('line 90 queryObj data at key: ', queryObj[key])
+        socket.emit(chartID, queryObj[key]) //Broadcast data from query on topic of chartID
+        socket.on("disconnect", () => console.log("Socket disconnect for linecharts")) // disconnects socket to grab new metric data
+      } else {
+        const data = await queryData(query.metric, query.timeFrame)
+        queryObj[key] = data //setting data as value for key
+        console.log('***line 96 key:', key, 'queryObj value:', queryObj[key], 'data : ', data)
+        socket.emit(chartID, data) //Broadcast data from query on topic of chartID
+        socket.on("disconnect", () => console.log("Socket disconnect for linecharts")) // disconnects socket to grab new metric data
+      }
     }
-  }, 5000) // socket.emit will send the data every five second. 
+  }, 10000) // socket.emit will send the data every n second. 
 })
 
 //------------------------------------------------------------------------------------------------------------//
@@ -79,11 +108,12 @@ io.on('connect_error', (err) => {
 });
 
 //------------------------------------------------------------------------------------------------------------//
+//*THIS BLOCKS ARE FOR ADDING METRICS DATA TO THE DATABASE */
 // Query data from API endpoint and write data to database
 // Existing database is not overwritten and does not present conflicts 
 // LastTimeStamp variable tracked to check the last time data was queried and written
 let lastTimeStamp = 0;
-//setInterval to query data and store in backend every 15s.
+// setInterval to query data and store in backend every 15s.
 setInterval(async () => {
   setTimeout(async () => {
     await dbController.add_failedpartitionscount_value(lastTimeStamp);
@@ -113,7 +143,7 @@ setInterval(async () => {
     // console.log('db after 6 sec')
   }, 6000)
 
-}, 15000)
+}, 60000) // 1 minute set interval
 //------------------------------------------------------------------------------------------------------------//
 //Post request to frontend to show historical data for each Metric Chart
 app.post('/historicalData',
@@ -124,6 +154,15 @@ app.post('/historicalData',
     res.status(200).json(res.locals.historicalData)
   })
 
+//------------------------------------------------------------------------------------------------------------//
+//Post request to frontend to delete chart
+app.post('/delete',
+  (req, res) => {
+    const { chartID } = req.body;
+    delete chartsData[chartID]
+    res.status(200).json('ChartID was removed')
+  }
+)
 
 //------------------------------------------------------------------------------------------------------------//
 // Reassign metric and timeframe based on OnChange event from frontEnd
@@ -143,23 +182,26 @@ const queryData = async (metric, timeFrame) => {
   const res = await fetch(`http://localhost:9090/api/v1/query?query=${metric}[${timeFrame}]`)
   const data = await res.json()
   switch (metric) {
-    case 'kafka_server_broker_topic_metrics_bytesinpersec_rate':
-    case 'kafka_server_replica_fetcher_manager_failedpartitionscount_value':
-    case 'kafka_server_replica_fetcher_manager_maxlag_value':
-    case 'kafka_server_replica_manager_offlinereplicacount':
-    case 'kafka_server_broker_topic_metrics_bytesinpersec_rate':
-    case 'kafka_server_broker_topic_metrics_bytesoutpersec_rate':
-    case 'kafka_server_broker_topic_metrics_messagesinpersec_rate':
-    case 'kafka_server_broker_topic_metrics_replicationbytesinpersec_rate':
-    case 'kafka_server_replica_manager_underreplicatedpartitions':
-    case 'kafka_server_replica_manager_failedisrupdatespersec':
-    case 'scrape_duration_seconds':
-    case 'scrape_samples_scraped':
+    case 'kafka_server_broker_topic_metrics_bytesinpersec_rate': //linechart
+    case 'kafka_server_replica_fetcher_manager_failedpartitionscount_value'://linechart
+    case 'kafka_server_replica_fetcher_manager_maxlag_value'://linechart
+    case 'kafka_server_replica_manager_offlinereplicacount'://linechart
+    case 'kafka_server_broker_topic_metrics_bytesinpersec_rate'://linechart
+    case 'kafka_server_broker_topic_metrics_bytesoutpersec_rate'://linechart
+    case 'kafka_server_broker_topic_metrics_messagesinpersec_rate'://linechart
+    case 'kafka_server_broker_topic_metrics_replicationbytesinpersec_rate'://linechart
+    case 'kafka_server_replica_manager_underreplicatedpartitions'://linechart
+    case 'kafka_server_replica_manager_failedisrupdatespersec'://linechart
+    case 'scrape_duration_seconds'://linechart
+    case 'scrape_samples_scraped'://linechart
+    case 'kafka_coordinator_group_metadata_manager_numgroups': //piechart
+    case 'kafka_coordinator_group_metadata_manager_numgroupsdead': //piechart 
+    case 'kafka_coordinator_group_metadata_manager_numgroupsempty': //piechart
       return data.data.result
-    case 'kafka_server_request_handler_avg_idle_percent':
+    case 'kafka_server_request_handler_avg_idle_percent'://linechart
       return [data.data.result[4]]
-    case 'kafka_jvm_heap_usage':
-    case 'kafka_jvm_non_heap_usage':
+    case 'kafka_jvm_heap_usage': //histogram
+    case 'kafka_jvm_non_heap_usage'://histogram
       return data.data.result[3].values;
   }
 };
@@ -169,11 +211,9 @@ const queryData = async (metric, timeFrame) => {
 const getHistogram = async (metric, timeFrame, numOfBins) => {
   const data = await queryData(metric, timeFrame); // data = [...[time,values]] 
   data.sort((a, b) => a[1] - b[1]); //sort the data base on values
-  // console.log('data in getHistory-line 172: ' , data , 'and typeof' , typeof data[0][1])
   const minValue = Number(data[0][1])
   const maxValue = Number(data[data.length - 1][1])
   const binRange = (maxValue - minValue) / numOfBins;
-  // console.log('inside getHistogram calculation: ', 'minValue:', minValue, 'maxValue:', maxValue, 'binRange:', binRange)
 
   const histogram = {}
   let sum = 0;
@@ -189,7 +229,6 @@ const getHistogram = async (metric, timeFrame, numOfBins) => {
   })
 
   const avg = Math.round(sum / data.length)
-  // console.log('avg to find mean', avg)
   const results = [
     {
       metric: {
@@ -200,6 +239,20 @@ const getHistogram = async (metric, timeFrame, numOfBins) => {
   ]
 
   return results
+}
+
+//------------------------------------------------------------------------------------------------------------//
+//Method to get piechart 
+const getPieChart = async (metricsArr) => {
+  const results = await (metricsArr.map(async (metric) => {
+    const data = await queryData(metric, '30s'); // Results array of objects with metric and values keys
+    const timeValueArr = data[0].values[data[0].values.length - 1] // [time, value] at values.length - 1
+    return {
+      metric: { topic: metric },
+      values: [timeValueArr]
+    }
+  }))
+  return await Promise.all(results)
 }
 
 //------------------------------------------------------------------------------------------------------------//
@@ -222,47 +275,3 @@ server.listen(PORT, () => console.log('Listening on Port', PORT))
 
 
 module.exports = app;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// const register = new client.Registry();
-// client.collectDefaultMetrics({
-//     app: 'iris',
-//     prefix: 'kafka_controller_',
-//     timeout: 10000,
-//     gcDurationBuckets: [0.001, 0.01, 0.1, 1, 2, 5],
-//     register
-// });
-
-// app.get('/metrics/', async (req, res) => {
-//     res.setHeader('Content-Type', register.contentType);
-//     // const data = await register.getSingleMetric('node_process_cpu_user_seconds_total');
-//     const data = await register.metrics()
-//     console.log('register metrics: ', data)
-//     // console.log('inside prom client serverjs', data, typeof data)
-//     res.send(data)
-// });
-
-// app.listen(8080, () => console.log('Server is running on http://localhost:8080, metrics are exposed on http://localhost:8080/metrics'));
