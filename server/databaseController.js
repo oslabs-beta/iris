@@ -1,23 +1,32 @@
 // const db = require('./databaseModel.js');
-const db = require('./databaseModel.js');
+const db = require('./pg.ts');
 const fetch = require('node-fetch')
 
 const keys = {
   // metric: identifier
   kafka_server_broker_topic_metrics_bytesinpersec_rate: 'topic',
   kafka_server_replica_fetcher_manager_failedpartitionscount_value: 'client_id',
-  // TODO: Insert other metric key pairs
+  kafka_server_replica_fetcher_manager_maxlag_value: 'client_id',
+  kafka_server_replica_manager_offlinereplicacount: 'service',
+  kafka_server_broker_topic_metrics_bytesoutpersec_rate: 'topic',
+  kafka_server_broker_topic_metrics_messagesinpersec_rate: 'topic',
+  kafka_server_broker_topic_metrics_replicationbytesinpersec_rate: 'service',
+  kafka_server_replica_manager_underreplicatedpartitions: 'service',
+  kafka_server_replica_manager_failedisrupdatespersec: 'aggregate',
+  scrape_duration_seconds: 'job',
+  scrape_samples_scraped: 'job',
+  kafka_server_request_handler_avg_idle_percent: 'aggregate',
 }
 
 const dbController = {}
 
 dbController.getHistoricalData = (req, res) => {
   const {metric, timeStart, timeEnd} = req.body
-  
+
   const body = `SELECT * 
     FROM iris_database AS ib
-    WHERE ib.time >= ${timeStart} 
-      AND ib.time <= ${timeEnd}
+    WHERE ib.time >= ${Math.floor(timeStart.getTime() / 1000)} 
+      AND ib.time <= ${Math.floor(timeEnd.getTime() / 1000)}
       AND ib.metric = '${metric}'
   `
 
@@ -46,7 +55,6 @@ dbController.getHistoricalData = (req, res) => {
     return next();
   });
 }
-
 
 dbController.add_bytesinpersec_rate = (lastTimeStamp) => {
   return fetch(`http://localhost:9090/api/v1/query?query=kafka_server_broker_topic_metrics_bytesinpersec_rate[5m]`)

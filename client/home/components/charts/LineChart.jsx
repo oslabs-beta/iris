@@ -1,5 +1,5 @@
 import React, { Component, useState, useEffect } from 'react';
-import { Line } from 'react-chartjs-2';
+import { Line, Bar, Pie } from 'react-chartjs-2';
 import Chart from 'chart.js/auto';
 import mock1h from '../../dummyData/mockData_1h';
 import mock6h from '../../dummyData/mockData_6h';
@@ -10,7 +10,7 @@ function LineChart(props) {
     // deconstruct chartData
     const { chartData } = props;
 
-    const [lineChartMetric, updateLine] = useState({
+    const [chartMetric, updateLine] = useState({
         // labels will be for date -> most likely going to do a cache arr as date.time
         labels: ['filler'],
         datasets: [
@@ -19,7 +19,7 @@ function LineChart(props) {
                 data: [0],
                 borderColor: "gray"
             }
-        ]
+        ],
     });
 
     // function to generate random colors for our chartjs lines
@@ -93,70 +93,34 @@ function LineChart(props) {
         // for mockdata
         // const [timestampArr, lineChartData] = convertKafkatoChart(mock1h.data.result)
         const [timestampArr, lineChartData] = convertKafkatoChart(chartData)
-
         // set our state - updateLine with our new time stamps and metrics data
         updateLine({
             // labels will be for date -> most likely going to do a cache arr as date.time
             labels: timestampArr,
-            datasets: lineChartData // this is an array of 3 subarrays -> subarray [line data]
+            datasets: lineChartData, // this is an array of 3 subarrays -> subarray [line data]
         });
+
     }, [props])
 
     const options = {
         responsive: true,
         plugins: {
-          legend: {
-            position: 'top',
-          },
-          title: {
-            display: true,
-            text: 'TOP SECRET: ITAR RESTRICTED DATA',
-          },
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: 'TOP SECRET: ITAR RESTRICTED DATA',
+            },
         },
         background: 'rgba(0, 54, 0, 1)',
     }
-    // return new Chart('graph', {
-    //     id: 'graph',
-    //     type: 'line',
-    //     data: lineChartMetric,
-    //     options: options
-    // })
 
-    return <Line id="graph" options={options} data={lineChartMetric} />;
+    return (
+        <>
+            <Line id='lineGraph' options={options} data={chartMetric} />
+        </>
+    )
 }
 
 export default LineChart;
-
-/*
-
-// metrics housed in state and also for our chartjs plots
-const [currMetrics, setMetrics] = useState();
-
-// grab data - currently dummyData from process_cpu_user_seconds_total
-// fetch request to our query - using prom client
-const metric = 'process_cpu_user_seconds_total'
-async function getNewMetrics(metric) {
-    let data = [];
-
-    // need the endpoint - most likely will be {ip}:5556/query..{metric}
-    axios.get(`localhost:5556/${metric}`)
-        .then(data => setMetrics(data))
-        .catch(err => console.log(`some error occurred while grabbing data from ${metric}: ${err}`));
-
-    // modify for time and metrics - boilerplate for now
-    updateLine({
-        // labels will be for date -> most likely going to do a cache arr as date.time
-        labels: Object.keys(currMetrics).reverse(),
-        datasets: [{
-            label: 'Price',
-            data: Object.values(currMetrics).map(data => Number.data),
-            borderColor: "gray",
-        }],
-    })
-
-}
-
-//metric will be modifiable
-setInterval(getNewMetrics(metric), 3000);
-
-*/
