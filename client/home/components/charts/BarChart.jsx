@@ -31,28 +31,7 @@ function BarChart(props) {
     });
 
     socket.on(chartID, (data) => {
-        // console.log('socket received data: ', data)
         const [binArray, countArr, colorArr, linRegressArr] = convertKafkatoChart(data)
-        // console.log('binArray: ',binArray, 'countArr: ', countArr)
-
-        // const newObj = JSON.parse(JSON.stringify(barData))
-
-        // const newLabels = [...barData.labels]
-        // for (let i = 0; i < barData.labels; i++) {
-        //     newLabels[i] = binArray[i]
-        // }
-        // newObj.labels = newLabels
-
-        // newObj.datasets.labels = chartID
-        // // console.log('bardata: ', barData)
-        // // console.log('bardata.data: ', barData.datasets[0].data)
-        // const newData = [];
-        // for (let i = 0; i < countArr.length; i++) {
-        //     newData[i] = countArr[i]
-        // }
-        // newObj.datasets.data = countArr
-
-        // console.log('linRegressArr: ', linRegressArr)
 
         const newObj = {
             labels: binArray,
@@ -72,7 +51,6 @@ function BarChart(props) {
             }]
         };
         setBarData(newObj);
-        // console.log('after setting barData: ', barData)
     });
 
     socket.on('connect_error', (err) => {
@@ -96,11 +74,9 @@ function BarChart(props) {
 
         // we need to convert our unix timestamps to regular time stamps
         // need to create an array to house our metrics, correlated to specific time stamp
-        // console.log('data:', data)
         const results = data; // results here is an array
         const topicData = {};
         topicData[data[0].metric.topic] = data[0].values
-        // console.log("line 50 inside BarChart for topicData.metric:", topicData[data[0].metric.topic])
         const binArray = [];
         const countArr = [];
         const colorArr = [];
@@ -116,42 +92,6 @@ function BarChart(props) {
 
         return [binArray, countArr, colorArr, linRegressArr]
     }
-
-    // const [binArray, countArr, colorArr] = convertKafkatoChart(mock1h.data.result)
-
-    // const [barData, setBarData] = useState({
-    //     // labels will be for date -> most likely going to do a cache arr as date.time
-    //     labels: [binArray],
-    //     datasets: [
-    //         {
-    //             label: chartID,
-    //             data: countArr,
-    //             backgroundColor: colorArr
-    //         }
-    //     ],
-    // });
-
-
-    // useEffect(() => {
-    //     // for mockdata
-    //     const [binArray, countArr, colorArr] = convertKafkatoChart(mock1h.data.result)
-    //     // console.log('binArr: ', binArray);
-    //     // console.log('countArr: ', countArr);
-
-    //     // set our state - updateLine with our new time stamps and metrics data
-    //     setBarData({
-    //         // labels will be for date -> most likely going to do a cache arr as date.time
-    //         labels: binArray,
-    //         // datasets: countArr
-    //         datasets: [
-    //             {
-    //                 labels: chartID,
-    //                 data: countArr,
-    //                 backgroundColor: colorArr
-    //             }
-    //         ]
-    //     });
-    // }, [props])
 
     const options = {
         responsive: true,
