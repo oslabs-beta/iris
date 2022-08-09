@@ -61,7 +61,9 @@ io.on('connection', async (socket) => {
     const JVMNonHeapUsage = await getHistogram('kafka_jvm_non_heap_usage', '1h', 20);
     socket.emit('kafka_jvm_heap_usage', JVMHeapUsage)
     socket.emit('kafka_jvm_non_heap_usage', JVMNonHeapUsage)
-    // console.log('Data after first socket connection for JVM_Heap:' , JVMHeapUsage)
+    // console.log('Data after first socket connection for JVM_Heap:' , JVMHeapUsage[0].values)
+    // console.log('Data after first socket connection for JVM_Non_Heap:' , JVMNonHeapUsage[0].values)
+    socket.on("disconnect", () => console.log("Socket disconnect"))
 
     //query and emit data for linecharts
     for (const [chartID, query] of Object.entries(chartsData)) {
@@ -69,7 +71,7 @@ io.on('connection', async (socket) => {
       socket.emit(chartID, data) //Broadcast data from query on topic of chartID
       socket.on("disconnect", () => console.log("Socket disconnect")) // disconnects socket to grab new metric data
     }
-  }, 5000) // socket.emit will send the data every five second. 
+  }, 10000) // socket.emit will send the data every five second. 
 })
 
 //------------------------------------------------------------------------------------------------------------//
@@ -79,6 +81,7 @@ io.on('connect_error', (err) => {
 });
 
 //------------------------------------------------------------------------------------------------------------//
+//*THIS BLOCKS ARE FOR ADDING METRICS DATA TO THE DATABASE */
 // Query data from API endpoint and write data to database
 // Existing database is not overwritten and does not present conflicts 
 // LastTimeStamp variable tracked to check the last time data was queried and written
@@ -113,7 +116,7 @@ setInterval(async () => {
     // console.log('db after 6 sec')
   }, 6000)
 
-}, 15000)
+}, 60000)
 //------------------------------------------------------------------------------------------------------------//
 //Post request to frontend to show historical data for each Metric Chart
 app.post('/historicalData',

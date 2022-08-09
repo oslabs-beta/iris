@@ -20,7 +20,7 @@ function LineGraphContainer(props) {
 
   socket.on(chartID, (data) => {
     setChartData(data)
-    console.log('after setting chartData: ', chartData)
+    // console.log('after setting chartData: ', chartData)
   });
 
   socket.on('connect_error', (err) => {
