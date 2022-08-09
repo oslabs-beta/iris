@@ -16,6 +16,12 @@ function BarChart(props) {
                 label: chartID,
                 data: [0],
                 backgroundColor: ['#000000']
+            },
+            {
+                label: chartID,
+                data: [0],
+                type: 'line',
+                backgroundColor: ['#000000']
             }
         ],
     });
@@ -26,7 +32,7 @@ function BarChart(props) {
 
     socket.on(chartID, (data) => {
         // console.log('socket received data: ', data)
-        const [binArray, countArr, colorArr] = convertKafkatoChart(data)
+        const [binArray, countArr, colorArr, linRegressArr] = convertKafkatoChart(data)
         // console.log('binArray: ',binArray, 'countArr: ', countArr)
 
         // const newObj = JSON.parse(JSON.stringify(barData))
@@ -46,12 +52,23 @@ function BarChart(props) {
         // }
         // newObj.datasets.data = countArr
 
+        console.log('linRegressArr: ', linRegressArr)
+
         const newObj = {
             labels: binArray,
             datasets: [{
                 label: chartID, // label not showing up here //fuck you Walter you fucking name it label'S'!!!!!
                 data: countArr,
-                backgroundColor: colorArr
+                backgroundColor: colorArr,
+                order: 1,
+            },
+            {
+                label: 'Average', // label not showing up here //fuck you Walter you fucking name it label'S'!!!!!
+                data: linRegressArr,
+                backgroundColor: '#000000',
+                borderColor: '#000000',
+                type: 'line',
+                pointRadius: 0
             }]
         };
         setBarData(newObj);
@@ -84,21 +101,20 @@ function BarChart(props) {
         const topicData = {};
         topicData[data[0].metric.topic] = data[0].values
         // console.log("line 50 inside BarChart for topicData.metric:", topicData[data[0].metric.topic])
-        const binArray = []
-        const countArr = []
-        const colorArr = []
+        const binArray = [];
+        const countArr = [];
+        const colorArr = [];
+        const linRegressArr = [];
         topicData[data[0].metric.topic].forEach(element => {
             binArray.push(Number(element[0]))
-            // binArray.push(new Date(Number(element[0]) * 1000).toLocaleTimeString());
-            // countArr.push({
-            //     label: chartID,
-            //     data: element[1],
-            //     // borderColor: getRandomColor()
-            // });
             countArr.push(Number(element[1]))
             colorArr.push(getRandomColor())
         })
-        return [binArray, countArr, colorArr]
+        for (let i = 0; i < countArr.length; i++) {
+            linRegressArr.push(countArr.reduce((a, b) => a+b, 0) / countArr.length)
+        }
+
+        return [binArray, countArr, colorArr, linRegressArr]
     }
 
     // const [binArray, countArr, colorArr] = convertKafkatoChart(mock1h.data.result)
