@@ -85,38 +85,42 @@ io.on('connect_error', (err) => {
 // Query data from API endpoint and write data to database
 // Existing database is not overwritten and does not present conflicts 
 // LastTimeStamp variable tracked to check the last time data was queried and written
-let lastTimeStamp = 0;
+// let lastTimeStamp = 0;
 //setInterval to query data and store in backend every 15s.
-setInterval(async () => {
-  setTimeout(async () => {
-    await dbController.add_failedpartitionscount_value(lastTimeStamp);
-    await dbController.add_maxlag_value(lastTimeStamp);
-    await dbController.add_bytesoutpersec_rate(lastTimeStamp);
-    // console.log('db after 0 sec')
-  }, 0)
+// setInterval(async () => {
+//   setTimeout(async () => {
+//     await dbController.add_failedpartitionscount_value(lastTimeStamp);
+//     await dbController.add_maxlag_value(lastTimeStamp);
+//     await dbController.add_bytesoutpersec_rate(lastTimeStamp);
+//     // console.log('db after 0 sec')
+//   }, 0)
 
-  setTimeout(async () => {
-    await dbController.add_messagesinpersec_rate(lastTimeStamp);
-    await dbController.add_replicationbytesinpersec_rate(lastTimeStamp);
-    await dbController.add_underreplicatedpartitions(lastTimeStamp);
-    // console.log('db after 2 sec')
-  }, 2000)
+//   setTimeout(async () => {
+//     await dbController.add_messagesinpersec_rate(lastTimeStamp);
+//     await dbController.add_replicationbytesinpersec_rate(lastTimeStamp);
+//     await dbController.add_underreplicatedpartitions(lastTimeStamp);
+//     // console.log('db after 2 sec')
+//   }, 2000)
 
-  setTimeout(async () => {
-    await dbController.add_failedisrupdatespersec(lastTimeStamp);
-    await dbController.add_scrapedurationseconds(lastTimeStamp);
-    await dbController.add_scrape_samples_scraped(lastTimeStamp);
-    // console.log('db after 4 sec')
-  }, 4000)
+//   setTimeout(async () => {
+//     await dbController.add_failedisrupdatespersec(lastTimeStamp);
+//     await dbController.add_scrapedurationseconds(lastTimeStamp);
+//     await dbController.add_scrape_samples_scraped(lastTimeStamp);
+//     // console.log('db after 4 sec')
+//   }, 4000)
 
-  setTimeout(async () => {
-    await dbController.add_requesthandleraverageidlepercent(lastTimeStamp)
-    lastTimeStamp = await dbController.add_bytesinpersec_rate(lastTimeStamp)
-    // console.log('in setInterval after dbController new time:', lastTimeStamp)
-    // console.log('db after 6 sec')
-  }, 6000)
+//   setTimeout(async () => {
+//     await dbController.add_requesthandleraverageidlepercent(lastTimeStamp)
+//     lastTimeStamp = await dbController.add_bytesinpersec_rate(lastTimeStamp)
+//     // console.log('in setInterval after dbController new time:', lastTimeStamp)
+//     // console.log('db after 6 sec')
+//   }, 6000)
 
+<<<<<<< HEAD
 }, 60000)
+=======
+// }, 60000)
+>>>>>>> cc71e919da3987da58bdf69784d6bb50a39fafb3
 //------------------------------------------------------------------------------------------------------------//
 //Post request to frontend to show historical data for each Metric Chart
 app.post('/historicalData',

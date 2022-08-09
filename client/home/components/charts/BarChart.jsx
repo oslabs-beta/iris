@@ -9,12 +9,25 @@ const socket = io();
 function BarChart(props) {
     const { chartID } = props;
     const [barData, setBarData] = useState({
+<<<<<<< HEAD
+=======
+        // labels will be for date -> most likely going to do a cache arr as date.time
+>>>>>>> cc71e919da3987da58bdf69784d6bb50a39fafb3
         labels: [0],
         datasets: [
             {
                 label: chartID,
                 data: [0],
                 backgroundColor: ['#000000']
+<<<<<<< HEAD
+=======
+            },
+            {
+                label: chartID,
+                data: [0],
+                type: 'line',
+                backgroundColor: ['#000000']
+>>>>>>> cc71e919da3987da58bdf69784d6bb50a39fafb3
             }
         ],
     });
@@ -25,6 +38,7 @@ function BarChart(props) {
 
     socket.on(chartID, (data) => {
         // console.log('socket received data: ', data)
+<<<<<<< HEAD
         const [binArray, countArr, colorArr] = convertKafkatoChart(data)
         // console.log('binArray: ',binArray, 'countArr: ', countArr)
         const newObj = {
@@ -33,6 +47,45 @@ function BarChart(props) {
                 label: chartID, 
                 data: countArr,
                 backgroundColor: colorArr
+=======
+        const [binArray, countArr, colorArr, linRegressArr] = convertKafkatoChart(data)
+        // console.log('binArray: ',binArray, 'countArr: ', countArr)
+
+        // const newObj = JSON.parse(JSON.stringify(barData))
+        
+        // const newLabels = [...barData.labels]
+        // for (let i = 0; i < barData.labels; i++) {
+        //     newLabels[i] = binArray[i]
+        // }
+        // newObj.labels = newLabels
+
+        // newObj.datasets.labels = chartID
+        // // console.log('bardata: ', barData)
+        // // console.log('bardata.data: ', barData.datasets[0].data)
+        // const newData = [];
+        // for (let i = 0; i < countArr.length; i++) {
+        //     newData[i] = countArr[i]
+        // }
+        // newObj.datasets.data = countArr
+
+        console.log('linRegressArr: ', linRegressArr)
+
+        const newObj = {
+            labels: binArray,
+            datasets: [{
+                label: chartID, // label not showing up here //fuck you Walter you fucking name it label'S'!!!!!
+                data: countArr,
+                backgroundColor: colorArr,
+                order: 1,
+            },
+            {
+                label: 'Average', // label not showing up here //fuck you Walter you fucking name it label'S'!!!!!
+                data: linRegressArr,
+                backgroundColor: '#000000',
+                borderColor: '#000000',
+                type: 'line',
+                pointRadius: 0
+>>>>>>> cc71e919da3987da58bdf69784d6bb50a39fafb3
             }]
         };
         setBarData(newObj);
@@ -65,17 +118,62 @@ function BarChart(props) {
         const topicData = {};
         topicData[data[0].metric.topic] = data[0].values
         // console.log("line 50 inside BarChart for topicData.metric:", topicData[data[0].metric.topic])
-        const binArray = []
-        const countArr = []
-        const colorArr = []
+        const binArray = [];
+        const countArr = [];
+        const colorArr = [];
+        const linRegressArr = [];
         topicData[data[0].metric.topic].forEach(element => {
             binArray.push(Number(element[0]))
             countArr.push(Number(element[1]))
             colorArr.push(getRandomColor())
         })
-        return [binArray, countArr, colorArr]
+        for (let i = 0; i < countArr.length; i++) {
+            linRegressArr.push(countArr.reduce((a, b) => a+b, 0) / countArr.length)
+        }
+
+        return [binArray, countArr, colorArr, linRegressArr]
     }
+<<<<<<< HEAD
     
+=======
+
+    // const [binArray, countArr, colorArr] = convertKafkatoChart(mock1h.data.result)
+
+    // const [barData, setBarData] = useState({
+    //     // labels will be for date -> most likely going to do a cache arr as date.time
+    //     labels: [binArray],
+    //     datasets: [
+    //         {
+    //             label: chartID,
+    //             data: countArr,
+    //             backgroundColor: colorArr
+    //         }
+    //     ],
+    // });
+    
+
+    // useEffect(() => {
+    //     // for mockdata
+    //     const [binArray, countArr, colorArr] = convertKafkatoChart(mock1h.data.result)
+    //     // console.log('binArr: ', binArray);
+    //     // console.log('countArr: ', countArr);
+
+    //     // set our state - updateLine with our new time stamps and metrics data
+    //     setBarData({
+    //         // labels will be for date -> most likely going to do a cache arr as date.time
+    //         labels: binArray,
+    //         // datasets: countArr
+    //         datasets: [
+    //             {
+    //                 labels: chartID,
+    //                 data: countArr,
+    //                 backgroundColor: colorArr
+    //             }
+    //         ]
+    //     });
+    // }, [props])
+
+>>>>>>> cc71e919da3987da58bdf69784d6bb50a39fafb3
     const options = {
         responsive: true,
         plugins: {
