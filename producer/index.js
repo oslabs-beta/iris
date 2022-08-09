@@ -50,28 +50,3 @@ setInterval(() => {
 }, 2000);
 
 
-/**
- * Implementation with node-rdkafka npm module
- */
-// import Kafka from 'node-rdkafka';
-// import eventType from '../eventType.js';
-
-// const stream1 = Kafka.Producer.createWriteStream({
-//   'metadata.broker.list': 'localhost:9092'
-// }, {}, {topic: 'test1'})
-
-// const stream2 = Kafka.Producer.createWriteStream({
-//   'metadata.broker.list': 'localhost:9092'
-// }, {}, {topic: 'test2'})
-
-// function queueMessage() {
-//   const event1 = { category: 'DOG', noise: 'bark' };
-//   const event2 = { category: 'CAT', noise: 'meow' };
-//   const success1 = stream1.write(eventType.toBuffer(event1))
-//   const success2 = stream1.write(eventType.toBuffer(event2))
-//   return (success1 && success2) ? console.log('Successful message') : console.log('Something went wrong')
-// }
-
-// setInterval(() => {
-//   queueMessage();
-// }, 3000);
