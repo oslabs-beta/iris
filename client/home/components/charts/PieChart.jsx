@@ -24,16 +24,7 @@ function PieChart(props) {
     });
 
     socket.on(chartID, (data) => { // data => array of 3  [ {metric, value} ,  {metric, value} ,  {metric, value} ]
-        // console.log('socket received data: ', data)
-        // const labelsArr = []
-        // const dataArr = []
-        // const colorsArr = []
-        // data.forEach(obj => {
         const [binArray, countArr, colorArr] = convertKafkatoChart(data)
-        //     dataArr.push(countArr[0])
-        //     labelsArr.push(binArray[0])
-        //     colorsArr.push(colorArr[0])
-        // })
 
         const newObj = {
             labels: binArray,
@@ -44,7 +35,6 @@ function PieChart(props) {
             }]
         };
         setPieData(newObj);
-        // console.log('after setting pieData: ', pieData)
     });
 
     socket.on('connect_error', (err) => {
@@ -72,8 +62,6 @@ function PieChart(props) {
         const results = data; // results here is an array
         const topicData = {};
         topicData[data[0].metric.topic] = data[0].values
-        console.log(topicData)
-        // console.log("line 64 inside PieChart for topicData.metric:", topicData[data[0].metric.topic])
         const binArray = [];
         const countArr = [];
         const colorArr = [];
@@ -87,17 +75,6 @@ function PieChart(props) {
             countArr.push(Number(values[1]))
             colorArr.push(getRandomColor())
         }
-
-        // const countArr = [];
-        // const colorArr = [];
-        // topicData[data[0].metric.topic].forEach(element => {
-        //     countArr.push(Number(element[1]))
-        //     colorArr.push(getRandomColor())
-        // })
-
-        console.log('binArray: ', binArray)
-        console.log('countArr: ', countArr)
-        console.log('colorArr: ', colorArr)
 
         return [binArray, countArr, colorArr]
     }

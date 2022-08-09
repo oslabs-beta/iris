@@ -69,9 +69,11 @@ function LineChart(props) {
         for (let [topic, value] of Object.entries(topicData)) {
             for (let i = 0; i < value.length; i++) { // { topic: [timestamp , another time] }
                 if (!timeArrBuilt) {
-                    timestampArr.push(
-                        new Date(Number(value[i][0]) * 1000).toLocaleTimeString() // mult by 1000 given value comes in as seconds
-                    );
+                    let currDate = new Date(Number(value[i][0]) * 1000).toLocaleTimeString(); // mult by 1000 given value comes in as seconds
+                    // console.log('currDate', currDate)
+                    let splittedString = currDate.split(":");
+                    currDate = splittedString.slice(0, -1).join(':') + splittedString[2].slice(-2);
+                    timestampArr.push(currDate);
                 }
                 metricsArr.push(Number(value[i][1]));
             }
