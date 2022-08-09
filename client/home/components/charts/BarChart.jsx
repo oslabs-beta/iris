@@ -9,25 +9,19 @@ const socket = io();
 function BarChart(props) {
     const { chartID } = props;
     const [barData, setBarData] = useState({
-<<<<<<< HEAD
-=======
         // labels will be for date -> most likely going to do a cache arr as date.time
->>>>>>> cc71e919da3987da58bdf69784d6bb50a39fafb3
         labels: [0],
         datasets: [
             {
                 label: chartID,
                 data: [0],
                 backgroundColor: ['#000000']
-<<<<<<< HEAD
-=======
             },
             {
                 label: chartID,
                 data: [0],
                 type: 'line',
                 backgroundColor: ['#000000']
->>>>>>> cc71e919da3987da58bdf69784d6bb50a39fafb3
             }
         ],
     });
@@ -38,16 +32,6 @@ function BarChart(props) {
 
     socket.on(chartID, (data) => {
         // console.log('socket received data: ', data)
-<<<<<<< HEAD
-        const [binArray, countArr, colorArr] = convertKafkatoChart(data)
-        // console.log('binArray: ',binArray, 'countArr: ', countArr)
-        const newObj = {
-            labels: binArray,
-            datasets: [{
-                label: chartID, 
-                data: countArr,
-                backgroundColor: colorArr
-=======
         const [binArray, countArr, colorArr, linRegressArr] = convertKafkatoChart(data)
         // console.log('binArray: ',binArray, 'countArr: ', countArr)
 
@@ -85,7 +69,6 @@ function BarChart(props) {
                 borderColor: '#000000',
                 type: 'line',
                 pointRadius: 0
->>>>>>> cc71e919da3987da58bdf69784d6bb50a39fafb3
             }]
         };
         setBarData(newObj);
@@ -133,9 +116,6 @@ function BarChart(props) {
 
         return [binArray, countArr, colorArr, linRegressArr]
     }
-<<<<<<< HEAD
-    
-=======
 
     // const [binArray, countArr, colorArr] = convertKafkatoChart(mock1h.data.result)
 
@@ -173,7 +153,6 @@ function BarChart(props) {
     //     });
     // }, [props])
 
->>>>>>> cc71e919da3987da58bdf69784d6bb50a39fafb3
     const options = {
         responsive: true,
         plugins: {
