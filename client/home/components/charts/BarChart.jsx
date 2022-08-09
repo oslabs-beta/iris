@@ -36,7 +36,7 @@ function BarChart(props) {
         // console.log('binArray: ',binArray, 'countArr: ', countArr)
 
         // const newObj = JSON.parse(JSON.stringify(barData))
-        
+
         // const newLabels = [...barData.labels]
         // for (let i = 0; i < barData.labels; i++) {
         //     newLabels[i] = binArray[i]
@@ -52,7 +52,7 @@ function BarChart(props) {
         // }
         // newObj.datasets.data = countArr
 
-        console.log('linRegressArr: ', linRegressArr)
+        // console.log('linRegressArr: ', linRegressArr)
 
         const newObj = {
             labels: binArray,
@@ -111,7 +111,7 @@ function BarChart(props) {
             colorArr.push(getRandomColor())
         })
         for (let i = 0; i < countArr.length; i++) {
-            linRegressArr.push(countArr.reduce((a, b) => a+b, 0) / countArr.length)
+            linRegressArr.push(countArr.reduce((a, b) => a + b, 0) / countArr.length)
         }
 
         return [binArray, countArr, colorArr, linRegressArr]
@@ -130,7 +130,7 @@ function BarChart(props) {
     //         }
     //     ],
     // });
-    
+
 
     // useEffect(() => {
     //     // for mockdata
@@ -167,7 +167,7 @@ function BarChart(props) {
     };
 
     return (
-        <div id = 'barGraph'>
+        <div id='barGraph'>
             <Bar id='barGraph' options={options} data={barData} />
         </div>
     )
