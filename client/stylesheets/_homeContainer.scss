@@ -11,12 +11,24 @@ body {
 
 
     #leftPane {
-      width: 80%;
+      position: fixed;
+      width: 30%;
+      margin-left: 1%;
+      #barGraph {
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 8px;
+        margin-top: 5%;
+        padding: 8px;
+        canvas {
+          background: rgba(255, 255, 255, 0);
+          margin-top: 0%;
+        }
+      }
     }
 
     #rightPane {
-      width: 20%;
-
+      width: 70%;
+      margin-left: 30%;
       button#newGraph {
         position: fixed;
         right: 2%;

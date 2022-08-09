@@ -7,39 +7,55 @@ import io from 'socket.io-client';
 const socket = io();
 
 function BarChart(props) {
-
     const { chartID } = props;
-    // const [barData, setBarData] = useState({
-    //     // labels will be for date -> most likely going to do a cache arr as date.time
-    //     labels: [],
-    //     datasets: [
-    //         {
-    //             label: chartID,
-    //             data: [],
-    //             backgroundColor: []
-    //         }
-    //     ],
-    // });
+    const [barData, setBarData] = useState({
+        // labels will be for date -> most likely going to do a cache arr as date.time
+        labels: [0],
+        datasets: [
+            {
+                label: chartID,
+                data: [0],
+                backgroundColor: ['#000000']
+            }
+        ],
+    });
 
     socket.on('connect', () => {
         console.log('socket connected')
     });
 
     socket.on(chartID, (data) => {
-        console.log('socket received data: ', data)
-        // const [binArray, countArr] = convertKafkatoChart(data)
-        // // set our state - updateLine with our new time stamps and metrics data
-        // const newObj = Object.assign(barData, {
-        //     // labels will be for date -> most likely going to do a cache arr as date.time
-        //     labels: binArray,
-        //     datasets: {
-        //         labels: chartID,
-        //         data: countArr,
-        //         borderColor: 
-        //     }
-        // })
+        // console.log('socket received data: ', data)
+        const [binArray, countArr, colorArr] = convertKafkatoChart(data)
+        // console.log('binArray: ',binArray, 'countArr: ', countArr)
+
+        // const newObj = JSON.parse(JSON.stringify(barData))
+        
+        // const newLabels = [...barData.labels]
+        // for (let i = 0; i < barData.labels; i++) {
+        //     newLabels[i] = binArray[i]
+        // }
+        // newObj.labels = newLabels
+
+        // newObj.datasets.labels = chartID
+        // // console.log('bardata: ', barData)
+        // // console.log('bardata.data: ', barData.datasets[0].data)
+        // const newData = [];
+        // for (let i = 0; i < countArr.length; i++) {
+        //     newData[i] = countArr[i]
+        // }
+        // newObj.datasets.data = countArr
+
+        const newObj = {
+            labels: binArray,
+            datasets: [{
+                label: chartID, // label not showing up here //fuck you Walter you fucking name it label'S'!!!!!
+                data: countArr,
+                backgroundColor: colorArr
+            }]
+        };
         setBarData(newObj);
-        console.log('after setting chartData: ', barData)
+        // console.log('after setting barData: ', barData)
     });
 
     socket.on('connect_error', (err) => {
@@ -72,7 +88,8 @@ function BarChart(props) {
         const countArr = []
         const colorArr = []
         topicData[data[0].metric.topic].forEach(element => {
-            binArray.push(new Date(Number(element[0]) * 1000).toLocaleTimeString());
+            binArray.push(Number(element[0]))
+            // binArray.push(new Date(Number(element[0]) * 1000).toLocaleTimeString());
             // countArr.push({
             //     label: chartID,
             //     data: element[1],
@@ -84,19 +101,20 @@ function BarChart(props) {
         return [binArray, countArr, colorArr]
     }
 
-    const [binArray, countArr, colorArr] = convertKafkatoChart(mock1h.data.result)
+    // const [binArray, countArr, colorArr] = convertKafkatoChart(mock1h.data.result)
 
-    const [barData, setBarData] = useState({
-        // labels will be for date -> most likely going to do a cache arr as date.time
-        labels: binArray,
-        datasets: [
-            {
-                label: chartID,
-                data: countArr,
-                backgroundColor: colorArr
-            }
-        ],
-    });
+    // const [barData, setBarData] = useState({
+    //     // labels will be for date -> most likely going to do a cache arr as date.time
+    //     labels: [binArray],
+    //     datasets: [
+    //         {
+    //             label: chartID,
+    //             data: countArr,
+    //             backgroundColor: colorArr
+    //         }
+    //     ],
+    // });
+    
 
     // useEffect(() => {
     //     // for mockdata
@@ -133,9 +151,9 @@ function BarChart(props) {
     };
 
     return (
-        <>
+        <div id = 'barGraph'>
             <Bar id='barGraph' options={options} data={barData} />
-        </>
+        </div>
     )
 }
 
