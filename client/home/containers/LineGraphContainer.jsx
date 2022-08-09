@@ -2,6 +2,7 @@ import React, { Component, useState, useEffect } from 'react';
 import LineChart from '../components/charts/LineChart.jsx';
 import io from 'socket.io-client';
 import mock1h from '../dummyData/mockData_1h';
+import e from 'cors';
 
 const socket = io();
 
@@ -84,6 +85,34 @@ function LineGraphContainer(props) {
     return;
   }
 
+  function handleChartDelete(e) {
+    // need to target the chart with chartID 
+    // more like deleting graphContainer
+    const chartToDelete = e.target.parentNode.parentNode
+    // console.log('chartID: ', chartID)
+    // console.log(chartToDelete);
+
+    // remove from DOM
+    chartToDelete.remove();
+
+    console.log(JSON.stringify({ chartID: chartID }));
+
+    // fetch request with POST to backend so backend can process the socket.off    
+    // fetch('/delete', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({ chartID: chartID })
+    // })
+    //   .then((response) => {
+    //     console.log(response)
+    //   })
+    //   .catch(err => {
+    //     console.log('Error thrown in POST request  in graphContainer: ', err)
+    //   })
+
+    // no return;
+  }
+
   // async function handleHistoricalMetrics(e) {
   //   console.log('starting historical metric fetch')
 
@@ -138,6 +167,8 @@ function LineGraphContainer(props) {
           <option value="6h">6h</option>
           <option value="12h">12h</option>
         </select>
+
+        <button id="deleteGraph" onClick={(e) => handleChartDelete(e)}>-</button>
       </div>
 
       {/* <select id='historicalTime' onChange={(e) => handleHistoricalMetrics(e)}>

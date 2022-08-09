@@ -34,6 +34,12 @@
         outline: none;
       }
     }
+
+    #deleteButton {
+      align-self: flex-end;
+      justify-content: flex-start;
+
+    }
   }
 
   #lineGraph {
