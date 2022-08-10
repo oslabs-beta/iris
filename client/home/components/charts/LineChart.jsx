@@ -120,7 +120,32 @@ function LineChart(props) {
 
     return (
         <>
-            <Line id='lineGraph' options={options} data={chartMetric} />
+            <Line id='lineGraph' 
+                options={
+                    { 
+                        maintainAspectRatio: true, 
+                        responsive: true,
+                        layout: {
+                            padding: 30
+                        },
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    font : {
+                                        family: 'Trebuchet MS',
+                                    },
+                                },
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: 'TOP SECRET: ITAR RESTRICTED DATA',
+                            },
+                        } 
+                    }
+                } 
+                data={chartMetric} 
+            />
         </>
     )
 }
