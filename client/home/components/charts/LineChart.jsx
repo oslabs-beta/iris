@@ -126,7 +126,11 @@ function LineChart(props) {
                         maintainAspectRatio: true, 
                         responsive: true,
                         layout: {
-                            padding: 30
+                            padding: {
+                                right: 30,
+                                left: 30,
+                                bottom: 30
+                            }
                         },
                         plugins: {
                             legend: {
