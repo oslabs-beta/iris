@@ -95,7 +95,24 @@ function PieChart(props) {
 
     return (
         <div id='pieGraph'>
-            <Pie id='pieGraph' options={options} data={pieData} />
+            <Pie id='pieGraph' 
+                options={
+                    { 
+                        maintainAspectRatio: false, 
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: 'TOP SECRET: ITAR RESTRICTED DATA',
+                            },
+                        } 
+                    }
+                } 
+                data={pieData} 
+            />
         </div>
     )
 }

@@ -108,7 +108,24 @@ function BarChart(props) {
 
     return (
         <div id='barGraph'>
-            <Bar id='barGraph' options={options} data={barData} />
+            <Bar id='barGraph' 
+                options={
+                    { 
+                        maintainAspectRatio: false, 
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: 'TOP SECRET: ITAR RESTRICTED DATA',
+                            },
+                        } 
+                    }
+                }
+                data={barData} 
+            />
         </div>
     )
 }
