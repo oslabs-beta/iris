@@ -36,7 +36,7 @@ function BarChart(props) {
         const newObj = {
             labels: binArray,
             datasets: [{
-                label: chartID, // label not showing up here //fuck you Walter you fucking name it label'S'!!!!!
+                label: chartID, // label not showing up here
                 data: countArr,
                 backgroundColor: colorArr,
                 order: 1,
