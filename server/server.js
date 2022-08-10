@@ -81,19 +81,17 @@ io.on('connection', async (socket) => {
     socket.emit('pieChart', pieChartData);
     socket.on("disconnect", () => console.log("Socket disconnect for piechart"))
 
+    //caching the data to fix latency problem
     const queryObj = {}
     //query and emit data for linecharts
     for (const [chartID, query] of Object.entries(chartsData)) {
       const key = JSON.stringify(`${query.metric}+${query.timeFrame}`) // 'kafka_coordinator_group_metadata_manager_numgroups+5m'
-      console.log('key is :', key)
       if (queryObj[key]) {
-        console.log('line 90 queryObj data at key: ', queryObj[key])
         socket.emit(chartID, queryObj[key]) //Broadcast data from query on topic of chartID
         socket.on("disconnect", () => console.log("Socket disconnect for linecharts")) // disconnects socket to grab new metric data
       } else {
         const data = await queryData(query.metric, query.timeFrame)
         queryObj[key] = data //setting data as value for key
-        console.log('***line 96 key:', key, 'queryObj value:', queryObj[key], 'data : ', data)
         socket.emit(chartID, data) //Broadcast data from query on topic of chartID
         socket.on("disconnect", () => console.log("Socket disconnect for linecharts")) // disconnects socket to grab new metric data
       }
