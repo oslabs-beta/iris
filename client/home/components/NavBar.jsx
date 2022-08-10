@@ -17,13 +17,32 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 
+import Backdrop from '@mui/material/Backdrop';
+import Modal from '@mui/material/Modal';
+import Fade from '@mui/material/Fade';
+
 const pages = ['Our MVP', 'Our Prices', 'Our Story'];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+
+const style = {
+    position: 'absolute',
+    top: '30%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '50%',
+    height: '30%',
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+  };
 
 function NavBar() {
 
     const [anchorElNav, setAnchorElNav] = React.useState(null);
-    const [anchorElUser, setAnchorElUser] = React.useState(null);
+
+    const [open, setOpen] = React.useState(false);
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
 
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
@@ -36,16 +55,36 @@ function NavBar() {
         setAnchorElNav(null);
     };
 
-    const handleCloseUserMenu = () => {
-        setAnchorElUser(null);
-    };
-
     return (
         <nav className='navbar'>
             <div className="logo">
                 <a href='/' className='site-logo'><img src={irisLogo} id = "iris-logo"/></a>
                 <a href='/' className='site-title'><img src={irisName} id = "iris-logo"/></a>
             </div>
+
+            <Button onClick={handleOpen}>ROOT ACCESS</Button>
+            <Modal
+                aria-labelledby="transition-modal-title"
+                aria-describedby="transition-modal-description"
+                open={open}
+                onClose={handleClose}
+                closeAfterTransition
+                BackdropComponent={Backdrop}
+                BackdropProps={{
+                timeout: 500,
+                }}
+            >
+                <Fade in={open}>
+                <Box sx={style}>
+                    <Typography id="transition-modal-title" variant="h6" component="h2">
+                    For your eyes only
+                    </Typography>
+                    <Typography id="transition-modal-description" sx={{ mt: 2 }}>
+                    &#128065; &#128068; &#128065;
+                    </Typography>
+                </Box>
+                </Fade>
+            </Modal>
 
             <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
             <IconButton
