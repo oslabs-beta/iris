@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 
 function Port(props) {
+  const { handleClose } = props
+
   function handlePort(e) {
     const port = e.target.parentNode.querySelector('#portOption').value;
     const password = e.target.parentNode.querySelector('#password').value;
@@ -20,7 +22,10 @@ function Port(props) {
       .then(res => res.json())
       .then((data) => {
         console.log(data)
-        if (data === port) alert(`ROOT ACCESS GRANTED`)
+        if (data === port) {
+          alert(`ROOT ACCESS GRANTED`)
+          handleClose()
+        }
         else alert('Incorrect password: Your ISP has been flagged by the IRS')
       })
       .catch(err => {

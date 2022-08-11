@@ -37,7 +37,10 @@ function NavBar() {
 
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
+    const handleClose = () => {
+      console.log('handleClose clicked')
+      setOpen(false);
+    }
 
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
@@ -62,7 +65,7 @@ function NavBar() {
                 aria-labelledby="transition-modal-title"
                 aria-describedby="transition-modal-description"
                 open={open}
-                onClose={handleClose}
+                // onClose={handleClose}
                 closeAfterTransition
                 BackdropComponent={Backdrop}
                 BackdropProps={{
@@ -79,7 +82,7 @@ function NavBar() {
                     </Typography> */}
                     <h1>&#128065; &#128068; &#128065;</h1>
                     <h3>for your eyes only</h3>
-                    <Port/>
+                    <Port handleClose={handleClose}/>
                 </Box>
                 </Fade>
             </Modal>
