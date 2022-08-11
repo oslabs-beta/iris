@@ -3,12 +3,12 @@ const fetch = require('node-fetch')
 const path = require('path')
 const http = require('http')
 const { Server } = require('socket.io')
-const { urlencoded } = require('express')
 const cors = require('cors')
 const dbController = require('./databaseController.js')
+const portController = require('./portController.js')
 
 const PORT = 8080
-// const io = require('socket.io');
+
 //------------------------------------------------------------------------------------------------------------//
 const app = express();
 app.use(cors())
@@ -110,38 +110,38 @@ io.on('connect_error', (err) => {
 // Query data from API endpoint and write data to database
 // Existing database is not overwritten and does not present conflicts 
 // LastTimeStamp variable tracked to check the last time data was queried and written
-let lastTimeStamp = 0;
 // setInterval to query data and store in backend every 15s.
-setInterval(async () => {
-  setTimeout(async () => {
-    await dbController.add_failedpartitionscount_value(lastTimeStamp);
-    await dbController.add_maxlag_value(lastTimeStamp);
-    await dbController.add_bytesoutpersec_rate(lastTimeStamp);
-    // console.log('db after 0 sec')
-  }, 0)
+// let lastTimeStamp = 0;
+// setInterval(async () => {
+//   setTimeout(async () => {
+//     await dbController.add_failedpartitionscount_value(lastTimeStamp);
+//     await dbController.add_maxlag_value(lastTimeStamp);
+//     await dbController.add_bytesoutpersec_rate(lastTimeStamp);
+//     // console.log('db after 0 sec')
+//   }, 0)
 
-  setTimeout(async () => {
-    await dbController.add_messagesinpersec_rate(lastTimeStamp);
-    await dbController.add_replicationbytesinpersec_rate(lastTimeStamp);
-    await dbController.add_underreplicatedpartitions(lastTimeStamp);
-    // console.log('db after 2 sec')
-  }, 2000)
+//   setTimeout(async () => {
+//     await dbController.add_messagesinpersec_rate(lastTimeStamp);
+//     await dbController.add_replicationbytesinpersec_rate(lastTimeStamp);
+//     await dbController.add_underreplicatedpartitions(lastTimeStamp);
+//     // console.log('db after 2 sec')
+//   }, 2000)
 
-  setTimeout(async () => {
-    await dbController.add_failedisrupdatespersec(lastTimeStamp);
-    await dbController.add_scrapedurationseconds(lastTimeStamp);
-    await dbController.add_scrape_samples_scraped(lastTimeStamp);
-    // console.log('db after 4 sec')
-  }, 4000)
+//   setTimeout(async () => {
+//     await dbController.add_failedisrupdatespersec(lastTimeStamp);
+//     await dbController.add_scrapedurationseconds(lastTimeStamp);
+//     await dbController.add_scrape_samples_scraped(lastTimeStamp);
+//     // console.log('db after 4 sec')
+//   }, 4000)
 
-  setTimeout(async () => {
-    await dbController.add_requesthandleraverageidlepercent(lastTimeStamp)
-    lastTimeStamp = await dbController.add_bytesinpersec_rate(lastTimeStamp)
-    // console.log('in setInterval after dbController new time:', lastTimeStamp)
-    // console.log('db after 6 sec')
-  }, 6000)
+//   setTimeout(async () => {
+//     await dbController.add_requesthandleraverageidlepercent(lastTimeStamp)
+//     lastTimeStamp = await dbController.add_bytesinpersec_rate(lastTimeStamp)
+//     // console.log('in setInterval after dbController new time:', lastTimeStamp)
+//     // console.log('db after 6 sec')
+//   }, 6000)
 
-}, 60000) // 1 minute set interval
+// }, 60000) // 1 minute set interval
 //------------------------------------------------------------------------------------------------------------//
 //Post request to frontend to show historical data for each Metric Chart
 app.post('/historicalData',
@@ -153,12 +153,30 @@ app.post('/historicalData',
   })
 
 //------------------------------------------------------------------------------------------------------------//
-//Post request to frontend to delete chart
+// Post request to frontend to delete chart
 app.post('/delete',
   (req, res) => {
     const { chartID } = req.body;
     delete chartsData[chartID]
     res.status(200).json('ChartID was removed')
+  }
+)
+
+//------------------------------------------------------------------------------------------------------------//
+// Post request from frontend to verify port and password
+app.post('/port',
+  portController.verifyPort,
+  (req, res) => {
+    res.status(201).json(res.locals.port)
+  }
+)
+
+//------------------------------------------------------------------------------------------------------------//
+// Create a port and password combo in backend via Postman
+app.post('/createPort',
+  portController.createPort,
+  (req, res) => {
+    res.status(201).json(res.locals.port)
   }
 )
 

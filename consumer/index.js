@@ -5,8 +5,8 @@ const eventInteger = require('../eventTypes/eventInteger.js')
 
 
 const kafka = new Kafka({
-  clientId:'iris',
-  brokers:['localhost:9092'],
+  clientId: 'iris',
+  brokers: ['localhost:9092'],
   requestTimeout: 25000,
   connectionTimeout: 3000,
   retry: {
@@ -16,17 +16,17 @@ const kafka = new Kafka({
   logLevel: 'logLevel.DEBUG'
 })
 
-const consumer = kafka.consumer({groupId:'iris'})
+const consumer = kafka.consumer({ groupId: 'iris' })
 
 consumer.connect()
 
 consumer.subscribe({
-  topics:['test1', 'test2'],
+  topics: ['test1', 'test2'],
   fromBeginning: true
 })
 
 consumer.run({
-  eachMessage: async({topic, partition, message}) => {
+  eachMessage: async ({ topic, partition, message }) => {
     if (topic === 'test1') {
       console.log('received message: ', eventInteger.fromBuffer(message.value))
     }
