@@ -1,4 +1,3 @@
-import { format } from 'path';
 import React, { Component } from 'react';
 
 function Port(props) {
@@ -9,7 +8,7 @@ function Port(props) {
     if (port === '' || password === '') alert('Must Fill in All Required Input Fields');
     else if (port !== '' && password !== '') {
       const reqBody = {
-        portNumber: port,
+        port: port,
         password: password
       };
 
@@ -18,8 +17,10 @@ function Port(props) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(reqBody)
       })
-      .then((formattedData) => {
-        if (formattedData === port) console.log('Verified')
+      .then(res => res.json())
+      .then((data) => {
+        console.log(data)
+        if (data === port) alert(`ROOT ACCESS GRANTED`)
         else alert('Incorrect password: Your ISP has been flagged by the IRS')
       })
       .catch(err => {
@@ -30,11 +31,9 @@ function Port(props) {
 
   return (
     <div id='portAccess'>
-
-      <input id='portOption'>PORT</input>
-      <input id='password'>Password</input>
+      <input id='portOption' defaultValue='9090'></input>
+      <input id='password' type='password'></input>
       <button id='submit' onClick={(e) => handlePort(e)}>Get ROOT ACCESS</button>
-
     </div>
   )
 }

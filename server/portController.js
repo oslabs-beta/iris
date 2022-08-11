@@ -6,13 +6,14 @@ const portController = {}
 portController.verifyPort = async (req, res, next) => {
   try {
     const { port, password } = req.body;
-
+    
     // checking if port or password is empty
     if (!port || !password) return next('port or password is missing')
-
+    
     // parsing our Port db to see if we have a matching port
     const queryResult = await Port.findOne({ port: port });
-
+    console.log('queryResult pw: ', queryResult)
+    
     // checking to see if the password matches after to our bcrypt hash
     const comparePass = await bcrypt.compare(password, queryResult.password);
 
