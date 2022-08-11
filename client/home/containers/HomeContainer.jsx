@@ -4,12 +4,12 @@ import LeftPane from './LeftPane.jsx';
 
 
 function HomeContainer(props) {
-    return (
-        <div id='homePage'>
-            <LeftPane />
-            <RightPane />
-        </div>
-    )
+  return (
+    <div id='homePage'>
+      <LeftPane />
+      <RightPane />
+    </div>
+  )
 };
 
 export default HomeContainer;
