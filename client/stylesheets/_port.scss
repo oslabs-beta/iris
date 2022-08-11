@@ -1,0 +1,32 @@
+
+.MuiBox-root.css-1oo4evn {
+  font-family: Garet Book;
+  text-align: center;
+  #portAccess {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    input {
+      margin-bottom: 2%;
+      width: 40%;
+      &:focus {
+        outline: none;
+      }
+    }
+    button {
+      font-family: Garet Book;
+      color: black;
+      background: none;
+      border: none;
+      &:hover {
+        cursor: pointer;
+      }
+      &:focus-within {
+        transform: scale(1.2);
+        transition-duration: 500ms;
+      }
+    }
+  }
+}

@@ -1,7 +1,8 @@
 import React, { Component, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import irisLogo from '../assets/IRIS_logo_v1.png'
-import irisName from '../assets/IRIS_name_v1.png'
+import irisLogo from '../assets/IRIS_logo_v1.png';
+import irisName from '../assets/IRIS_name_v1.png';
+import Port from './Port.jsx';
 
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
@@ -36,7 +37,10 @@ function NavBar() {
 
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
+    const handleClose = () => {
+      console.log('handleClose clicked')
+      setOpen(false);
+    }
 
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
@@ -61,7 +65,7 @@ function NavBar() {
                 aria-labelledby="transition-modal-title"
                 aria-describedby="transition-modal-description"
                 open={open}
-                onClose={handleClose}
+                // onClose={handleClose}
                 closeAfterTransition
                 BackdropComponent={Backdrop}
                 BackdropProps={{
@@ -70,12 +74,15 @@ function NavBar() {
             >
                 <Fade in={open}>
                 <Box sx={style}>
-                    <Typography id="transition-modal-title" variant="h6" component="h2">
+                    {/* <Typography id="transition-modal-title" variant="h6" component="h2">
                     For your eyes only
                     </Typography>
                     <Typography id="transition-modal-description" sx={{ mt: 2 }}>
                     &#128065; &#128068; &#128065;
-                    </Typography>
+                    </Typography> */}
+                    <h1>&#128065; &#128068; &#128065;</h1>
+                    <h3>for your eyes only</h3>
+                    <Port handleClose={handleClose}/>
                 </Box>
                 </Fade>
             </Modal>
