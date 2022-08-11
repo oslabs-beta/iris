@@ -72,7 +72,19 @@ io.on('connection', async (socket) => {
     const JVMNonHeapUsage = await getHistogram('kafka_jvm_non_heap_usage', '1h', 20);
     socket.emit('kafka_jvm_heap_usage', JVMHeapUsage)
     socket.emit('kafka_jvm_non_heap_usage', JVMNonHeapUsage)
+
+    // console.log('Data after first socket connection for JVM_Heap:' , JVMHeapUsage[0].values)
+    // console.log('Data after first socket connection for JVM_Non_Heap:' , JVMNonHeapUsage[0].values)
+    // socket.on("disconnect", () => console.log("Socket disconnect"))
+
+    // const JVMHeapUsage = await getHistogram('kafka_jvm_heap_usage', '1h', 20)
+    // const JVMNonHeapUsage = await getHistogram('kafka_jvm_non_heap_usage', '1h', 20);
+    // socket.emit('kafka_jvm_heap_usage', JVMHeapUsage)
+    // socket.emit('kafka_jvm_non_heap_usage', JVMNonHeapUsage)
+
     socket.on("disconnect", () => console.log("Socket disconnect for histogram"))
+
+
 
     const pieChartData = await getPieChart(['kafka_coordinator_group_metadata_manager_numgroups',
       'kafka_coordinator_group_metadata_manager_numgroupsdead',
@@ -110,6 +122,7 @@ io.on('connect_error', (err) => {
 // Query data from API endpoint and write data to database
 // Existing database is not overwritten and does not present conflicts 
 // LastTimeStamp variable tracked to check the last time data was queried and written
+<<<<<<< HEAD
 // setInterval to query data and store in backend every 15s.
 // let lastTimeStamp = 0;
 // setInterval(async () => {
@@ -119,6 +132,21 @@ io.on('connect_error', (err) => {
 //     await dbController.add_bytesoutpersec_rate(lastTimeStamp);
 //     // console.log('db after 0 sec')
 //   }, 0)
+=======
+let lastTimeStamp = 0;
+
+//setInterval to query data and store in backend every 15s.
+
+// setInterval to query data and store in backend every 15s.
+
+setInterval(async () => {
+  setTimeout(async () => {
+    await dbController.add_failedpartitionscount_value(lastTimeStamp);
+    await dbController.add_maxlag_value(lastTimeStamp);
+    await dbController.add_bytesoutpersec_rate(lastTimeStamp);
+    // console.log('db after 0 sec')
+  }, 0)
+>>>>>>> 0a9401d67cf6d80a37d037f62d4f68048b3fe3f5
 
 //   setTimeout(async () => {
 //     await dbController.add_messagesinpersec_rate(lastTimeStamp);
@@ -141,7 +169,14 @@ io.on('connect_error', (err) => {
 //     // console.log('db after 6 sec')
 //   }, 6000)
 
+<<<<<<< HEAD
 // }, 60000) // 1 minute set interval
+=======
+}, 60000)
+
+// 1 minute set interval
+
+>>>>>>> 0a9401d67cf6d80a37d037f62d4f68048b3fe3f5
 //------------------------------------------------------------------------------------------------------------//
 //Post request to frontend to show historical data for each Metric Chart
 app.post('/historicalData',
@@ -288,6 +323,7 @@ app.use((err, req, res, next) => {
 //------------------------------------------------------------------------------------------------------------//
 //PORT listening
 server.listen(PORT, () => console.log('Listening on Port', PORT))
+
 
 
 module.exports = app;
