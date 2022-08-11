@@ -7,18 +7,36 @@ body {
     margin-top: 70px;
 
     display: flex;
-    flex-direction: flex-start;
+    flex-direction: row;
 
 
     #leftPane {
       position: fixed;
       width: 30%;
       margin-left: 1%;
+
       #barGraph {
         background: rgba(255, 255, 255, 0.7);
         border-radius: 8px;
         margin-top: 5%;
         padding: 8px;
+        height: 25vh;
+
+        canvas {
+          background: rgba(255, 255, 255, 0);
+          margin-top: 0%;
+          height: 90%;
+        }
+      }
+
+      #pieGraph {
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 8px;
+        margin-top: 5%;
+        padding: 8px;
+        height: 30vh;
+
+
         canvas {
           background: rgba(255, 255, 255, 0);
           margin-top: 0%;
@@ -29,6 +47,7 @@ body {
     #rightPane {
       width: 70%;
       margin-left: 30%;
+
       button#newGraph {
         position: fixed;
         right: 2%;

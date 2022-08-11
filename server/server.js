@@ -3,12 +3,12 @@ const fetch = require('node-fetch')
 const path = require('path')
 const http = require('http')
 const { Server } = require('socket.io')
-const { urlencoded } = require('express')
 const cors = require('cors')
 const dbController = require('./databaseController.js')
+const portController = require('./portController.js')
 
 const PORT = 8080
-// const io = require('socket.io');
+
 //------------------------------------------------------------------------------------------------------------//
 const app = express();
 app.use(cors())
@@ -44,44 +44,69 @@ const io = require('socket.io')(server, {
 io.on('connection', async (socket) => {
   console.log('a user connected')
   //Histogram connection
-  // const JVMHeapUsage = await getHistogram('kafka_jvm_heap_usage', '1h', 20)
-  // const JVMNonHeapUsage = await getHistogram('kafka_jvm_non_heap_usage', '1h', 20);
-  // socket.emit('kafka_jvm_heap_usage', JVMHeapUsage)
-  // socket.emit('kafka_jvm_non_heap_usage', JVMNonHeapUsage)
-  
+  const JVMHeapUsage = await getHistogram('kafka_jvm_heap_usage', '1h', 20)
+  const JVMNonHeapUsage = await getHistogram('kafka_jvm_non_heap_usage', '1h', 20);
+  socket.emit('kafka_jvm_heap_usage', JVMHeapUsage)
+  socket.emit('kafka_jvm_non_heap_usage', JVMNonHeapUsage)
+  socket.on("disconnect", () => console.log("Socket disconnect for histogram first start up"))
   //Piechart connection
   const pieChartData = await getPieChart(['kafka_coordinator_group_metadata_manager_numgroups',
-                                          'kafka_coordinator_group_metadata_manager_numgroupsdead',
-                                          'kafka_coordinator_group_metadata_manager_numgroupsempty'
-                                          ])
-  console.log('Data from getPieChart when connected: ', pieChartData)
+    'kafka_coordinator_group_metadata_manager_numgroupsdead',
+    'kafka_coordinator_group_metadata_manager_numgroupsempty'
+  ])
+  // console.log('Data from getPieChart when connected: ', pieChartData)
   socket.emit('pieChart', pieChartData);
+  socket.on("disconnect", () => console.log("Socket disconnect for piechart first start up"))
 
   //Line chart connection
   for (const [chartID, query] of Object.entries(chartsData)) {
     const data = await queryData(query.metric, query.timeFrame)
     socket.emit(chartID, data) //Broadcast data from query on topic of chartID
+    socket.on("disconnect", () => console.log("Socket disconnect for linecharts first start up"))
   }
 
   // setInterval is for sending data to the frontend every X seconds.
   setInterval(async () => {
     // Query and emit data for JVM_HEAP_USAGE (HISTOGRAM) and JVM_NON_HEAP_USAGE (HISTOGRAM)
+    const JVMHeapUsage = await getHistogram('kafka_jvm_heap_usage', '1h', 20)
+    const JVMNonHeapUsage = await getHistogram('kafka_jvm_non_heap_usage', '1h', 20);
+    socket.emit('kafka_jvm_heap_usage', JVMHeapUsage)
+    socket.emit('kafka_jvm_non_heap_usage', JVMNonHeapUsage)
+
+    // console.log('Data after first socket connection for JVM_Heap:' , JVMHeapUsage[0].values)
+    // console.log('Data after first socket connection for JVM_Non_Heap:' , JVMNonHeapUsage[0].values)
+    // socket.on("disconnect", () => console.log("Socket disconnect"))
+
     // const JVMHeapUsage = await getHistogram('kafka_jvm_heap_usage', '1h', 20)
     // const JVMNonHeapUsage = await getHistogram('kafka_jvm_non_heap_usage', '1h', 20);
     // socket.emit('kafka_jvm_heap_usage', JVMHeapUsage)
     // socket.emit('kafka_jvm_non_heap_usage', JVMNonHeapUsage)
 
+    socket.on("disconnect", () => console.log("Socket disconnect for histogram"))
+
+
+
     const pieChartData = await getPieChart(['kafka_coordinator_group_metadata_manager_numgroups',
-                                            'kafka_coordinator_group_metadata_manager_numgroupsdead',
-                                            'kafka_coordinator_group_metadata_manager_numgroupsempty'
-                                            ])
+      'kafka_coordinator_group_metadata_manager_numgroupsdead',
+      'kafka_coordinator_group_metadata_manager_numgroupsempty'
+    ])
     socket.emit('pieChart', pieChartData);
-    
+    socket.on("disconnect", () => console.log("Socket disconnect for piechart"))
+
+    //caching the data to fix latency problem
+    const queryObj = {}
     //query and emit data for linecharts
     for (const [chartID, query] of Object.entries(chartsData)) {
-      const data = await queryData(query.metric, query.timeFrame)
-      socket.emit(chartID, data) //Broadcast data from query on topic of chartID
-      socket.on("disconnect", () => console.log("Socket disconnect")) // disconnects socket to grab new metric data
+      const key = JSON.stringify(`${query.metric}+${query.timeFrame}`) // 'kafka_coordinator_group_metadata_manager_numgroups+5m'
+      if (queryObj[key]) {
+        socket.emit(chartID, queryObj[key]) //Broadcast data from query on topic of chartID
+        socket.on("disconnect", () => console.log("Socket disconnect for linecharts")) // disconnects socket to grab new metric data
+      } else {
+        const data = await queryData(query.metric, query.timeFrame)
+        queryObj[key] = data //setting data as value for key
+        socket.emit(chartID, data) //Broadcast data from query on topic of chartID
+        socket.on("disconnect", () => console.log("Socket disconnect for linecharts")) // disconnects socket to grab new metric data
+      }
     }
   }, 10000) // socket.emit will send the data every n second. 
 })
@@ -97,8 +122,9 @@ io.on('connect_error', (err) => {
 // Query data from API endpoint and write data to database
 // Existing database is not overwritten and does not present conflicts 
 // LastTimeStamp variable tracked to check the last time data was queried and written
+<<<<<<< HEAD
+// setInterval to query data and store in backend every 15s.
 // let lastTimeStamp = 0;
-//setInterval to query data and store in backend every 15s.
 // setInterval(async () => {
 //   setTimeout(async () => {
 //     await dbController.add_failedpartitionscount_value(lastTimeStamp);
@@ -106,6 +132,21 @@ io.on('connect_error', (err) => {
 //     await dbController.add_bytesoutpersec_rate(lastTimeStamp);
 //     // console.log('db after 0 sec')
 //   }, 0)
+=======
+let lastTimeStamp = 0;
+
+//setInterval to query data and store in backend every 15s.
+
+// setInterval to query data and store in backend every 15s.
+
+setInterval(async () => {
+  setTimeout(async () => {
+    await dbController.add_failedpartitionscount_value(lastTimeStamp);
+    await dbController.add_maxlag_value(lastTimeStamp);
+    await dbController.add_bytesoutpersec_rate(lastTimeStamp);
+    // console.log('db after 0 sec')
+  }, 0)
+>>>>>>> 0a9401d67cf6d80a37d037f62d4f68048b3fe3f5
 
 //   setTimeout(async () => {
 //     await dbController.add_messagesinpersec_rate(lastTimeStamp);
@@ -128,7 +169,14 @@ io.on('connect_error', (err) => {
 //     // console.log('db after 6 sec')
 //   }, 6000)
 
-// }, 60000)
+<<<<<<< HEAD
+// }, 60000) // 1 minute set interval
+=======
+}, 60000)
+
+// 1 minute set interval
+
+>>>>>>> 0a9401d67cf6d80a37d037f62d4f68048b3fe3f5
 //------------------------------------------------------------------------------------------------------------//
 //Post request to frontend to show historical data for each Metric Chart
 app.post('/historicalData',
@@ -138,14 +186,32 @@ app.post('/historicalData',
     io.emit(chartID, res.locals.historicalData)
     res.status(200).json(res.locals.historicalData)
   })
+
 //------------------------------------------------------------------------------------------------------------//
-//Post request to frontend to delete chart
-app.post('/delete', 
-  (req,res) => {
+// Post request to frontend to delete chart
+app.post('/delete',
+  (req, res) => {
     const { chartID } = req.body;
-    delete chartsData.chartID
-    // console.log('ChartID was removed: ', (!chartsData[chartID]))
-    res.status(200).send('ChartID was removed: ', (!chartsData[chartID]))
+    delete chartsData[chartID]
+    res.status(200).json('ChartID was removed')
+  }
+)
+
+//------------------------------------------------------------------------------------------------------------//
+// Post request from frontend to verify port and password
+app.post('/port',
+  portController.verifyPort,
+  (req, res) => {
+    res.status(201).json(res.locals.port)
+  }
+)
+
+//------------------------------------------------------------------------------------------------------------//
+// Create a port and password combo in backend via Postman
+app.post('/createPort',
+  portController.createPort,
+  (req, res) => {
+    res.status(201).json(res.locals.port)
   }
 )
 
@@ -233,7 +299,7 @@ const getPieChart = async (metricsArr) => {
     const data = await queryData(metric, '30s'); // Results array of objects with metric and values keys
     const timeValueArr = data[0].values[data[0].values.length - 1] // [time, value] at values.length - 1
     return {
-      metric: {topic: metric},
+      metric: { topic: metric },
       values: [timeValueArr]
     }
   }))
@@ -257,6 +323,7 @@ app.use((err, req, res, next) => {
 //------------------------------------------------------------------------------------------------------------//
 //PORT listening
 server.listen(PORT, () => console.log('Listening on Port', PORT))
+
 
 
 module.exports = app;
