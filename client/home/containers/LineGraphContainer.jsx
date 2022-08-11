@@ -2,17 +2,16 @@ import React, { Component, useState, useEffect } from 'react';
 import LineChart from '../components/charts/LineChart.jsx';
 import io from 'socket.io-client';
 import mock1h from '../dummyData/mockData_1h';
+import e from 'cors';
 
 const socket = io();
 
-function GraphContainer(props) {
+function LineGraphContainer(props) {
   // Exposed props.chartID when creating chart at Page Level Component
   // Use dummy value of '1' for unit testing
   const { chartID } = props;
-  // const chartID = '1';
   const [chartData, setChartData] = useState(mock1h.data.result);
 
-  // console.log(chartID);
 
   socket.on('connect', () => {
     console.log('socket connected')
@@ -20,28 +19,16 @@ function GraphContainer(props) {
 
   socket.on(chartID, (data) => {
     setChartData(data)
-    console.log('after setting chartData: ', chartData)
   });
 
   socket.on('connect_error', (err) => {
     console.log(`connect_error due to ${err.message}`);
   });
 
-  // functionality to change graph here -> dropdown to select from different graphs
-  // dynamic update
-  async function handleChartChange(e) {
-    console.log('handleChartChange: ', e.target.value);
-  }
-
   async function handleDynamicMetrics(e) {
     // grab metric by pulling value from our select id
     const metrics = e.target.parentNode.querySelector('#metric').value;
     const timeFrame = e.target.parentNode.querySelector('#timeframe').value;
-    console.log('e.target', metrics, timeFrame)
-
-    // function for later when we figure out how to rework logic
-    // function (metrics, timeFrame) {
-    // }
 
     let reqBody;
 
@@ -90,14 +77,39 @@ function GraphContainer(props) {
     return;
   }
 
-  async function handleHistoricalMetrics(e) {
-    console.log('starting historical metric fetch')
+  function handleChartDelete(e) {
+    // need to target the chart with chartID 
+    // more like deleting graphContainer
+    const chartToDelete = e.target.parentNode.parentNode.parentNode
+    // remove from DOM
+    chartToDelete.remove();
 
-    const startTime = e.target.parentNode.querySelector('#starttime').value
-    const endTime = e.target.parentNode.querySelector('#endtime').value
+    console.log(JSON.stringify({ chartID: chartID }));
 
-    console.log(startTime, endTime)
+    // fetch request with POST to backend so backend can process the socket.off    
+    fetch('/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chartID: chartID })
+    })
+      .then(res => res.json())
+      .then((data) => {
+        console.log(data)
+      })
+      .catch(err => {
+        console.log('Error thrown in POST request  in graphContainer: ', err)
+      })
+    // no return;
   }
+
+  // async function handleHistoricalMetrics(e) {
+  //   console.log('starting historical metric fetch')
+
+  //   const startTime = e.target.parentNode.querySelector('#starttime').value
+  //   const endTime = e.target.parentNode.querySelector('#endtime').value
+
+  //   console.log(startTime, endTime)
+  // }
 
   // return our render
   // need 2 drop downs -> 1) metrics, 2) timeframe
@@ -144,6 +156,13 @@ function GraphContainer(props) {
           <option value="6h">6h</option>
           <option value="12h">12h</option>
         </select>
+
+        <button id="deleteGraph" onClick={(e) => handleChartDelete(e)}>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-x-square" viewBox="0 0 16 16">
+            <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+          </svg>
+        </button>
       </div>
 
       {/* <select id='historicalTime' onChange={(e) => handleHistoricalMetrics(e)}>
@@ -168,4 +187,4 @@ function GraphContainer(props) {
   )
 }
 
-export default GraphContainer;
+export default LineGraphContainer;

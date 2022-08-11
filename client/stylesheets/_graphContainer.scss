@@ -2,10 +2,23 @@
   font-family: Garet Book;
   display: grid;
   grid-template-areas: "dropdown"
-                        "graph";
+    "graph";
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.746);
+  background: rgba(255, 255, 255, 0.7);
   margin: 8px;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.346);
+
+  &:hover {
+    box-shadow: 0px 16px 24px rgba(0, 0, 0, 0.5);
+    transform: scale(1.05);
+    transition-duration: 400ms;
+    cursor: crosshair;
+  }
+
+  &:not(:hover) {
+    transition-duration: 600ms;
+  }
+
   .selectDropdown {
     display: flex;
     flex-direction: row;
@@ -13,27 +26,57 @@
     grid-area: dropdown;
     text-align: center;
     margin-top: 2%;
+
     select {
       font-family: Garet Book;
-      border:1px solid rgb(43, 43, 43);
+      border: 1px solid rgb(43, 43, 43);
       border-radius: 6px;
       background: rgba(255, 255, 255, 0.286);
+
       &#metric {
         width: 65%;
+        margin-left: 5%;
         margin-right: 2%;
       }
+
       &#timeFrame {
         width: 25%;
       }
+
       &:focus {
         outline: none;
       }
     }
+
+    #deleteGraph {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: auto;
+      margin-right: 2%;
+      border: none;
+      background: none;
+
+      svg {
+        width: 24px;
+        height: 24px;
+        &:hover {
+          cursor: pointer;
+          transform: scale(1.05);
+          transition-duration: 300ms;
+        }
+        &:not(:hover) {
+          transition-duration: 600ms;
+        }
+      }
+
+
+    }
   }
 
-  #graph {
+  #lineGraph {
     grid-area: graph;
-    
+
   }
 
 }
