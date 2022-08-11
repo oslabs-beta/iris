@@ -38,7 +38,6 @@ This ensures Kafka brokers do not become throttled and maintain fault tolerance.
 - Second terminal, run ```npm run start:producer```. It should show:
 <img width="482" alt="image" src="https://user-images.githubusercontent.com/102982879/183764487-57fdc27c-080a-4669-bc5c-ba6d99c2ec94.png">
 
-
 - Third terminal, run ```npm run start:consumer```. It should show:
 <img width="371" alt="image" src="https://user-images.githubusercontent.com/102982879/183764560-3dd0e3bf-32c6-4b7d-aef9-6ef30a777571.png">
 
@@ -49,9 +48,20 @@ This ensures Kafka brokers do not become throttled and maintain fault tolerance.
 ## Viewing the Metric
 
 1) After running ```npm run dev```, ```localhost:8081``` should pop up in the browser
-<img src = "https://user-images.githubusercontent.com/102982879/183765267-b8e76e06-7556-45d0-be8d-a8d8d5aef054.png" width="900" height="600">
 
 2) Click on Metric bar to change to different Kafka Metric with different Time Frame
+
+<img src= "https://user-images.githubusercontent.com/102982879/184166185-ab7e1b27-c273-4ecd-be4f-67eaa348d821.gif" width="200" height="200">
+
+3) Click on ```+``` for more charts
+
+4) Click on ```-``` next time ```Time Frame``` to delete a chart
+
+## Changing Ports
+
+1) Default PORT is ```localhost:9090```
+
+2) Click on ```PORT ACCESSS``` on the Navigation Bar to switch to a different port
 
 ## Other localhost:
 
