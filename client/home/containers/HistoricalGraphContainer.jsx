@@ -18,20 +18,6 @@ function HistoricalGraphContainer(props) {
     chartToDelete.remove();
 
     console.log(JSON.stringify({ chartID: chartID }));
-
-    // fetch request with POST to backend so backend can process the socket.off    
-    fetch('/delete', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chartID: chartID })
-    })
-      .then(res => res.json())
-      .then((data) => {
-        console.log(data)
-      })
-      .catch(err => {
-        console.log('Error thrown in POST request  in graphContainer: ', err)
-      })
   }
 
   async function handleHistorical(e) {
@@ -45,24 +31,26 @@ function HistoricalGraphContainer(props) {
     console.log('startTime: ', startTime)
     console.log('endTime: ', endTime)
 
-    // await fetch('/historical', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(
-    //     { 
-    //       metric: metric
-    //       startTime: startTime,
-    //       endTime: endTime 
-    //     }
-    //   )
-    // })
-    //   .then(res => res.json())
-    //   .then((data) => {
-    //     console.log('fetch post success')
-    //   })
-    //   .catch(err => {
-    //     console.log('Error thrown in POST request  in graphContainer: ', err)
-    //   })
+    await fetch('/historicalData', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(
+        { 
+          metric: metric,
+          startTime: startTime,
+          endTime: endTime 
+        }
+      )
+    })
+      .then(res => res.json())
+      .then((data) => {
+        console.log('fetch post success')
+        setChartData(data)
+        console.log('setChartData: ', data)
+      })
+      .catch(err => {
+        console.log('Error thrown in POST request  in graphContainer: ', err)
+      })
      
   }
   return (
