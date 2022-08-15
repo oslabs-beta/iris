@@ -1,6 +1,6 @@
 // const db = require('./databaseModel.js');
-const db = require('./pg.ts');
-const fetch = require('node-fetch')
+const db = require('./pg.ts'); 
+const fetch = require('node-fetch');
 
 const keys = {
   // metric: identifier
@@ -20,38 +20,41 @@ const keys = {
 
 const dbController = {}
 
-dbController.getHistoricalData = (req, res) => {
-  const { metric, timeStart, timeEnd } = req.body
+dbController.getHistoricalData = (req, res, next) => {
+  const { metric, startTime, endTime } = req.body
+
+  console.log('getHistoricalData times: ', startTime, endTime)
 
   const body = `SELECT * 
     FROM iris_database AS ib
-    WHERE ib.time >= ${Math.floor(timeStart.getTime() / 1000)} 
-      AND ib.time <= ${Math.floor(timeEnd.getTime() / 1000)}
+    WHERE ib.time >= ${startTime} 
+      AND ib.time <= ${endTime}
       AND ib.metric = '${metric}'
   `
-
-  db.query(body, (err, result) => {
+  db.query(body, (err, queryResults) => {
     if (err) {
       return next(err);
     }
-    console.log(result);
-    // TODO: Format the data to pass in to the frontend graph
-    /**
-     * results: [
-     *  {
-     *    metric: {
-     *      keys[metric]: identifier
-     *    },
-     *    values : [
-     *      [time, value],
-     *      [time, value], 
-     *       ...
-     *    ]
-     *  }
-     * ]
-     */
+    const rows = queryResults.rows
+    const results = [];
+    const resultsObj = {}
 
-    res.locals.historicalData = result
+    // Iterate over each row of SQL data
+    // el refers to an individual row
+    rows.forEach(el => {
+      if (!resultsObj[el.identifier]) resultsObj[el.identifier] = [[el.time, el.value]]
+      else if (resultsObj[el.identifier]) resultsObj[el.identifier].push([el.time, el.value])
+    })
+
+    //indentifier includes within SQL database!
+    for (const identifier in resultsObj) {
+      const obj = {}
+      obj.metric = {}
+      obj.metric[keys[metric]] = identifier
+      obj.values = resultsObj[identifier]
+      results.push(obj)
+    }
+    res.locals.historicalData = results
     return next();
   });
 }

@@ -1,5 +1,5 @@
 //Connect to AWS RDS PostgreSQL db
-const { Pool } = require('pg');
+import { Pool } from 'pg';
 
 // create a new pool here using the connection string above
 const pool = new Pool({
@@ -19,3 +19,4 @@ module.exports = {
     return pool.query(text, params, callback);
   },
 };
+
