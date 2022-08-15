@@ -68,18 +68,18 @@ io.on('connection', async (socket) => {
   // setInterval is for sending data to the frontend every X seconds.
   setInterval(async () => {
     // Query and emit data for JVM_HEAP_USAGE (HISTOGRAM) and JVM_NON_HEAP_USAGE (HISTOGRAM)
-    const JVMHeapUsage = await getHistogram('kafka_jvm_heap_usage', '1h', 20)
-    const JVMNonHeapUsage = await getHistogram('kafka_jvm_non_heap_usage', '1h', 20);
-    socket.emit('kafka_jvm_heap_usage', JVMHeapUsage)
-    socket.emit('kafka_jvm_non_heap_usage', JVMNonHeapUsage)
-    socket.on("disconnect", () => console.log("Socket disconnect for histogram"))
+    // const JVMHeapUsage = await getHistogram('kafka_jvm_heap_usage', '1h', 20)
+    // const JVMNonHeapUsage = await getHistogram('kafka_jvm_non_heap_usage', '1h', 20);
+    // socket.emit('kafka_jvm_heap_usage', JVMHeapUsage)
+    // socket.emit('kafka_jvm_non_heap_usage', JVMNonHeapUsage)
+    // socket.on("disconnect", () => console.log("Socket disconnect for histogram"))
 
-    const pieChartData = await getPieChart(['kafka_coordinator_group_metadata_manager_numgroups',
-      'kafka_coordinator_group_metadata_manager_numgroupsdead',
-      'kafka_coordinator_group_metadata_manager_numgroupsempty'
-    ])
-    socket.emit('pieChart', pieChartData);
-    socket.on("disconnect", () => console.log("Socket disconnect for piechart"))
+    // const pieChartData = await getPieChart(['kafka_coordinator_group_metadata_manager_numgroups',
+    //   'kafka_coordinator_group_metadata_manager_numgroupsdead',
+    //   'kafka_coordinator_group_metadata_manager_numgroupsempty'
+    // ])
+    // socket.emit('pieChart', pieChartData);
+    // socket.on("disconnect", () => console.log("Socket disconnect for piechart"))
 
     //caching the data to fix latency problem
     const queryObj = {}
@@ -96,7 +96,7 @@ io.on('connection', async (socket) => {
         socket.on("disconnect", () => console.log("Socket disconnect for linecharts")) // disconnects socket to grab new metric data
       }
     }
-  }, 10000) // socket.emit will send the data every n second. 
+  }, 8000) // socket.emit will send the data every n second. 
 })
 
 //------------------------------------------------------------------------------------------------------------//
@@ -110,45 +110,52 @@ io.on('connect_error', (err) => {
 // Query data from API endpoint and write data to database
 // Existing database is not overwritten and does not present conflicts 
 // LastTimeStamp variable tracked to check the last time data was queried and written
+let lastTimeStamp = 0;
+
+//setInterval to query data and store in backend every 15s.
+
 // setInterval to query data and store in backend every 15s.
-// let lastTimeStamp = 0;
-// setInterval(async () => {
-//   setTimeout(async () => {
-//     await dbController.add_failedpartitionscount_value(lastTimeStamp);
-//     await dbController.add_maxlag_value(lastTimeStamp);
-//     await dbController.add_bytesoutpersec_rate(lastTimeStamp);
-//     // console.log('db after 0 sec')
-//   }, 0)
 
-//   setTimeout(async () => {
-//     await dbController.add_messagesinpersec_rate(lastTimeStamp);
-//     await dbController.add_replicationbytesinpersec_rate(lastTimeStamp);
-//     await dbController.add_underreplicatedpartitions(lastTimeStamp);
-//     // console.log('db after 2 sec')
-//   }, 2000)
+setInterval(async () => {
+  // setTimeout(async () => {
+    await dbController.add_failedpartitionscount_value(lastTimeStamp);
+    await dbController.add_maxlag_value(lastTimeStamp);
+    await dbController.add_bytesoutpersec_rate(lastTimeStamp);
+    // console.log('db after 0 sec')
+  // }, 0)
 
-//   setTimeout(async () => {
-//     await dbController.add_failedisrupdatespersec(lastTimeStamp);
-//     await dbController.add_scrapedurationseconds(lastTimeStamp);
-//     await dbController.add_scrape_samples_scraped(lastTimeStamp);
-//     // console.log('db after 4 sec')
-//   }, 4000)
+  // setTimeout(async () => {
+    await dbController.add_messagesinpersec_rate(lastTimeStamp);
+    await dbController.add_replicationbytesinpersec_rate(lastTimeStamp);
+    await dbController.add_underreplicatedpartitions(lastTimeStamp);
+    // console.log('db after 2 sec')
+  // }, 2000)
 
-//   setTimeout(async () => {
-//     await dbController.add_requesthandleraverageidlepercent(lastTimeStamp)
-//     lastTimeStamp = await dbController.add_bytesinpersec_rate(lastTimeStamp)
-//     // console.log('in setInterval after dbController new time:', lastTimeStamp)
-//     // console.log('db after 6 sec')
-//   }, 6000)
+  // setTimeout(async () => {
+    await dbController.add_failedisrupdatespersec(lastTimeStamp);
+    await dbController.add_scrapedurationseconds(lastTimeStamp);
+    await dbController.add_scrape_samples_scraped(lastTimeStamp);
+    // console.log('db after 4 sec')
+  // }, 4000)
 
-// }, 60000) // 1 minute set interval
+  // setTimeout(async () => {
+    await dbController.add_requesthandleraverageidlepercent(lastTimeStamp)
+    lastTimeStamp = await dbController.add_bytesinpersec_rate(lastTimeStamp)
+    // console.log('in setInterval after dbController new time:', lastTimeStamp)
+    // console.log('db after 6 sec')
+  // }, 6000)
+
+}, 60000)
+
+// 1 minute set interval
+
 //------------------------------------------------------------------------------------------------------------//
 //Post request to frontend to show historical data for each Metric Chart
 app.post('/historicalData',
   dbController.getHistoricalData,
   (req, res) => {
-    const { chartID } = req.body
-    io.emit(chartID, res.locals.historicalData)
+    // const { chartID } = req.body
+    // io.emit(chartID, res.locals.historicalData)
     res.status(200).json(res.locals.historicalData)
   })
 
@@ -288,6 +295,7 @@ app.use((err, req, res, next) => {
 //------------------------------------------------------------------------------------------------------------//
 //PORT listening
 server.listen(PORT, () => console.log('Listening on Port', PORT))
+
 
 
 module.exports = app;
