@@ -1,8 +1,6 @@
 // const db = require('./databaseModel.js');
-const db = require('./pg.ts');
+const db = require('./pg.ts'); 
 const fetch = require('node-fetch');
-const { time } = require('console');
-const { IndexKind } = require('typescript');
 
 const keys = {
   // metric: identifier

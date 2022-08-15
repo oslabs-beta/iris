@@ -1,5 +1,5 @@
 //Connect to ElephantSQL Database
-const { Pool } = require('pg');
+import {Pool} from 'pg';
 
 const PG_URI =
   'postgres://jdwopgmg:RYBczgdXQcF_5EZpgORznG25gTTddcOr@raja.db.elephantsql.com/jdwopgmg';
