@@ -1,7 +1,6 @@
-// const db = require('./databaseModel.js');
-const db = require('./pg.ts');
-const fetch = require('node-fetch')
-
+const db = require('./pg.ts'); 
+const fetch = require('node-fetch');
+//------------------------------------------------------------------------------------------------------------//
 const keys = {
   // metric: identifier
   kafka_server_broker_topic_metrics_bytesinpersec_rate: 'topic',
@@ -17,45 +16,48 @@ const keys = {
   scrape_samples_scraped: 'job',
   kafka_server_request_handler_avg_idle_percent: 'aggregate',
 }
-
+//------------------------------------------------------------------------------------------------------------//
+//------------------------------------------------------------------------------------------------------------//
 const dbController = {}
+dbController.getHistoricalData = (req, res, next) => {
+  const { metric, startTime, endTime } = req.body
 
-dbController.getHistoricalData = (req, res) => {
-  const { metric, timeStart, timeEnd } = req.body
+  console.log('getHistoricalData times: ', startTime, endTime)
 
   const body = `SELECT * 
     FROM iris_database AS ib
-    WHERE ib.time >= ${Math.floor(timeStart.getTime() / 1000)} 
-      AND ib.time <= ${Math.floor(timeEnd.getTime() / 1000)}
+    WHERE ib.time >= ${startTime} 
+      AND ib.time <= ${endTime}
       AND ib.metric = '${metric}'
   `
-
-  db.query(body, (err, result) => {
+  db.query(body, (err, queryResults) => {
     if (err) {
       return next(err);
     }
-    console.log(result);
-    // TODO: Format the data to pass in to the frontend graph
-    /**
-     * results: [
-     *  {
-     *    metric: {
-     *      keys[metric]: identifier
-     *    },
-     *    values : [
-     *      [time, value],
-     *      [time, value], 
-     *       ...
-     *    ]
-     *  }
-     * ]
-     */
+    const rows = queryResults.rows
+    const results = [];
+    const resultsObj = {}
 
-    res.locals.historicalData = result
+    // Iterate over each row of SQL data
+    // el refers to an individual row
+    rows.forEach(el => {
+      if (!resultsObj[el.identifier]) resultsObj[el.identifier] = [[el.time, el.value]]
+      else if (resultsObj[el.identifier]) resultsObj[el.identifier].push([el.time, el.value])
+    })
+
+    //indentifier includes within SQL database!
+    for (const identifier in resultsObj) {
+      const obj = {}
+      obj.metric = {}
+      obj.metric[keys[metric]] = identifier
+      obj.values = resultsObj[identifier]
+      results.push(obj)
+    }
+    res.locals.historicalData = results
     return next();
   });
 }
-
+//------------------------------------------------------------------------------------------------------------//
 dbController.add_bytesinpersec_rate = (lastTimeStamp) => {
   return fetch(`http://localhost:9090/api/v1/query?query=kafka_server_broker_topic_metrics_bytesinpersec_rate[5m]`)
     .then(res => res.json())
@@ -65,7 +67,6 @@ dbController.add_bytesinpersec_rate = (lastTimeStamp) => {
         VALUES `;
       //key = identifier + metric + time 
       const results = data.data.result;
-      // console.log('first run', lastTimeStamp)
       let time;
       results.forEach(result => {
         if (result.metric.topic) {
@@ -75,7 +76,6 @@ dbController.add_bytesinpersec_rate = (lastTimeStamp) => {
             const element = result.values[i] // element = [time, value]
             time = element[0];
             if (time > lastTimeStamp) { // 0 -> 1659801332.432 
-              // console.log('time:', time,'timeStamp:', lastTimeStamp)
               const value = element[1];
               const key = `${identifier}%${metric}%${time}`;
               body += `('${key}', '${identifier}', '${metric}', ${time}, ${value}), `
@@ -95,7 +95,6 @@ dbController.add_bytesinpersec_rate = (lastTimeStamp) => {
             console.log('Error in dbController.add_bytesinpersec_rate: cannot overwrite data in AWS')
           } else {
             console.log('Successfully written to db')
-            // console.log('newTimeStamp: ', time)
           }
         })
         return time
@@ -106,7 +105,7 @@ dbController.add_bytesinpersec_rate = (lastTimeStamp) => {
       }
     })
 };
-
+//------------------------------------------------------------------------------------------------------------//
 dbController.add_failedpartitionscount_value = (lastTimeStamp) => {
   return fetch(`http://localhost:9090/api/v1/query?query=kafka_server_replica_fetcher_manager_failedpartitionscount_value[5m]`)
     .then(res => res.json())
@@ -116,7 +115,6 @@ dbController.add_failedpartitionscount_value = (lastTimeStamp) => {
         VALUES `;
       //key = identifier + metric + time 
       const results = data.data.result;
-      // console.log('first run', lastTimeStamp)
       let time;
       results.forEach(result => {
         const identifier = result.metric.client_id;
@@ -125,7 +123,6 @@ dbController.add_failedpartitionscount_value = (lastTimeStamp) => {
           const element = result.values[i] // element = [time, value]
           time = element[0];
           if (time > lastTimeStamp) { // 0 -> 1659801332.432 
-            // console.log('time:', time,'timeStamp:', lastTimeStamp)
             const value = element[1];
             const key = `${identifier}%${metric}%${time}`;
             body += `('${key}', '${identifier}', '${metric}', ${time}, ${value}), `
@@ -144,7 +141,6 @@ dbController.add_failedpartitionscount_value = (lastTimeStamp) => {
             console.log('Error in dbController.add_failedpartitionscount_value: cannot overwrite data in AWS')
           } else {
             console.log('Successfully written to db')
-            // console.log('newTimeStamp: ', time)
           }
         })
       }
@@ -153,7 +149,7 @@ dbController.add_failedpartitionscount_value = (lastTimeStamp) => {
       }
     })
 };
-
+//------------------------------------------------------------------------------------------------------------//
 dbController.add_maxlag_value = (lastTimeStamp) => {
   return fetch(`http://localhost:9090/api/v1/query?query=kafka_server_replica_fetcher_manager_maxlag_value[5m]`)
     .then(res => res.json())
@@ -197,7 +193,7 @@ dbController.add_maxlag_value = (lastTimeStamp) => {
       }
     })
 };
-
+//------------------------------------------------------------------------------------------------------------//
 dbController.add_offlinereplicacount = (lastTimeStamp) => {
   return fetch(`http://localhost:9090/api/v1/query?query=kafka_server_replica_manager_offlinereplicacount[5m]`)
     .then(res => res.json())
@@ -207,7 +203,6 @@ dbController.add_offlinereplicacount = (lastTimeStamp) => {
         VALUES `;
       //key = identifier + metric + time 
       const results = data.data.result;
-      // console.log('first run', lastTimeStamp)
       let time;
       results.forEach(result => {
         const identifier = result.metric.service;
@@ -216,7 +211,6 @@ dbController.add_offlinereplicacount = (lastTimeStamp) => {
           const element = result.values[i] // element = [time, value]
           time = element[0];
           if (time > lastTimeStamp) { // 0 -> 1659801332.432 
-            // console.log('time:', time,'timeStamp:', lastTimeStamp)
             const value = element[1];
             const key = `${identifier}%${metric}%${time}`;
             body += `('${key}', '${identifier}', '${metric}', ${time}, ${value}), `
@@ -235,7 +229,6 @@ dbController.add_offlinereplicacount = (lastTimeStamp) => {
             console.log('Error in dbController.add_offlinereplicacount: cannot overwrite data in AWS')
           } else {
             console.log('Successfully written to db')
-            // console.log('newTimeStamp: ', time)
           }
         })
       }
@@ -244,7 +237,7 @@ dbController.add_offlinereplicacount = (lastTimeStamp) => {
       }
     })
 };
-
+//------------------------------------------------------------------------------------------------------------//
 dbController.add_bytesoutpersec_rate = (lastTimeStamp) => {
   return fetch(`http://localhost:9090/api/v1/query?query=kafka_server_broker_topic_metrics_bytesoutpersec_rate[5m]`)
     .then(res => res.json())
@@ -254,7 +247,6 @@ dbController.add_bytesoutpersec_rate = (lastTimeStamp) => {
         VALUES `;
       //key = identifier + metric + time 
       const results = data.data.result;
-      // console.log('first run', lastTimeStamp)
       let time;
       results.forEach(result => {
         if (result.metric.topic) {
@@ -264,7 +256,6 @@ dbController.add_bytesoutpersec_rate = (lastTimeStamp) => {
             const element = result.values[i] // element = [time, value]
             time = element[0];
             if (time > lastTimeStamp) { // 0 -> 1659801332.432 
-              // console.log('time:', time,'timeStamp:', lastTimeStamp)
               const value = element[1];
               const key = `${identifier}%${metric}%${time}`;
               body += `('${key}', '${identifier}', '${metric}', ${time}, ${value}), `
@@ -284,7 +275,6 @@ dbController.add_bytesoutpersec_rate = (lastTimeStamp) => {
             console.log('Error in dbController.add_bytesoutpersec_rate: cannot overwrite data in AWS')
           } else {
             console.log('Successfully written to db')
-            // console.log('newTimeStamp: ', time)
           }
         })
       }
@@ -293,7 +283,7 @@ dbController.add_bytesoutpersec_rate = (lastTimeStamp) => {
       }
     })
 };
-
+//------------------------------------------------------------------------------------------------------------//
 dbController.add_messagesinpersec_rate = (lastTimeStamp) => {
   return fetch(`http://localhost:9090/api/v1/query?query=kafka_server_broker_topic_metrics_messagesinpersec_rate[5m]`)
     .then(res => res.json())
@@ -303,7 +293,6 @@ dbController.add_messagesinpersec_rate = (lastTimeStamp) => {
         VALUES `;
       //key = identifier + metric + time 
       const results = data.data.result;
-      // console.log('first run', lastTimeStamp)
       let time;
       results.forEach(result => {
         if (result.metric.topic) {
@@ -313,7 +302,6 @@ dbController.add_messagesinpersec_rate = (lastTimeStamp) => {
             const element = result.values[i] // element = [time, value]
             time = element[0];
             if (time > lastTimeStamp) { // 0 -> 1659801332.432 
-              // console.log('time:', time,'timeStamp:', lastTimeStamp)
               const value = element[1];
               const key = `${identifier}%${metric}%${time}`;
               body += `('${key}', '${identifier}', '${metric}', ${time}, ${value}), `
@@ -333,7 +321,6 @@ dbController.add_messagesinpersec_rate = (lastTimeStamp) => {
             console.log('Error in dbController.add_messagesinpersec_rate: ,cannot overwrite data in AWS')
           } else {
             console.log('Successfully written to db')
-            // console.log('newTimeStamp: ', time)
           }
         })
       }
@@ -342,7 +329,7 @@ dbController.add_messagesinpersec_rate = (lastTimeStamp) => {
       }
     })
 };
-
+//------------------------------------------------------------------------------------------------------------//
 dbController.add_replicationbytesinpersec_rate = (lastTimeStamp) => {
   return fetch(`http://localhost:9090/api/v1/query?query=kafka_server_broker_topic_metrics_replicationbytesinpersec_rate[5m]`)
     .then(res => res.json())
@@ -352,7 +339,6 @@ dbController.add_replicationbytesinpersec_rate = (lastTimeStamp) => {
         VALUES `;
       //key = identifier + metric + time 
       const results = data.data.result;
-      // console.log('first run', lastTimeStamp)
       let time;
       results.forEach(result => {
         const identifier = result.metric.service;
@@ -361,7 +347,6 @@ dbController.add_replicationbytesinpersec_rate = (lastTimeStamp) => {
           const element = result.values[i] // element = [time, value]
           time = element[0];
           if (time > lastTimeStamp) { // 0 -> 1659801332.432 
-            // console.log('time:', time,'timeStamp:', lastTimeStamp)
             const value = element[1];
             const key = `${identifier}%${metric}%${time}`;
             body += `('${key}', '${identifier}', '${metric}', ${time}, ${value}), `
@@ -380,7 +365,6 @@ dbController.add_replicationbytesinpersec_rate = (lastTimeStamp) => {
             console.log('Error in dbController.add_replicationbytesinpersec_rate: cannot overwrite data in AWS')
           } else {
             console.log('Successfully written to db')
-            // console.log('newTimeStamp: ', time)
           }
         })
       }
@@ -389,7 +373,7 @@ dbController.add_replicationbytesinpersec_rate = (lastTimeStamp) => {
       }
     })
 };
-
+//------------------------------------------------------------------------------------------------------------//
 dbController.add_underreplicatedpartitions = (lastTimeStamp) => {
   return fetch(`http://localhost:9090/api/v1/query?query=kafka_server_replica_manager_underreplicatedpartitions[5m]`)
     .then(res => res.json())
@@ -399,7 +383,6 @@ dbController.add_underreplicatedpartitions = (lastTimeStamp) => {
         VALUES `;
       //key = identifier + metric + time 
       const results = data.data.result;
-      // console.log('first run', lastTimeStamp)
       let time;
       results.forEach(result => {
         const identifier = result.metric.service;
@@ -408,7 +391,6 @@ dbController.add_underreplicatedpartitions = (lastTimeStamp) => {
           const element = result.values[i] // element = [time, value]
           time = element[0];
           if (time > lastTimeStamp) { // 0 -> 1659801332.432 
-            // console.log('time:', time,'timeStamp:', lastTimeStamp)
             const value = element[1];
             const key = `${identifier}%${metric}%${time}`;
             body += `('${key}', '${identifier}', '${metric}', ${time}, ${value}), `
@@ -427,7 +409,6 @@ dbController.add_underreplicatedpartitions = (lastTimeStamp) => {
             console.log('Error in dbController.add_underreplicatedpartitions: cannot overwrite data in AWS')
           } else {
             console.log('Successfully written to db')
-            // console.log('newTimeStamp: ', time)
           }
         })
       }
@@ -436,7 +417,7 @@ dbController.add_underreplicatedpartitions = (lastTimeStamp) => {
       }
     })
 };
-
+//------------------------------------------------------------------------------------------------------------//
 dbController.add_failedisrupdatespersec = (lastTimeStamp) => {
   return fetch(`http://localhost:9090/api/v1/query?query=kafka_server_replica_manager_failedisrupdatespersec[5m]`)
     .then(res => res.json())
@@ -446,7 +427,6 @@ dbController.add_failedisrupdatespersec = (lastTimeStamp) => {
         VALUES `;
       //key = identifier + metric + time 
       const results = data.data.result;
-      // console.log('first run', lastTimeStamp)
       let time;
       results.forEach(result => {
         const identifier = result.metric.aggregate;
@@ -455,7 +435,6 @@ dbController.add_failedisrupdatespersec = (lastTimeStamp) => {
           const element = result.values[i] // element = [time, value]
           time = element[0];
           if (time > lastTimeStamp) { // 0 -> 1659801332.432 
-            // console.log('time:', time,'timeStamp:', lastTimeStamp)
             const value = element[1];
             const key = `${identifier}%${metric}%${time}`;
             body += `('${key}', '${identifier}', '${metric}', ${time}, ${value}), `
@@ -474,7 +453,6 @@ dbController.add_failedisrupdatespersec = (lastTimeStamp) => {
             console.log('dbController.add_failedisrupdatespersec: cannot overwrite data in AWS')
           } else {
             console.log('Successfully written to db')
-            // console.log('newTimeStamp: ', time)
           }
         })
       }
@@ -483,7 +461,7 @@ dbController.add_failedisrupdatespersec = (lastTimeStamp) => {
       }
     })
 };
-
+//------------------------------------------------------------------------------------------------------------//
 dbController.add_scrapedurationseconds = (lastTimeStamp) => {
   return fetch(`http://localhost:9090/api/v1/query?query=scrape_duration_seconds[5m]`)
     .then(res => res.json())
@@ -493,7 +471,6 @@ dbController.add_scrapedurationseconds = (lastTimeStamp) => {
         VALUES `;
       //key = identifier + metric + time 
       const results = data.data.result;
-      // console.log('first run', lastTimeStamp)
       let time;
       results.forEach(result => {
         const identifier = result.metric.job;
@@ -502,14 +479,12 @@ dbController.add_scrapedurationseconds = (lastTimeStamp) => {
           const element = result.values[i] // element = [time, value]
           time = element[0];
           if (time > lastTimeStamp) { // 0 -> 1659801332.432 
-            // console.log('time:', time,'timeStamp:', lastTimeStamp)
             const value = element[1];
             const key = `${identifier}%${metric}%${time}`;
             body += `('${key}', '${identifier}', '${metric}', ${time}, ${value}), `
           }
         }
       })
-
       // Remove ', ' from last added string value
       body = body.slice(0, body.length - 2)
       body += ';'
@@ -521,7 +496,6 @@ dbController.add_scrapedurationseconds = (lastTimeStamp) => {
             console.log('dbController.add_scrapedurationsecondscannot overwrite data in AWS')
           } else {
             console.log('Successfully written to db')
-            // console.log('newTimeStamp: ', time)
           }
         })
       }
@@ -530,7 +504,7 @@ dbController.add_scrapedurationseconds = (lastTimeStamp) => {
       }
     })
 };
-
+//------------------------------------------------------------------------------------------------------------//
 dbController.add_scrape_samples_scraped = (lastTimeStamp) => {
   return fetch(`http://localhost:9090/api/v1/query?query=scrape_samples_scraped[5m]`)
     .then(res => res.json())
@@ -540,7 +514,6 @@ dbController.add_scrape_samples_scraped = (lastTimeStamp) => {
         VALUES `;
       //key = identifier + metric + time 
       const results = data.data.result;
-      // console.log('first run', lastTimeStamp)
       let time;
       results.forEach(result => {
         const identifier = result.metric.job;
@@ -549,7 +522,6 @@ dbController.add_scrape_samples_scraped = (lastTimeStamp) => {
           const element = result.values[i] // element = [time, value]
           time = element[0];
           if (time > lastTimeStamp) { // 0 -> 1659801332.432 
-            // console.log('time:', time,'timeStamp:', lastTimeStamp)
             const value = element[1];
             const key = `${identifier}%${metric}%${time}`;
             body += `('${key}', '${identifier}', '${metric}', ${time}, ${value}), `
@@ -560,7 +532,6 @@ dbController.add_scrape_samples_scraped = (lastTimeStamp) => {
       // Remove ', ' from last added string value
       body = body.slice(0, body.length - 2)
       body += ';'
-
       // Handle if there are no available data to record and db.query tries to write an empty body
       if (body[body.length - 2] === ')') {
         db.query(body, (err, res) => {
@@ -568,7 +539,6 @@ dbController.add_scrape_samples_scraped = (lastTimeStamp) => {
             console.log('dbController.add_scrape_samples_scraped:cannot overwrite data in AWS')
           } else {
             console.log('Successfully written to db')
-            // console.log('newTimeStamp: ', time)
           }
         })
       }
@@ -577,7 +547,7 @@ dbController.add_scrape_samples_scraped = (lastTimeStamp) => {
       }
     })
 };
-
+//------------------------------------------------------------------------------------------------------------//
 dbController.add_requesthandleraverageidlepercent = (lastTimeStamp) => {
   return fetch(`http://localhost:9090/api/v1/query?query=kafka_server_request_handler_avg_idle_percent[5m]`)
     .then(res => res.json())
@@ -587,7 +557,6 @@ dbController.add_requesthandleraverageidlepercent = (lastTimeStamp) => {
         VALUES `;
       //key = identifier + metric + time 
       const results = data.data.result;
-      // console.log('first run', lastTimeStamp)
       let time;
       results.forEach(result => {
         const identifier = result.metric.aggregate;
@@ -596,7 +565,6 @@ dbController.add_requesthandleraverageidlepercent = (lastTimeStamp) => {
           const element = result.values[i] // element = [time, value]
           time = element[0];
           if (time > lastTimeStamp) { // 0 -> 1659801332.432 
-            // console.log('time:', time,'timeStamp:', lastTimeStamp)
             const value = element[1];
             const key = `${identifier}%${metric}%${time}`;
             body += `('${key}', '${identifier}', '${metric}', ${time}, ${value}), `
@@ -615,7 +583,6 @@ dbController.add_requesthandleraverageidlepercent = (lastTimeStamp) => {
             console.log('Error in dbController.add_requesthandleraverageidlepercent: cannot overwrite data in AWS')
           } else {
             console.log('Successfully written to db')
-            // console.log('newTimeStamp: ', time)
           }
         })
       }
