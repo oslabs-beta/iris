@@ -7,7 +7,6 @@ import express from 'express'
 import fetch from 'node-fetch'
 import path from 'path'
 import http from 'http'
-import { Server } from 'socket.io'
 import cors from 'cors'
 import dbController from './databaseController.js'
 import portController from './portController.js'
@@ -78,19 +77,14 @@ io.on('connection', async (socket : Socket) : Promise<void> => {
   const JVMHeapUsage = await getHistogram('kafka_jvm_heap_usage', '1h', 20)
   const JVMNonHeapUsage = await getHistogram('kafka_jvm_non_heap_usage', '1h', 20);
   socket.emit('kafka_jvm_heap_usage', JVMHeapUsage)
-  console.log('1')
   socket.emit('kafka_jvm_non_heap_usage', JVMNonHeapUsage)
-  console.log('2')
-  // socket.on("disconnect", () : void => console.log("Socket disconnect for histogram first start up"))
+  
   //Piechart connection
   const pieChartData = await getPieChart(['kafka_coordinator_group_metadata_manager_numgroups',
     'kafka_coordinator_group_metadata_manager_numgroupsdead',
     'kafka_coordinator_group_metadata_manager_numgroupsempty'
   ])
-  // console.log('Data from getPieChart when connected: ', pieChartData)
   socket.emit('pieChart', pieChartData);
-  console.log('3')
-  // socket.on("disconnect", () : void => console.log("Socket disconnect for piechart first start up"))
 
   //Line chart connection
   for (const [chartID, query] of Object.entries(chartsData)) {
@@ -106,18 +100,14 @@ io.on('connection', async (socket : Socket) : Promise<void> => {
     const JVMHeapUsage = await getHistogram('kafka_jvm_heap_usage', '1h', 20)
     const JVMNonHeapUsage = await getHistogram('kafka_jvm_non_heap_usage', '1h', 20);
     socket.emit('kafka_jvm_heap_usage', JVMHeapUsage)
-    console.log('1a')
     socket.emit('kafka_jvm_non_heap_usage', JVMNonHeapUsage)
-    console.log('2a')
-    // socket.on("disconnect", () : void => console.log("Socket disconnect for histogram"))
 
     const pieChartData = await getPieChart(['kafka_coordinator_group_metadata_manager_numgroups',
       'kafka_coordinator_group_metadata_manager_numgroupsdead',
       'kafka_coordinator_group_metadata_manager_numgroupsempty'
     ])
     socket.emit('pieChart', pieChartData);
-    console.log('3a')
-    // socket.on("disconnect", () : void => console.log("Socket disconnect for piechart"))
+
 
     //caching the data to fix latency problem
     const queryObj = {}
@@ -126,14 +116,10 @@ io.on('connection', async (socket : Socket) : Promise<void> => {
       const key = JSON.stringify(`${query.metric}+${query.timeFrame}`) // 'kafka_coordinator_group_metadata_manager_numgroups+5m'
       if (queryObj[key]) {
         socket.emit(chartID, queryObj[key]) //Broadcast data from query on topic of chartID
-        console.log('4a')
-        // socket.on("disconnect", () : void => console.log("Socket disconnect for linecharts")) // disconnects socket to grab new metric data
       } else {
         const data = await queryData(query.metric, query.timeFrame)
         queryObj[key] = data //setting data as value for key
         socket.emit(chartID, data) //Broadcast data from query on topic of chartID
-        console.log('4b')
-        // socket.on("disconnect", () : void => console.log("Socket disconnect for linecharts")) // disconnects socket to grab new metric data
       }
     }
   }, 8000) // socket.emit will send the data every n second. 
@@ -151,9 +137,7 @@ io.on('connect_error', (err : Error) : void => {
 // Existing database is not overwritten and does not present conflicts 
 // LastTimeStamp variable tracked to check the last time data was queried and written
 let lastTimeStamp = 0;
-
 // setInterval to query data and store in backend every 15s.
-
 setInterval(async () : Promise<void> => {
   const start = Date.now();
   console.log('start time:', Date.now() - start)
@@ -175,35 +159,6 @@ setInterval(async () : Promise<void> => {
   // })
   lastTimeStamp = await dbController.add_bytesinpersec_rate(lastTimeStamp)
   console.log('End time:', Date.now() - start)
-
-  // // setTimeout(async () : Promise<void> => {
-  //   await dbController.add_failedpartitionscount_value(lastTimeStamp);
-  //   await dbController.add_maxlag_value(lastTimeStamp);
-  //   await dbController.add_bytesoutpersec_rate(lastTimeStamp);
-  //   // console.log('db after 0 sec')
-  // // }, 0)
-
-  // // setTimeout(async () : Promise<void> => {
-  //   await dbController.add_messagesinpersec_rate(lastTimeStamp);
-  //   await dbController.add_replicationbytesinpersec_rate(lastTimeStamp);
-  //   await dbController.add_underreplicatedpartitions(lastTimeStamp);
-  //   // console.log('db after 2 sec')
-  // // }, 2000)
-
-  // // setTimeout(async () : Promise<void> => {
-  //   await dbController.add_failedisrupdatespersec(lastTimeStamp);
-  //   await dbController.add_scrapedurationseconds(lastTimeStamp);
-  //   await dbController.add_scrape_samples_scraped(lastTimeStamp);
-  //   // console.log('db after 4 sec')
-  // // }, 4000)
-
-  // // setTimeout(async () : Promise<void> => {
-  //   await dbController.add_requesthandleraverageidlepercent(lastTimeStamp)
-  //   lastTimeStamp = await dbController.add_bytesinpersec_rate(lastTimeStamp)
-  //   // console.log('in setInterval after dbController new time:', lastTimeStamp)
-  //   // console.log('db after 6 sec')
-  // // }, 6000)
-
 }, 30000)// 1 minute set interval
 
 //------------------------------------------------------------------------------------------------------------//
@@ -299,11 +254,9 @@ const getHistogram = async (metric : String, timeFrame : String, numOfBins : num
   const minValue = Number(data[0][1])
   const maxValue = Number(data[data.length - 1][1])
   const binRange = (maxValue - minValue) / numOfBins;
-
   const histogram = {}
   let currBin = Math.round(minValue + binRange);
   data.forEach((num : Values[]):void => {
-    //finding the mean 
     if (Number(num[1]) <= currBin) {
       if (!histogram[currBin]) histogram[currBin] = 1
       else histogram[currBin] += 1
