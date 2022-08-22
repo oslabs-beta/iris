@@ -12,14 +12,15 @@ module.exports = {
   ],
   devtool: 'inline-source-map',
   devServer: {
+    host: 'localhost',
+    port: 8080,
     static: {
       directory: path.resolve(__dirname, 'build'),
       publicPath: '/'
     },
     proxy: {
-      '/': 'http://localhost:8080',
-      // '/signup': 'http://localhost:3000',
-      // '/createPost': 'http://localhost:3000',
+      // '/': 'http://localhost:8080',
+      // '/': 'http://localhost:8081',
       compress: true,
       port: 8080,
     },
