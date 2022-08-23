@@ -47,22 +47,43 @@ body {
     #rightPane {
       width: 70%;
       margin-left: 30%;
-
-      button#newGraph {
+      
+      .buttonAdd {
         position: fixed;
         right: 2%;
-        border: none;
-        background: none;
-
-        &:hover {
+        display: flex;
+        flex-direction: column;
+        button#newGraph {
+          border: none;
+          background: none;
+          margin-bottom: 6px;
           &:hover {
-            transform: scale(1.1);
-            transition-duration: 300ms;
-            cursor: pointer;
+            &:hover {
+              transform: scale(1.1);
+              transition-duration: 300ms;
+              cursor: pointer;
+            }
+  
+            &:not(:hover) {
+              transition-duration: 600ms;
+            }
           }
-
-          &:not(:hover) {
-            transition-duration: 600ms;
+        }
+  
+        button#newHistoricalGraph {
+          border: none;
+          background: none;
+  
+          &:hover {
+            &:hover {
+              transform: scale(1.1);
+              transition-duration: 300ms;
+              cursor: pointer;
+            }
+  
+            &:not(:hover) {
+              transition-duration: 600ms;
+            }
           }
         }
       }

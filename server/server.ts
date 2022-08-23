@@ -62,7 +62,7 @@ type SocketConfig = {
 
 const IOConfig : SocketConfig = {
   cors: {
-    origin: ["*", "http://localhost:8080"],
+    origin: ["*"],
   },
 }
 
