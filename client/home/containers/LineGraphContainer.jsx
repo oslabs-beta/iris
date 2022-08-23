@@ -23,9 +23,9 @@ function LineGraphContainer(props) {
     setChartData(data)
   });
 
-  socket.on('connect_error', (err) => {
-    console.log(`connect_error due to ${err.message}`);
-  });
+  // socket.on('connect_error', (err) => {
+  //   console.log(`connect_error due to ${err.message}`);
+  // });
 
 
   async function handleDynamicMetrics(e) {
@@ -62,15 +62,13 @@ function LineGraphContainer(props) {
       }
     }
 
-    console.log('reqBody: ', reqBody)
-
     await fetch('/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(reqBody)
     })
       .then((formattedData) => {
-        console.log(formattedData)
+        
       })
       .catch(err => {
         console.log('Error thrown in POST request in graphContainer: ', err)
@@ -97,7 +95,7 @@ function LineGraphContainer(props) {
     })
       .then(res => res.json())
       .then((data) => {
-        console.log(data)
+
       })
       .catch(err => {
         console.log('Error thrown in POST request  in graphContainer: ', err)
