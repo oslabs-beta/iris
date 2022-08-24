@@ -121,7 +121,7 @@ io.on('connection', async (socket : Socket) : Promise<void> => {
         socket.emit(chartID, data) //Broadcast data from query on topic of chartID
       }
     }
-  }, 8000) // socket.emit will send the data every n second. 
+  }, 5000) // socket.emit will send the data every n second. 
 })
 
 //------------------------------------------------------------------------------------------------------------//

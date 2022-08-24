@@ -60,7 +60,7 @@ function NavBar() {
                 <a href='/' className='site-title'><img src={irisName} id = "iris-logo"/></a>
             </div>
 
-            <Button onClick={handleOpen}>ROOT ACCESS</Button>
+            <Button onClick={handleOpen}>PORT ACCESS</Button>
             <Modal
                 aria-labelledby="transition-modal-title"
                 aria-describedby="transition-modal-description"
@@ -74,15 +74,9 @@ function NavBar() {
             >
                 <Fade in={open}>
                 <Box sx={style}>
-                    {/* <Typography id="transition-modal-title" variant="h6" component="h2">
-                    For your eyes only
-                    </Typography>
-                    <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-                    &#128065; &#128068; &#128065;
-                    </Typography> */}
-                    <h1>&#128065; &#128068; &#128065;</h1>
-                    <h3>for your eyes only</h3>
-                    <Port handleClose={handleClose}/>
+                  <h1>Port Access</h1>
+                  <h3>Enter Prometheus Port Here</h3>
+                  <Port handleClose={handleClose}/>
                 </Box>
                 </Fade>
             </Modal>
