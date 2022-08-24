@@ -44,8 +44,8 @@ function BarChart(props) {
       {
         label: 'Average', // label not showing up here //fuck you Walter you fucking name it label'S'!!!!!
         data: linRegressArr,
-        backgroundColor: '#000000',
-        borderColor: '#000000',
+        backgroundColor: 'rgb(52,153,204)',
+        borderColor: 'rgb(52,153,204)',
         type: 'line',
         pointRadius: 0
       }]
@@ -53,20 +53,23 @@ function BarChart(props) {
     setBarData(newObj);
   });
 
-  socket.on('connect_error', (err) => {
-    console.log(`connect_error due to ${err.message}`);
-  });
+  // socket.on('connect_error', (err) => {
+  //   console.log(`connect_error due to ${err.message}`);
+  // });
 
   /////////////////////////
   // tester code until we figure out how data comes in
-  function getRandomColor() {
-    let letters = '0123456789ABCDEF'.split('');
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-  }
+  // function getRandomColor() {
+  //   // let letters = '0123456789ABCDEF'.split('');
+  //   // let color = '#';
+  //   // for (let i = 0; i < 6; i++) {
+  //   //   color += letters[Math.floor(Math.random() * 16)];
+  //   // }
+
+  //   let color = 'rgb(52,153,204,'
+  //   color += String(Math.random()*0.50+0.30) + ')'
+  //   return color;
+  // }
 
   function convertKafkatoChart(data) {
     // if kafkadata is null
@@ -84,7 +87,8 @@ function BarChart(props) {
     topicData[data[0].metric.topic].forEach(element => {
       binArray.push(Number(element[0]))
       countArr.push(Number(element[1]))
-      colorArr.push(getRandomColor())
+      // colorArr.push(getRandomColor())
+      colorArr.push('rgb(52,153,204,0.5)')
     })
     for (let i = 0; i < countArr.length; i++) {
       linRegressArr.push(countArr.reduce((a, b) => a + b, 0) / countArr.length)
@@ -93,24 +97,12 @@ function BarChart(props) {
     return [binArray, countArr, colorArr, linRegressArr]
   }
 
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'top',
-      },
-      title: {
-        display: true,
-        text: 'TOP SECRET: ITAR RESTRICTED DATA',
-      },
-    },
-  };
-
   return (
     <div id='barGraph'>
       <Bar id='barGraph' 
         options={
           { 
+            animation: false,
             maintainAspectRatio: false, 
             responsive: true,
             plugins: {
@@ -119,9 +111,9 @@ function BarChart(props) {
               },
               title: {
                 display: true,
-                text: 'TOP SECRET: ITAR RESTRICTED DATA',
+                text: 'Hourly Distribution',
               },
-            } 
+            }
           }
         }
         data={barData} 

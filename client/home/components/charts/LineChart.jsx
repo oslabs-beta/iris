@@ -24,11 +24,17 @@ function LineChart(props) {
 
   // function to generate random colors for our chartjs lines
   function getRandomColor() {
-    let letters = '0123456789ABCDEF'.split('');
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
+    // let letters = '0123456789ABCDEF'.split('');
+    // let color = '#';
+    // for (let i = 0; i < 6; i++) {
+    //   color += letters[Math.floor(Math.random() * 16)];
+    // }
+    // return color;
+
+    let color = 'rgb(52,153,'
+    color += String(Math.floor(Math.random()*100)+150) + ','
+    color += String(Math.random()*0.60+0.30) + ')'
+
     return color;
   }
 
@@ -84,6 +90,7 @@ function LineChart(props) {
         label: topic,
         data: metricsArr,
         borderColor: getRandomColor()
+        // borderColor: 'rgb(52,153,204,0.7)'
       });
       // reset for next topic
       metricsArr = [];
@@ -104,25 +111,12 @@ function LineChart(props) {
 
   }, [props])
 
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'top',
-      },
-      title: {
-        display: true,
-        text: 'TOP SECRET: ITAR RESTRICTED DATA',
-      },
-    },
-    background: 'rgba(0, 54, 0, 1)',
-  }
-
   return (
     <>
       <Line id='lineGraph' 
         options={
           { 
+            animation: false,
             maintainAspectRatio: true, 
             responsive: true,
             layout: {
@@ -130,6 +124,11 @@ function LineChart(props) {
                 right: 30,
                 left: 30,
                 bottom: 30
+              }
+            },
+            elements: {
+              point:{
+                  radius: 0
               }
             },
             plugins: {
