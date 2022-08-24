@@ -24,13 +24,6 @@ function LineChart(props) {
 
   // function to generate random colors for our chartjs lines
   function getRandomColor() {
-    // let letters = '0123456789ABCDEF'.split('');
-    // let color = '#';
-    // for (let i = 0; i < 6; i++) {
-    //   color += letters[Math.floor(Math.random() * 16)];
-    // }
-    // return color;
-
     let color = 'rgb(52,153,'
     color += String(Math.floor(Math.random()*100)+150) + ','
     color += String(Math.random()*0.60+0.30) + ')'
@@ -44,7 +37,6 @@ function LineChart(props) {
 
     // we need to convert our unix timestamps to regular time stamps
     // need to create an array to house our metrics, correlated to specific time stamp
-    // console.log('kafkadata:', kafkaData)
     const results = kafkaData; // results here is an array
     const topicData = {};
 
@@ -76,7 +68,6 @@ function LineChart(props) {
       for (let i = 0; i < value.length; i++) { // { topic: [timestamp , another time] }
         if (!timeArrBuilt) {
           let currDate = new Date(Number(value[i][0]) * 1000).toLocaleTimeString(); // mult by 1000 given value comes in as seconds
-          // console.log('currDate', currDate)
           let splittedString = currDate.split(":");
           currDate = splittedString.slice(0, -1).join(':') + splittedString[2].slice(-2);
           timestampArr.push(currDate);
@@ -90,7 +81,6 @@ function LineChart(props) {
         label: topic,
         data: metricsArr,
         borderColor: getRandomColor()
-        // borderColor: 'rgb(52,153,204,0.7)'
       });
       // reset for next topic
       metricsArr = [];
