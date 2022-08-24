@@ -50,7 +50,7 @@ Iris provides a containerized Docker environment with a highly configurable Kafk
 
 2) Click on ```Metric``` and ```Time Frame``` dropdowns to monitor different Kafka Metrics on different Time Frames.
 
-<img src= "https://media.discordapp.net/attachments/1001284784078733404/1012010351497322516/iris_demo.gif" width="#00" height="#00">
+<img src= "https://media.giphy.com/media/gG2vTWd5WWdUbaRJnd/giphy.gif" width="#00" height="#00">
 
 3) Click on ```+``` button in the upper right hand corner to add additional line charts.
 
