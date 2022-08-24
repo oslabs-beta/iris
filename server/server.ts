@@ -49,7 +49,7 @@ let chartsData : ChartsList = {
 // creating Socket.io Connection
 
 type CORS = {
-  origin: string,
+  origin: string[],
   methods?: string[],
   allowedHeaders?: string[],
   credentials?: Boolean, 
@@ -62,7 +62,7 @@ type SocketConfig = {
 
 const IOConfig : SocketConfig = {
   cors: {
-    origin: "*",
+    origin: ["*"],
   },
 }
 
@@ -91,7 +91,6 @@ io.on('connection', async (socket : Socket) : Promise<void> => {
     const data = await queryData(query.metric, query.timeFrame)
     socket.emit(chartID, data) //Broadcast data from query on topic of chartID
     socket.on("disconnect", () : void => console.log("Socket disconnect for linecharts first start up"))
-    console.log('4')
   }
   
   // setInterval is for sending data to the frontend every X seconds.
@@ -122,7 +121,7 @@ io.on('connection', async (socket : Socket) : Promise<void> => {
         socket.emit(chartID, data) //Broadcast data from query on topic of chartID
       }
     }
-  }, 8000) // socket.emit will send the data every n second. 
+  }, 5000) // socket.emit will send the data every n second. 
 })
 
 //------------------------------------------------------------------------------------------------------------//

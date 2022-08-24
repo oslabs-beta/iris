@@ -74,15 +74,9 @@ function NavBar() {
             >
                 <Fade in={open}>
                 <Box sx={style}>
-                    {/* <Typography id="transition-modal-title" variant="h6" component="h2">
-                    For your eyes only
-                    </Typography>
-                    <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-                    &#128065; &#128068; &#128065;
-                    </Typography> */}
-                    <h1>&#128065; &#128068; &#128065;</h1>
-                    <h3>for your eyes only</h3>
-                    <Port handleClose={handleClose}/>
+                  <h1>&#128065; &#128068; &#128065;</h1>
+                  <h3>for your eyes only</h3>
+                  <Port handleClose={handleClose}/>
                 </Box>
                 </Fade>
             </Modal>
