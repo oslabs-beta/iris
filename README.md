@@ -111,7 +111,7 @@ We provide an end to end Kafka producer and consumer to measure the stability of
   - https://www.linkedin.com/in/li-walter/
 
 - Huu (John) Le
-  - https://www.linkedin.com/in/huu-le/
+  - https://www.linkedin.com/in/huu-le-06a25a11b/
   - https://github.com/JohnLeGit
 
 
