@@ -19,9 +19,9 @@ function PieChart(props) {
     ],
   });
 
-  socket.on('connect', () => {
-    console.log('socket connected')
-  });
+  // socket.on('connect', () => {
+  //   console.log('socket connected')
+  // });
 
   socket.on(chartID, (data) => { // data => array of 3  [ {metric, value} ,  {metric, value} ,  {metric, value} ]
     const [binArray, countArr, colorArr] = convertKafkatoChart(data)
@@ -64,7 +64,7 @@ function PieChart(props) {
     topicData[data[0].metric.topic] = data[0].values
     const binArray = [];
     const countArr = [];
-    const colorArr = [];
+    const colorArr = ['rgb(52,153,204,0.7)', '#eb8686', '#86eb9d'];
 
     for (let i = 0; i < data.length; i++) {
       // parsing metric topic
@@ -73,31 +73,18 @@ function PieChart(props) {
       // parsing values
       let values = data[i].values[0];
       countArr.push(Number(values[1]))
-      colorArr.push(getRandomColor())
+      // colorArr.push(getRandomColor())
     }
 
     return [binArray, countArr, colorArr]
   }
-
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'top',
-        display: false,
-      },
-      title: {
-        display: true,
-        text: 'TOP SECRET: ITAR RESTRICTED DATA',
-      },
-    },
-  };
 
   return (
     <div id='pieGraph'>
       <Pie id='pieGraph' 
         options={
           { 
+            animation: false,
             maintainAspectRatio: false, 
             responsive: true,
             plugins: {
@@ -106,7 +93,7 @@ function PieChart(props) {
               },
               title: {
                 display: true,
-                text: 'TOP SECRET: ITAR RESTRICTED DATA',
+                text: 'Hourly Distribution',
               },
             } 
           }
