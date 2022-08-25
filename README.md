@@ -103,12 +103,12 @@ We provide an end to end Kafka producer and consumer to measure the stability of
   - https://github.com/blee3395
   
 - Michael Reyes
-  - https://github.com/Michaelr499
   - https://www.linkedin.com/in/michael-reyes-b4319216b/
+  - https://github.com/Michaelr499
 
 - Walter Li
-  - https://github.com/findwalle
   - https://www.linkedin.com/in/li-walter/
+  - https://github.com/findwalle
 
 - Huu (John) Le
   - https://www.linkedin.com/in/huu-le-06a25a11b/
