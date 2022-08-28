@@ -4,7 +4,7 @@
 <h2 align="center" style="font-size: 40px">Iris: A Kafka Health Monitoring Suite</h2>
 <p align="center">
   <img alt="GitHub" src="https://img.shields.io/badge/License-MIT-green.svg">
-  <img alt="Contributors" src="https://img.shields.io/github/contributors/oslabs-beta/d3no-data?color=%239d65c9&style=flat-square">
+  <img alt="Contributors" src="https://img.shields.io/github/contributors/oslabs-beta/iris?color=%239d65c9&style=flat-square">
   <img alt="GitHub All Releases" src="https://img.shields.io/github/downloads/oslabs-beta/iris/total?color=green">
   <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/oslabs-beta/iris?color=orange">
   <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/oslabs-beta/iris?style=social">  
