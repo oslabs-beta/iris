@@ -1,10 +1,10 @@
 <p align="center">
 <img src= "https://media.discordapp.net/attachments/1001284784078733404/1012010119787204678/IRIS_7.png" width="300" height="300" align="center">
 </p>
-<h2 align="center" style="font-size: 40px">Kafka Health Monitoring Suite</h2>
+<h2 align="center" style="font-size: 40px">Iris: A Kafka Health Monitoring Suite</h2>
 <p align="center">
   <img alt="GitHub" src="https://img.shields.io/badge/License-MIT-green.svg">
-  <img alt="GitHub issues" src="https://img.shields.io/github/issues-raw/oslabs-beta/iris?color=yellow">
+  <img alt="Contributors" src="https://img.shields.io/github/contributors/oslabs-beta/d3no-data?color=%239d65c9&style=flat-square">
   <img alt="GitHub All Releases" src="https://img.shields.io/github/downloads/oslabs-beta/iris/total?color=green">
   <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/oslabs-beta/iris?color=orange">
   <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/oslabs-beta/iris?style=social">  
@@ -25,22 +25,33 @@ Iris provides a containerized Docker environment with a highly configurable Kafk
 
 2) Fork the repo from the ```main``` branch
 
-3) Run the command: ```npm install```
+3) Run the command: 
+```sh 
+npm install
+```
 
-4) Open Docker and check Images tab, it should include the following Docker images to run the container environments. If not, please install the latest images using the ```docker pull``` command.
+4) Open Docker and check Images tab, it should include the following Docker images to run the container environments. If not, please install the latest images: 
+```sh 
+docker pull
+```
 
 <img width="1270" alt="image" src="https://user-images.githubusercontent.com/102982879/183763901-94dcec89-b7d8-4799-9686-b972782edf9c.png"  width="#00" height="#00">
 
 
-5) Once Docker has been booted up, run the ```docker-compose.yml``` file in your terminal using the ```docker-compose up``` command. 
-
-    - Watch your terminal. If at any point you receive the following error, close your Docker environment in your terminal with ```CTRL+C``` and rerun ```docker-compose up``` again. Use Docker Desktop, and click on JMX-Kafka's logs to monitor the JMX container logs for any errors you may miss in your terminal.
+5) Once Docker has been booted up, run the ```docker-compose.yml``` file in your terminal with the following command:
+```sh
+docker-compose up
+```  
+  - Watch your terminal. If at any point you receive the following error, close your Docker environment in your terminal with ```CTRL+C``` and rerun ```docker-compose up``` again. Use Docker Desktop, and click on JMX-Kafka's logs to monitor the JMX container logs for any errors you may miss in your terminal.
 
    <img src = "https://user-images.githubusercontent.com/102982879/183760177-7ae42fa9-02f7-46c6-8059-ad729448eccd.png">
 
 6) Now that the Kafka broker is running and the ports are being read properly, run your Kafka dependent program across the broker to begin streaming your data. 
 
-7) In another terminal, run command ```npm run dev``` to start the application and begin viewing the broker's health.
+7) To start the application and begin viewing the broker's health, in another terminal, run command: 
+```sh
+npm run dev
+```
 
 # Viewing the Metric
 
@@ -88,13 +99,19 @@ Iris provides a containerized Docker environment with a highly configurable Kafk
 
 We provide an end to end Kafka producer and consumer to measure the stability of the Iris health monitor. The ```Producer``` and ```Consumer``` files contain simple message files streamed to the Kafka Broker using ```AVRO``` schema and ```KafkaJS```. 
 
-- In one terminal, run the command: ```npm run start:producer```. It should show:
-
+- In one terminal, run the command: 
+```sh
+npm run start:producer
+``` 
   <img width="482" alt="image" src="https://user-images.githubusercontent.com/102982879/183764487-57fdc27c-080a-4669-bc5c-ba6d99c2ec94.png">
 
-- In a separate terminal, run the command: ```npm run start:consumer```. It should show:
-
+- In a separate terminal, run the command: 
+```sh
+npm run start:consumer
+```
   <img width="371" alt="image" src="https://user-images.githubusercontent.com/102982879/183764560-3dd0e3bf-32c6-4b7d-aef9-6ef30a777571.png">
+
+Now your should be passing messages across your Kafka Broker. 
 
 # Authors
 
