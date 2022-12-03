@@ -8,6 +8,7 @@
     "start": "nodemon server/server.ts",
     "start:consumer": "node ./consumer/index.js",
     "start:producer": "node ./producer/index.js",
+    "start:full": "node ./consumer/index.js & node ./producer/index.js",
     "test": "jest"
   },
   "repository": {
