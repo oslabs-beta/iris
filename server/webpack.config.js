@@ -2,10 +2,10 @@ const path = require('path');
 const webpack = require('webpack');
 
 module.exports = {
-  entry: path.resolve(__dirname,'server.ts'),
+  entry: path.resolve(__dirname,'./src/server.ts'),
   output: {
+    path: path.resolve(__dirname, './dist'),
     filename: 'bundle.js',
-    path: path.resolve(__dirname, 'dist')
   },
   module: {
     rules: [
@@ -23,8 +23,10 @@ module.exports = {
       },
       {
         test: /\.ts(x)?$/,
-        loader: 'ts-loader',
         exclude: /node_modules/,
+        use: {
+          loader: 'ts-loader',
+        }
       },
     ]
   },

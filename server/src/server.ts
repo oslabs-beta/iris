@@ -8,8 +8,8 @@ import fetch from 'node-fetch'
 import path from 'path'
 import http from 'http'
 import cors from 'cors'
-import dbController from './databaseController.js'
-import portController from './portController.js'
+import dbController from '../databaseController.js'
+import portController from '../portController.js'
 
 // import writeCSV from "./latencyTest/writeCSV.js"
 
@@ -25,7 +25,7 @@ app.use(express.urlencoded({ extended: true }))
 
 // Send index.html at app load
 app.get('/', (req: Request, res: Response): void => {
-  res.status(200).sendFile(path.resolve(__dirname, '../index.html'));
+  res.status(200).sendFile(path.resolve(__dirname, '../../client/dist/index.html'));
 });
 
 //------------------------------------------------------------------------------------------------------------//
