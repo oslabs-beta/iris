@@ -11,7 +11,7 @@ import cors from 'cors'
 import dbController from './controllers/databaseController.js'
 import portController from './controllers/portController.js'
 
-import BASE_PATH from '../config/default'
+import { BASE_PATH } from '../config/default'
 
 // import writeCSV from "./latencyTest/writeCSV.js"
 
@@ -216,7 +216,7 @@ type HistogramValues = [String, unknown]
 type PieValues = [number, String]
 
 const queryData = async (metric : String, timeFrame : String) : Promise<any | Results> => {
-  const res = await fetch(BASE_PATH + `/api/v1/query?query=${metric}[${timeFrame}]`)
+  const res = await fetch(`${BASE_PATH}/api/v1/query?query=${metric}[${timeFrame}]`, { method: 'get' })
   const data = await res.json()
   switch (metric) {
     case 'kafka_server_broker_topic_metrics_bytesinpersec_rate':              // Linechart
