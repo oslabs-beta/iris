@@ -1,7 +1,7 @@
 const db = require('./pg.ts'); 
 const fetch = require('node-fetch');
 
-const BASE_PATH = require('../../config/default')
+const { BASE_PATH } = require('../../config/default')
 
 //------------------------------------------------------------------------------------------------------------//
 const keys = {
@@ -19,7 +19,7 @@ const keys = {
   scrape_samples_scraped: 'job',
   kafka_server_request_handler_avg_idle_percent: 'aggregate',
 }
-//------------------------------------------------------------------------------------------------------------//
+
 //------------------------------------------------------------------------------------------------------------//
 const dbController = {}
 dbController.getHistoricalData = (req, res, next) => {
