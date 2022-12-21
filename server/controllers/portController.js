@@ -1,4 +1,4 @@
-const Port = require('./portModel.js');
+const Port = require('../models/portModel.js');
 const bcrypt = require('bcryptjs');
 
 const portController = {}

@@ -3,10 +3,10 @@ import { Pool } from 'pg';
 
 // create a new pool here using the connection string above
 const pool = new Pool({
-  user: 'iris_admin',
-  host: 'iris.cmfyktarcmqd.us-east-1.rds.amazonaws.com',
-  database: 'postgres',
-  password: 'password',
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_TABLE,
+  password: process.env.DB_PASSWORD,
   port: 5432,
 })
 
@@ -15,7 +15,6 @@ const pool = new Pool({
 // This will be required in the controllers to be the access point to the database
 module.exports = {
   query: (text, params, callback) => {
-    // console.log('executed query', text);
     return pool.query(text, params, callback);
   },
 };

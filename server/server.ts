@@ -8,8 +8,10 @@ import fetch from 'node-fetch'
 import path from 'path'
 import http from 'http'
 import cors from 'cors'
-import dbController from './databaseController.js'
-import portController from './portController.js'
+import dbController from './controllers/databaseController.js'
+import portController from './controllers/portController.js'
+
+import BASE_PATH from '../config/default'
 
 // import writeCSV from "./latencyTest/writeCSV.js"
 
@@ -139,7 +141,6 @@ let lastTimeStamp = 0;
 // setInterval to query data and store in backend every 15s.
 setInterval(async () : Promise<void> => {
   const start = Date.now();
-  console.log('start time:', Date.now() - start)
   await Promise.allSettled([
     dbController.add_failedpartitionscount_value(lastTimeStamp),
     dbController.add_maxlag_value(lastTimeStamp),
@@ -157,7 +158,6 @@ setInterval(async () : Promise<void> => {
   //   'duration(s)': Date.now() - start,
   // })
   lastTimeStamp = await dbController.add_bytesinpersec_rate(lastTimeStamp)
-  console.log('End time:', Date.now() - start)
 }, 30000)// 1 minute set interval
 
 //------------------------------------------------------------------------------------------------------------//
@@ -216,29 +216,29 @@ type HistogramValues = [String, unknown]
 type PieValues = [number, String]
 
 const queryData = async (metric : String, timeFrame : String) : Promise<any | Results> => {
-  const res = await fetch(`http://localhost:9090/api/v1/query?query=${metric}[${timeFrame}]`)
+  const res = await fetch(BASE_PATH + `/api/v1/query?query=${metric}[${timeFrame}]`)
   const data = await res.json()
   switch (metric) {
-    case 'kafka_server_broker_topic_metrics_bytesinpersec_rate': //linechart
-    case 'kafka_server_replica_fetcher_manager_failedpartitionscount_value'://linechart
-    case 'kafka_server_replica_fetcher_manager_maxlag_value'://linechart
-    case 'kafka_server_replica_manager_offlinereplicacount'://linechart
-    case 'kafka_server_broker_topic_metrics_bytesinpersec_rate'://linechart
-    case 'kafka_server_broker_topic_metrics_bytesoutpersec_rate'://linechart
-    case 'kafka_server_broker_topic_metrics_messagesinpersec_rate'://linechart
-    case 'kafka_server_broker_topic_metrics_replicationbytesinpersec_rate'://linechart
-    case 'kafka_server_replica_manager_underreplicatedpartitions'://linechart
-    case 'kafka_server_replica_manager_failedisrupdatespersec'://linechart
-    case 'scrape_duration_seconds'://linechart
-    case 'scrape_samples_scraped'://linechart
-    case 'kafka_coordinator_group_metadata_manager_numgroups': //piechart
-    case 'kafka_coordinator_group_metadata_manager_numgroupsdead': //piechart 
-    case 'kafka_coordinator_group_metadata_manager_numgroupsempty': //piechart
+    case 'kafka_server_broker_topic_metrics_bytesinpersec_rate':              // Linechart
+    case 'kafka_server_replica_fetcher_manager_failedpartitionscount_value':  // Linechart
+    case 'kafka_server_replica_fetcher_manager_maxlag_value':                 // Linechart
+    case 'kafka_server_replica_manager_offlinereplicacount':                  // Linechart
+    case 'kafka_server_broker_topic_metrics_bytesinpersec_rate':              // Linechart
+    case 'kafka_server_broker_topic_metrics_bytesoutpersec_rate':             // Linechart
+    case 'kafka_server_broker_topic_metrics_messagesinpersec_rate':           // Linechart
+    case 'kafka_server_broker_topic_metrics_replicationbytesinpersec_rate':   // Linechart
+    case 'kafka_server_replica_manager_underreplicatedpartitions':            // Linechart
+    case 'kafka_server_replica_manager_failedisrupdatespersec':               // Linechart
+    case 'scrape_duration_seconds':                                           // Linechart
+    case 'scrape_samples_scraped':                                            // Linechart
+    case 'kafka_coordinator_group_metadata_manager_numgroups':                // Piechart
+    case 'kafka_coordinator_group_metadata_manager_numgroupsdead':            // Piechart 
+    case 'kafka_coordinator_group_metadata_manager_numgroupsempty':           // Piechart
       return data.data.result
-    case 'kafka_server_request_handler_avg_idle_percent'://linechart
+    case 'kafka_server_request_handler_avg_idle_percent':                     // Linechart
       return [data.data.result[4]]
-    case 'kafka_jvm_heap_usage': //histogram
-    case 'kafka_jvm_non_heap_usage'://histogram
+    case 'kafka_jvm_heap_usage':                                              // Histogram
+    case 'kafka_jvm_non_heap_usage':                                          // Histogram
       return data.data.result[3].values;
     default:
       return
