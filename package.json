@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "NODE_ENV=development nodemon server/server.ts & NODE_ENV=development webpack serve --open",
     "start": "nodemon server/server.ts",
-    "start:consumer": "node .kafkaTest/consumer/index.js",
-    "start:producer": "node .kafkaTest/producer/index.js",
+    "start:consumer": "nodemon .kafkaTest/consumer/index.js",
+    "start:producer": "nodemon .kafkaTest/producer/index.js",
     "test": "jest"
   },
   "repository": {
