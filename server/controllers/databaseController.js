@@ -1,7 +1,10 @@
-const db = require('./pg.ts'); 
 const fetch = require('node-fetch');
+const config = require('config')
 
-const { BASE_PATH } = require('../../config/default')
+const db = require('./pg.ts'); 
+
+const DB_TABLE = config.get('DB_TABLE')
+const PROM_QUERY = config.get('PROM_QUERY')
 
 //------------------------------------------------------------------------------------------------------------//
 const keys = {
@@ -26,7 +29,7 @@ dbController.getHistoricalData = (req, res, next) => {
   const { metric, startTime, endTime } = req.body
 
   const body = `SELECT * 
-    FROM iris_database AS ib
+    FROM ${DB_TABLE} AS ib
     WHERE ib.time >= ${startTime} 
       AND ib.time <= ${endTime}
       AND ib.metric = '${metric}'
@@ -60,11 +63,11 @@ dbController.getHistoricalData = (req, res, next) => {
 }
 //------------------------------------------------------------------------------------------------------------//
 dbController.add_bytesinpersec_rate = (lastTimeStamp) => {
-  return fetch(BASE_PATH + `/api/v1/query?query=kafka_server_broker_topic_metrics_bytesinpersec_rate[5m]`)
+  return fetch(`${BASE_PATH}${PROM_QUERY}kafka_server_broker_topic_metrics_bytesinpersec_rate[5m]`)
     .then(res => res.json())
     .then(data => {
       let body = `
-        INSERT INTO iris_database(key, identifier, metric, time, value)
+        INSERT INTO ${DB_TABLE}(key, identifier, metric, time, value)
         VALUES `;
       //key = identifier + metric + time 
       const results = data.data.result;
@@ -108,11 +111,11 @@ dbController.add_bytesinpersec_rate = (lastTimeStamp) => {
 };
 //------------------------------------------------------------------------------------------------------------//
 dbController.add_failedpartitionscount_value = (lastTimeStamp) => {
-  return fetch(BASE_PATH + `/api/v1/query?query=kafka_server_replica_fetcher_manager_failedpartitionscount_value[5m]`)
+  return fetch(`${BASE_PATH}${PROM_QUERY}kafka_server_replica_fetcher_manager_failedpartitionscount_value[5m]`)
     .then(res => res.json())
     .then(data => {
       let body = `
-        INSERT INTO iris_database(key, identifier, metric, time, value)
+        INSERT INTO ${DB_TABLE}(key, identifier, metric, time, value)
         VALUES `;
       //key = identifier + metric + time 
       const results = data.data.result;
@@ -152,11 +155,11 @@ dbController.add_failedpartitionscount_value = (lastTimeStamp) => {
 };
 //------------------------------------------------------------------------------------------------------------//
 dbController.add_maxlag_value = (lastTimeStamp) => {
-  return fetch(BASE_PATH + `/api/v1/query?query=kafka_server_replica_fetcher_manager_maxlag_value[5m]`)
+  return fetch(`${BASE_PATH}${PROM_QUERY}kafka_server_replica_fetcher_manager_maxlag_value[5m]`)
     .then(res => res.json())
     .then(data => {
       let body = `
-        INSERT INTO iris_database(key, identifier, metric, time, value)
+        INSERT INTO ${DB_TABLE}(key, identifier, metric, time, value)
         VALUES `;
       //key = identifier + metric + time 
       const results = data.data.result;
@@ -196,11 +199,11 @@ dbController.add_maxlag_value = (lastTimeStamp) => {
 };
 //------------------------------------------------------------------------------------------------------------//
 dbController.add_offlinereplicacount = (lastTimeStamp) => {
-  return fetch(BASE_PATH + `/api/v1/query?query=kafka_server_replica_manager_offlinereplicacount[5m]`)
+  return fetch(`${BASE_PATH}${PROM_QUERY}kafka_server_replica_manager_offlinereplicacount[5m]`)
     .then(res => res.json())
     .then(data => {
       let body = `
-        INSERT INTO iris_database(key, identifier, metric, time, value)
+        INSERT INTO ${DB_TABLE}(key, identifier, metric, time, value)
         VALUES `;
       //key = identifier + metric + time 
       const results = data.data.result;
@@ -240,11 +243,11 @@ dbController.add_offlinereplicacount = (lastTimeStamp) => {
 };
 //------------------------------------------------------------------------------------------------------------//
 dbController.add_bytesoutpersec_rate = (lastTimeStamp) => {
-  return fetch(BASE_PATH + `/api/v1/query?query=kafka_server_broker_topic_metrics_bytesoutpersec_rate[5m]`)
+  return fetch(`${BASE_PATH}${PROM_QUERY}kafka_server_broker_topic_metrics_bytesoutpersec_rate[5m]`)
     .then(res => res.json())
     .then(data => {
       let body = `
-        INSERT INTO iris_database(key, identifier, metric, time, value)
+        INSERT INTO ${DB_TABLE}(key, identifier, metric, time, value)
         VALUES `;
       //key = identifier + metric + time 
       const results = data.data.result;
@@ -286,11 +289,11 @@ dbController.add_bytesoutpersec_rate = (lastTimeStamp) => {
 };
 //------------------------------------------------------------------------------------------------------------//
 dbController.add_messagesinpersec_rate = (lastTimeStamp) => {
-  return fetch(BASE_PATH + `/api/v1/query?query=kafka_server_broker_topic_metrics_messagesinpersec_rate[5m]`)
+  return fetch(`${BASE_PATH}${PROM_QUERY}kafka_server_broker_topic_metrics_messagesinpersec_rate[5m]`)
     .then(res => res.json())
     .then(data => {
       let body = `
-        INSERT INTO iris_database(key, identifier, metric, time, value)
+        INSERT INTO ${DB_TABLE}(key, identifier, metric, time, value)
         VALUES `;
       //key = identifier + metric + time 
       const results = data.data.result;
@@ -332,11 +335,11 @@ dbController.add_messagesinpersec_rate = (lastTimeStamp) => {
 };
 //------------------------------------------------------------------------------------------------------------//
 dbController.add_replicationbytesinpersec_rate = (lastTimeStamp) => {
-  return fetch(BASE_PATH + `/api/v1/query?query=kafka_server_broker_topic_metrics_replicationbytesinpersec_rate[5m]`)
+  return fetch(`${BASE_PATH}${PROM_QUERY}kafka_server_broker_topic_metrics_replicationbytesinpersec_rate[5m]`)
     .then(res => res.json())
     .then(data => {
       let body = `
-        INSERT INTO iris_database(key, identifier, metric, time, value)
+        INSERT INTO ${DB_TABLE}(key, identifier, metric, time, value)
         VALUES `;
       //key = identifier + metric + time 
       const results = data.data.result;
@@ -376,11 +379,11 @@ dbController.add_replicationbytesinpersec_rate = (lastTimeStamp) => {
 };
 //------------------------------------------------------------------------------------------------------------//
 dbController.add_underreplicatedpartitions = (lastTimeStamp) => {
-  return fetch(BASE_PATH + `/api/v1/query?query=kafka_server_replica_manager_underreplicatedpartitions[5m]`)
+  return fetch(`${BASE_PATH}${PROM_QUERY}kafka_server_replica_manager_underreplicatedpartitions[5m]`)
     .then(res => res.json())
     .then(data => {
       let body = `
-        INSERT INTO iris_database(key, identifier, metric, time, value)
+        INSERT INTO ${DB_TABLE}(key, identifier, metric, time, value)
         VALUES `;
       //key = identifier + metric + time 
       const results = data.data.result;
@@ -420,11 +423,11 @@ dbController.add_underreplicatedpartitions = (lastTimeStamp) => {
 };
 //------------------------------------------------------------------------------------------------------------//
 dbController.add_failedisrupdatespersec = (lastTimeStamp) => {
-  return fetch(BASE_PATH + `/api/v1/query?query=kafka_server_replica_manager_failedisrupdatespersec[5m]`)
+  return fetch(`${BASE_PATH}${PROM_QUERY}kafka_server_replica_manager_failedisrupdatespersec[5m]`)
     .then(res => res.json())
     .then(data => {
       let body = `
-        INSERT INTO iris_database(key, identifier, metric, time, value)
+        INSERT INTO ${DB_TABLE}(key, identifier, metric, time, value)
         VALUES `;
       //key = identifier + metric + time 
       const results = data.data.result;
@@ -464,11 +467,11 @@ dbController.add_failedisrupdatespersec = (lastTimeStamp) => {
 };
 //------------------------------------------------------------------------------------------------------------//
 dbController.add_scrapedurationseconds = (lastTimeStamp) => {
-  return fetch(BASE_PATH + `/api/v1/query?query=scrape_duration_seconds[5m]`)
+  return fetch(`${BASE_PATH}${PROM_QUERY}scrape_duration_seconds[5m]`)
     .then(res => res.json())
     .then(data => {
       let body = `
-        INSERT INTO iris_database(key, identifier, metric, time, value)
+        INSERT INTO ${DB_TABLE}(key, identifier, metric, time, value)
         VALUES `;
       //key = identifier + metric + time 
       const results = data.data.result;
@@ -507,11 +510,11 @@ dbController.add_scrapedurationseconds = (lastTimeStamp) => {
 };
 //------------------------------------------------------------------------------------------------------------//
 dbController.add_scrape_samples_scraped = (lastTimeStamp) => {
-  return fetch(BASE_PATH + `/api/v1/query?query=scrape_samples_scraped[5m]`)
+  return fetch(`${BASE_PATH}${PROM_QUERY}scrape_samples_scraped[5m]`)
     .then(res => res.json())
     .then(data => {
       let body = `
-        INSERT INTO iris_database(key, identifier, metric, time, value)
+        INSERT INTO ${DB_TABLE}(key, identifier, metric, time, value)
         VALUES `;
       //key = identifier + metric + time 
       const results = data.data.result;
@@ -550,11 +553,11 @@ dbController.add_scrape_samples_scraped = (lastTimeStamp) => {
 };
 //------------------------------------------------------------------------------------------------------------//
 dbController.add_requesthandleraverageidlepercent = (lastTimeStamp) => {
-  return fetch(BASE_PATH + `/api/v1/query?query=kafka_server_request_handler_avg_idle_percent[5m]`)
+  return fetch(`${BASE_PATH}${PROM_QUERY}kafka_server_request_handler_avg_idle_percent[5m]`)
     .then(res => res.json())
     .then(data => {
       let body = `
-        INSERT INTO iris_database(key, identifier, metric, time, value)
+        INSERT INTO ${DB_TABLE}(key, identifier, metric, time, value)
         VALUES `;
       //key = identifier + metric + time 
       const results = data.data.result;

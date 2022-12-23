@@ -32,7 +32,6 @@ services:
       - ALLOW_PLAINTEXT_LISTENER=yes
       - KAFKA_LISTENERS=PLAINTEXT://:9092
       - JVM_ARGS="-Dcom.sun.management.jmxremote.port=9991 -Dcom.sun.management.jmxremote.rmi.port=9991 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false" 
-
     depends_on:
       - zookeeper
   jmx-kafka:
@@ -55,24 +54,28 @@ services:
      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     command: "--config.file=/etc/prometheus/prometheus.yml"
     container_name: prometheus
-  kafka-test:
-    image: node:16-alpine
-    entrypoint: 
-     - "sh"
-     - "-c"
-     - "npm install && npm run start:producer && npm run start:consumer"
-    depends_on:
-     - kafka
-    container_name: kafka-test
-#   postgres:
-#     image: postgres:10.3
-#     restart: always
-#     environment:
-#       - POSTGRES_USER=iris_admin
-#       - POSTGRES_PASSWORD=password
-#     volumes:
-#       - postgres:/var/lib/postgresql/data
-#     ports:
-#       - '5432:5432'
-# volumes:
-#   postgres:
+
+  # kafka-test:
+  #   image: node:14-alpine
+  #   entrypoint: 
+  #    - "sh"
+  #    - "-c"
+  #    - "npm install && npm run start:producer && npm run start:consumer"
+  #   volumes:
+  #    - .:/tmp/app
+  #   depends_on:
+  #    - kafka
+  #   container_name: kafka-test
+
+  postgres:
+    image: postgres:10.5
+    restart: always
+    environment:
+      - POSTGRES_USER=dev_user 
+      - POSTGRES_PASSWORD=dev_pw
+    volumes:
+      - /var/lib/postgresql/data
+      - ./sql-scripts/db.init.sql:/docker-entrypoint-initdb.d/db.init.sql
+    ports:
+      - "8532:5432"
+    container_name: local-postgres
