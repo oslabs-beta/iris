@@ -9,12 +9,13 @@ import path from 'path'
 import http from 'http'
 import cors from 'cors'
 import dotenv from 'dotenv'
-dotenv.config()
+import config from 'config'
 
 import dbController from './controllers/databaseController.js'
 import portController from './controllers/portController.js'
 
-import { BASE_PATH } from '../config/default'
+dotenv.config()
+const BASE_PATH = config.get('BASE_PATH')
 
 // import writeCSV from "./latencyTest/writeCSV.js"
 
@@ -183,21 +184,21 @@ app.post('/delete',
 
 //------------------------------------------------------------------------------------------------------------//
 // Post request from frontend to verify port and password
-app.post('/port',
-  portController.verifyPort,
-  (req : Request, res : Response) => {
-    res.status(201).json(res.locals.port)
-  }
-)
+// app.post('/port',
+//   portController.verifyPort,
+//   (req : Request, res : Response) => {
+//     res.status(201).json(res.locals.port)
+//   }
+// )
 
-//------------------------------------------------------------------------------------------------------------//
-// Create a port and password combo in backend via Postman
-app.post('/createPort',
-  portController.createPort,
-  (req : Request, res : Response) : void => {
-    res.status(201).json(res.locals.port)
-  }
-)
+// //------------------------------------------------------------------------------------------------------------//
+// // Create a port and password combo in backend via Postman
+// app.post('/createPort',
+//   portController.createPort,
+//   (req : Request, res : Response) : void => {
+//     res.status(201).json(res.locals.port)
+//   }
+// )
 
 //------------------------------------------------------------------------------------------------------------//
 // Reassign metric and timeframe based on OnChange event from frontEnd
@@ -237,12 +238,12 @@ const queryData = async (metric : String, timeFrame : String) : Promise<any | Re
     case 'kafka_coordinator_group_metadata_manager_numgroups':                // Piechart
     case 'kafka_coordinator_group_metadata_manager_numgroupsdead':            // Piechart 
     case 'kafka_coordinator_group_metadata_manager_numgroupsempty':           // Piechart
-      return data.data.result
+      return data.data?.result
     case 'kafka_server_request_handler_avg_idle_percent':                     // Linechart
-      return [data.data.result[4]]
+      return [data.data?.result[4]]
     case 'kafka_jvm_heap_usage':                                              // Histogram
     case 'kafka_jvm_non_heap_usage':                                          // Histogram
-      return data.data.result[3].values;
+      return data.data?.result[3]?.values;
     default:
       return
   }
@@ -252,6 +253,9 @@ const queryData = async (metric : String, timeFrame : String) : Promise<any | Re
 //Method to get histogram 
 const getHistogram = async (metric : String, timeFrame : String, numOfBins : number) : Promise<Results> => {
   const data = await queryData(metric, timeFrame); // data = [...[time,values]] 
+
+  if (!data) return []
+
   data.sort((a : Values, b: Values) => Number(a[1]) - Number(b[1])); //sort the data base on values
   const minValue = Number(data[0][1])
   const maxValue = Number(data[data.length - 1][1])
@@ -282,7 +286,7 @@ const getHistogram = async (metric : String, timeFrame : String, numOfBins : num
 const getPieChart = async (metricsArr : String[]) : Promise<Results> => {
   const results = await (metricsArr.map(async (metric) => {
     const data = await queryData(metric, '30s'); // Results array of objects with metric and values keys
-    const timeValueArr = data[0].values[data[0].values.length - 1] // [time, value] at values.length - 1
+    const timeValueArr = data[0]?.values[data[0].values.length - 1] // [time, value] at values.length - 1
     return {
       metric: { topic: metric },
       values: [timeValueArr]
