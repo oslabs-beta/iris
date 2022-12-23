@@ -1,0 +1,3 @@
+exports.getHistoricalData = require('./getHistoricalData')
+
+
