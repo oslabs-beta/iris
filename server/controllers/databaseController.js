@@ -3,6 +3,7 @@ const config = require('config')
 
 const db = require('./pg.ts'); 
 
+const BASE_PATH = config.get('BASE_PATH')
 const DB_TABLE = config.get('DB_TABLE')
 const PROM_QUERY = config.get('PROM_QUERY')
 
