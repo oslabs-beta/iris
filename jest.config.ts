@@ -7,9 +7,10 @@ const config: Config = {
     '**./*.js'
   ],
   testEnvironment: 'node',
-  testMatch:['**./*.js'],
+  testMatch:['**.test.js'],
   testPathIgnorePatterns: [
     './config/',
+    './kafkaTest/',
     './node_modules/'
   ]
 };
