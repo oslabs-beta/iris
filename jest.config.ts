@@ -4,9 +4,9 @@ const config: Config = {
   verbose: true,
   collectCoverage: true,
   collectCoverageFrom: [
-    '**./*.js'
+    '**/client/*.*'
   ],
-  testEnvironment: 'node',
+  testEnvironment: 'jsdom',
   testMatch:['**.test.js'],
   testPathIgnorePatterns: [
     './config/',
