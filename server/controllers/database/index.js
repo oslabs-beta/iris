@@ -11,4 +11,3 @@ exports.add_failedisrupdatespersec = require('./add_failedisrupdatespersec')
 exports.add_scrapedurationseconds = require('./add_scrapedurationseconds')
 exports.add_scrape_samples_scraped = require('./add_scrape_samples_scraped')
 exports.add_requesthandleraverageidlepercent = require('./add_requesthandleraverageidlepercent')
-

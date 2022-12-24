@@ -1,6 +1,6 @@
 const fetch = require('node-fetch');
 
-const db = require('./pg.ts'); 
+const db = require('../pg.ts'); 
 
 const { BASE_PATH, DB_TABLE, PROM_QUERY } = require('config')
 
