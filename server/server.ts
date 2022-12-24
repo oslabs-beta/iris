@@ -8,12 +8,17 @@ import fetch from 'node-fetch'
 import path from 'path'
 import http from 'http'
 import cors from 'cors'
-import dbController from './databaseController.js'
-import portController from './portController.js'
+import dotenv from 'dotenv'
+
+import dbController from './controllers/databaseController.js'
+import portController from './controllers/portController.js'
+
+dotenv.config()
+const { BASE_PATH } = require('config')
 
 // import writeCSV from "./latencyTest/writeCSV.js"
 
-const PORT = 8080
+const PORT = 8000
 
 //------------------------------------------------------------------------------------------------------------//
 const app = express();
@@ -139,7 +144,6 @@ let lastTimeStamp = 0;
 // setInterval to query data and store in backend every 15s.
 setInterval(async () : Promise<void> => {
   const start = Date.now();
-  console.log('start time:', Date.now() - start)
   await Promise.allSettled([
     dbController.add_failedpartitionscount_value(lastTimeStamp),
     dbController.add_maxlag_value(lastTimeStamp),
@@ -157,7 +161,6 @@ setInterval(async () : Promise<void> => {
   //   'duration(s)': Date.now() - start,
   // })
   lastTimeStamp = await dbController.add_bytesinpersec_rate(lastTimeStamp)
-  console.log('End time:', Date.now() - start)
 }, 30000)// 1 minute set interval
 
 //------------------------------------------------------------------------------------------------------------//
@@ -180,21 +183,21 @@ app.post('/delete',
 
 //------------------------------------------------------------------------------------------------------------//
 // Post request from frontend to verify port and password
-app.post('/port',
-  portController.verifyPort,
-  (req : Request, res : Response) => {
-    res.status(201).json(res.locals.port)
-  }
-)
+// app.post('/port',
+//   portController.verifyPort,
+//   (req : Request, res : Response) => {
+//     res.status(201).json(res.locals.port)
+//   }
+// )
 
-//------------------------------------------------------------------------------------------------------------//
-// Create a port and password combo in backend via Postman
-app.post('/createPort',
-  portController.createPort,
-  (req : Request, res : Response) : void => {
-    res.status(201).json(res.locals.port)
-  }
-)
+// //------------------------------------------------------------------------------------------------------------//
+// // Create a port and password combo in backend via Postman
+// app.post('/createPort',
+//   portController.createPort,
+//   (req : Request, res : Response) : void => {
+//     res.status(201).json(res.locals.port)
+//   }
+// )
 
 //------------------------------------------------------------------------------------------------------------//
 // Reassign metric and timeframe based on OnChange event from frontEnd
@@ -216,30 +219,30 @@ type HistogramValues = [String, unknown]
 type PieValues = [number, String]
 
 const queryData = async (metric : String, timeFrame : String) : Promise<any | Results> => {
-  const res = await fetch(`http://localhost:9090/api/v1/query?query=${metric}[${timeFrame}]`)
+  const res = await fetch(`${BASE_PATH}/api/v1/query?query=${metric}[${timeFrame}]`, { method: 'get' })
   const data = await res.json()
   switch (metric) {
-    case 'kafka_server_broker_topic_metrics_bytesinpersec_rate': //linechart
-    case 'kafka_server_replica_fetcher_manager_failedpartitionscount_value'://linechart
-    case 'kafka_server_replica_fetcher_manager_maxlag_value'://linechart
-    case 'kafka_server_replica_manager_offlinereplicacount'://linechart
-    case 'kafka_server_broker_topic_metrics_bytesinpersec_rate'://linechart
-    case 'kafka_server_broker_topic_metrics_bytesoutpersec_rate'://linechart
-    case 'kafka_server_broker_topic_metrics_messagesinpersec_rate'://linechart
-    case 'kafka_server_broker_topic_metrics_replicationbytesinpersec_rate'://linechart
-    case 'kafka_server_replica_manager_underreplicatedpartitions'://linechart
-    case 'kafka_server_replica_manager_failedisrupdatespersec'://linechart
-    case 'scrape_duration_seconds'://linechart
-    case 'scrape_samples_scraped'://linechart
-    case 'kafka_coordinator_group_metadata_manager_numgroups': //piechart
-    case 'kafka_coordinator_group_metadata_manager_numgroupsdead': //piechart 
-    case 'kafka_coordinator_group_metadata_manager_numgroupsempty': //piechart
-      return data.data.result
-    case 'kafka_server_request_handler_avg_idle_percent'://linechart
-      return [data.data.result[4]]
-    case 'kafka_jvm_heap_usage': //histogram
-    case 'kafka_jvm_non_heap_usage'://histogram
-      return data.data.result[3].values;
+    case 'kafka_server_broker_topic_metrics_bytesinpersec_rate':              // Linechart
+    case 'kafka_server_replica_fetcher_manager_failedpartitionscount_value':  // Linechart
+    case 'kafka_server_replica_fetcher_manager_maxlag_value':                 // Linechart
+    case 'kafka_server_replica_manager_offlinereplicacount':                  // Linechart
+    case 'kafka_server_broker_topic_metrics_bytesinpersec_rate':              // Linechart
+    case 'kafka_server_broker_topic_metrics_bytesoutpersec_rate':             // Linechart
+    case 'kafka_server_broker_topic_metrics_messagesinpersec_rate':           // Linechart
+    case 'kafka_server_broker_topic_metrics_replicationbytesinpersec_rate':   // Linechart
+    case 'kafka_server_replica_manager_underreplicatedpartitions':            // Linechart
+    case 'kafka_server_replica_manager_failedisrupdatespersec':               // Linechart
+    case 'scrape_duration_seconds':                                           // Linechart
+    case 'scrape_samples_scraped':                                            // Linechart
+    case 'kafka_coordinator_group_metadata_manager_numgroups':                // Piechart
+    case 'kafka_coordinator_group_metadata_manager_numgroupsdead':            // Piechart 
+    case 'kafka_coordinator_group_metadata_manager_numgroupsempty':           // Piechart
+      return data.data?.result
+    case 'kafka_server_request_handler_avg_idle_percent':                     // Linechart
+      return [data.data?.result[4]]
+    case 'kafka_jvm_heap_usage':                                              // Histogram
+    case 'kafka_jvm_non_heap_usage':                                          // Histogram
+      return data.data?.result[3]?.values;
     default:
       return
   }
@@ -249,6 +252,9 @@ const queryData = async (metric : String, timeFrame : String) : Promise<any | Re
 //Method to get histogram 
 const getHistogram = async (metric : String, timeFrame : String, numOfBins : number) : Promise<Results> => {
   const data = await queryData(metric, timeFrame); // data = [...[time,values]] 
+
+  if (!data) return []
+
   data.sort((a : Values, b: Values) => Number(a[1]) - Number(b[1])); //sort the data base on values
   const minValue = Number(data[0][1])
   const maxValue = Number(data[data.length - 1][1])
@@ -279,7 +285,7 @@ const getHistogram = async (metric : String, timeFrame : String, numOfBins : num
 const getPieChart = async (metricsArr : String[]) : Promise<Results> => {
   const results = await (metricsArr.map(async (metric) => {
     const data = await queryData(metric, '30s'); // Results array of objects with metric and values keys
-    const timeValueArr = data[0].values[data[0].values.length - 1] // [time, value] at values.length - 1
+    const timeValueArr = data[0]?.values[data[0].values.length - 1] // [time, value] at values.length - 1
     return {
       metric: { topic: metric },
       values: [timeValueArr]

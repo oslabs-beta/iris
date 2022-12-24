@@ -2,15 +2,12 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
-  entry: path.resolve(__dirname, './client/index.js'),
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, 'index.html'),
-      filename: 'index.html'
-    }), 
-    // "@babel/plugin-transform-modules-commonjs"
-  ],
+  entry: {
+    app: './client/index.js'
+  },
+ 
   devtool: 'inline-source-map',
+
   devServer: {
     host: 'localhost',
     port: 8080,
@@ -18,9 +15,11 @@ module.exports = {
       directory: path.resolve(__dirname, 'build'),
       publicPath: '/'
     },
+    client: {
+      progress: true,
+    },
     proxy: {
-      // '/': 'http://localhost:8080',
-      // '/': 'http://localhost:8081',
+      '/': 'http://localhost:8000',
       compress: true,
       port: 8080,
     },
@@ -28,22 +27,33 @@ module.exports = {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
       "Access-Control-Allow-Headers": "X-Request-With, content-type, Authorization"
-    }
+    },
+    hot: true
   },
+
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'build'),
     clean: true
   },
+
   resolve: {
     extensions: ['.tsx', '.ts','.jsx', '.js', ],
   },
+
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: path.resolve(__dirname, 'index.html'),
+      filename: 'index.html'
+    }), 
+    // "@babel/plugin-transform-modules-commonjs"
+  ],
+
   module: {
     rules: [
       {
         test: /\.jsx?/,
-        // exclude: /(node_modules)/,
-        exclude: path.resolve(__dirname, '../node_modules'),
+        exclude: /(node_modules)/,
         use: {
           loader: 'babel-loader',
           options: {

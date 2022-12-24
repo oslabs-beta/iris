@@ -13,7 +13,7 @@ const kafka = new Kafka({
     initialRetryTime: 100,
     retries: 8
   },
-  logLevel: 'logLevel.DEBUG'
+  // logLevel: 'logLevel.DEBUG'
 })
 
 const consumer = kafka.consumer({ groupId: 'iris' })
