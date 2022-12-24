@@ -5,6 +5,8 @@
   "main": "webpack.config.js",
   "scripts": {
     "dev": "NODE_ENV=development nodemon server/server.ts & NODE_ENV=development webpack serve --open",
+    "dev:server": "NODE_ENV=development nodemon server/server.ts",
+    "dev:client": "NODE_ENV=development webpack serve",
     "start": "nodemon server/server.ts",
     "start:consumer": "nodemon .kafkaTest/consumer/index.js",
     "start:producer": "nodemon .kafkaTest/producer/index.js",
@@ -41,6 +43,7 @@
     "dotenv": "^16.0.1",
     "eslint": "^8.21.0",
     "express": "^4.18.1",
+    "express-validator": "^6.14.2",
     "html-webpack-plugin": "^5.5.0",
     "kafkajs": "^2.1.0",
     "mongoose": "^6.5.2",

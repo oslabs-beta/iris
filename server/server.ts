@@ -9,17 +9,16 @@ import path from 'path'
 import http from 'http'
 import cors from 'cors'
 import dotenv from 'dotenv'
-import config from 'config'
 
 import dbController from './controllers/databaseController.js'
 import portController from './controllers/portController.js'
 
 dotenv.config()
-const BASE_PATH = config.get('BASE_PATH')
+const { BASE_PATH } = require('config')
 
 // import writeCSV from "./latencyTest/writeCSV.js"
 
-const PORT = 8080
+const PORT = 8000
 
 //------------------------------------------------------------------------------------------------------------//
 const app = express();
