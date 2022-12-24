@@ -10,7 +10,7 @@ import http from 'http'
 import cors from 'cors'
 import dotenv from 'dotenv'
 
-import dbController from './controllers/databaseController.js'
+import dbController from './controllers/database'
 import portController from './controllers/portController.js'
 
 dotenv.config()
@@ -165,11 +165,7 @@ setInterval(async () : Promise<void> => {
 
 //------------------------------------------------------------------------------------------------------------//
 //Post request to frontend to show historical data for each Metric Chart
-app.post('/historicalData',
-  dbController.getHistoricalData,
-  (req : Request, res : Response) : void => {
-    res.status(200).json(res.locals.historicalData)
-  })
+app.post('/historicalData', dbController.getHistoricalData)
 
 //------------------------------------------------------------------------------------------------------------//
 // Post request to frontend to delete chart

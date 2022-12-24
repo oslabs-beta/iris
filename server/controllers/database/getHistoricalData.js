@@ -1,6 +1,9 @@
 const db = require('../pg.ts'); 
+const keys = require('./metricKeys')
 
-const getHistoricalData = (req, res) => {
+const { DB_TABLE } = require('config')
+
+const getHistoricalData = async (req, res) => {
   const { metric, startTime, endTime } = req.body
 
   const body = `SELECT * 
@@ -9,12 +12,16 @@ const getHistoricalData = (req, res) => {
       AND ib.time <= ${endTime}
       AND ib.metric = '${metric}'
   `
-  db.query(body, (err, queryResults) => {
+
+  const results = [];
+
+  // Query db for results and push to results array
+  await db.query(body, (err, queryResults) => {
     if (err) {
-      return next(err);
+      console.log('ERROR in PostgreSQL read for historical data')
+      return err;
     }
     const rows = queryResults.rows
-    const results = [];
     const resultsObj = {}
 
     // Iterate over each row of SQL data
@@ -24,7 +31,8 @@ const getHistoricalData = (req, res) => {
       else if (resultsObj[el.identifier]) resultsObj[el.identifier].push([el.time, el.value])
     })
 
-    //indentifier includes within SQL database!
+    // Iterate over each identifier to reconstruct Prometheus data object for Chart.js
+    // Identifier includes within SQL database!
     for (const identifier in resultsObj) {
       const obj = {}
       obj.metric = {}
@@ -32,9 +40,10 @@ const getHistoricalData = (req, res) => {
       obj.values = resultsObj[identifier]
       results.push(obj)
     }
-    res.locals.historicalData = results
-    return next();
+    
   });
+
+  return results
 }
 
 module.exports = getHistoricalData
