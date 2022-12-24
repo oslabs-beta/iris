@@ -8,17 +8,13 @@ import NumberContainer from './NumberContainer.jsx';
 
 function LeftPane(props) {
 
-  const leftPaneCharts = [
-    <NumberContainer/>,
-    <BarChart chartID={'kafka_jvm_heap_usage'} />, 
-    <BarChart chartID={'kafka_jvm_non_heap_usage'} />, 
-    <PieChart chartID={'pieChart'} />
-  ]
-
   // pie chart -> bar chart -> bar chart
   return (
     <div id='leftPane'>
-      {leftPaneCharts}
+      <NumberContainer/>,
+      <BarChart key='kafka_jvm_heap_usage' chartID={'kafka_jvm_heap_usage'} />, 
+      <BarChart key='kafka_jvm_non_heap_usage' chartID={'kafka_jvm_non_heap_usage'} />, 
+      <PieChart chartID={'pieChart'} />
     </div>
   )
 }

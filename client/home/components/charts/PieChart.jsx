@@ -80,7 +80,7 @@ function PieChart(props) {
   }
 
   return (
-    <div id='pieGraph'>
+    <div id='pieGraph' data-testid={`pie-chart-${chartID}`}>
       <Pie id='pieGraph' 
         options={
           { 

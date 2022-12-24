@@ -44,7 +44,7 @@ function NumberContainer(props) {
 
   // return our render
   return (
-    <div id='numberContainer'>
+    <div id='numberContainer' data-testid='number-container'>
       <div className="partitionCount">
         <h1>Partition Count:</h1>
         <h1 className='metric'>{partitionCount}</h1>

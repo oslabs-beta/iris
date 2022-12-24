@@ -98,7 +98,7 @@ function BarChart(props) {
   }
 
   return (
-    <div id='barGraph'>
+    <div id='barGraph' data-testid={`bar-chart-${chartID}`}>
       <Bar id='barGraph' 
         options={
           { 
