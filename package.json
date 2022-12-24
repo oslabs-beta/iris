@@ -10,7 +10,7 @@
     "start": "nodemon server/server.ts",
     "start:consumer": "nodemon .kafkaTest/consumer/index.js",
     "start:producer": "nodemon .kafkaTest/producer/index.js",
-    "test": "jest"
+    "test": "NODE_ENV=development jest"
   },
   "repository": {
     "type": "git",
@@ -71,9 +71,11 @@
   },
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.18.6",
+    "@testing-library/react": "^13.4.0",
     "@types/node": "^18.7.4",
     "@types/node-fetch": "^2.6.2",
     "jest": "^28.1.3",
+    "jest-environment-jsdom": "^29.3.1",
     "supertest": "^6.3.3",
     "ts-node": "^10.9.1",
     "tslib": "^2.4.0",

@@ -4,12 +4,13 @@ const config: Config = {
   verbose: true,
   collectCoverage: true,
   collectCoverageFrom: [
-    '**./*.js'
+    '**/client/*.*'
   ],
-  testEnvironment: 'node',
-  testMatch:['**./*.js'],
+  testEnvironment: 'jsdom',
+  testMatch:['**.test.js'],
   testPathIgnorePatterns: [
     './config/',
+    './kafkaTest/',
     './node_modules/'
   ]
 };
