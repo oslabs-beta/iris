@@ -2,3 +2,4 @@ node_modules
 build
 .env
 kafkaTest/node_modules
+coverage
