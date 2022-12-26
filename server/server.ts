@@ -4,7 +4,6 @@ import { Request, Response } from 'express'
 import { NextFunction } from "webpack-dev-server"
 
 import express from 'express'
-import fetch from 'node-fetch'
 import path from 'path'
 import http from 'http'
 import cors from 'cors'
@@ -12,9 +11,11 @@ import dotenv from 'dotenv'
 
 import dbController from './controllers/database'
 import portController from './controllers/portController.js'
+import queryData from './controllers/util/queryData'
+import getHistogram from './controllers/charts/getHistogram'
+import getPieChart from './controllers/charts/getPieChart'
 
 dotenv.config()
-const { BASE_PATH } = require('config')
 
 // import writeCSV from "./latencyTest/writeCSV.js"
 
@@ -207,88 +208,88 @@ app.post('/', (req : Request, res : Response) : void => {
   res.status(200).send('Metric and timeFrame changed')
 })
 
-//------------------------------------------------------------------------------------------------------------//
-//Making different switch cases for each metric to retrieve data
-type Results = { metric: {}, values: (Values[] | HistogramValues[] | PieValues[])}[]
-type Values = [number, String]
-type HistogramValues = [String, unknown]
-type PieValues = [number, String]
+// // //------------------------------------------------------------------------------------------------------------//
+// // //Making different switch cases for each metric to retrieve data
+// // type Results = { metric: {}, values: (Values[] | HistogramValues[] | PieValues[])}[]
+// // type Values = [number, String]
+// // type HistogramValues = [String, unknown]
+// // type PieValues = [number, String]
 
-const queryData = async (metric : String, timeFrame : String) : Promise<any | Results> => {
-  const res = await fetch(`${BASE_PATH}/api/v1/query?query=${metric}[${timeFrame}]`, { method: 'get' })
-  const data = await res.json()
-  switch (metric) {
-    case 'kafka_server_broker_topic_metrics_bytesinpersec_rate':              // Linechart
-    case 'kafka_server_replica_fetcher_manager_failedpartitionscount_value':  // Linechart
-    case 'kafka_server_replica_fetcher_manager_maxlag_value':                 // Linechart
-    case 'kafka_server_replica_manager_offlinereplicacount':                  // Linechart
-    case 'kafka_server_broker_topic_metrics_bytesinpersec_rate':              // Linechart
-    case 'kafka_server_broker_topic_metrics_bytesoutpersec_rate':             // Linechart
-    case 'kafka_server_broker_topic_metrics_messagesinpersec_rate':           // Linechart
-    case 'kafka_server_broker_topic_metrics_replicationbytesinpersec_rate':   // Linechart
-    case 'kafka_server_replica_manager_underreplicatedpartitions':            // Linechart
-    case 'kafka_server_replica_manager_failedisrupdatespersec':               // Linechart
-    case 'scrape_duration_seconds':                                           // Linechart
-    case 'scrape_samples_scraped':                                            // Linechart
-    case 'kafka_coordinator_group_metadata_manager_numgroups':                // Piechart
-    case 'kafka_coordinator_group_metadata_manager_numgroupsdead':            // Piechart 
-    case 'kafka_coordinator_group_metadata_manager_numgroupsempty':           // Piechart
-      return data.data?.result
-    case 'kafka_server_request_handler_avg_idle_percent':                     // Linechart
-      return [data.data?.result[4]]
-    case 'kafka_jvm_heap_usage':                                              // Histogram
-    case 'kafka_jvm_non_heap_usage':                                          // Histogram
-      return data.data?.result[3]?.values;
-    default:
-      return
-  }
-};
+// // const queryData = async (metric : String, timeFrame : String) : Promise<any | Results> => {
+// //   const res = await fetch(`${BASE_PATH}/api/v1/query?query=${metric}[${timeFrame}]`, { method: 'get' })
+// //   const data = await res.json()
+// //   switch (metric) {
+// //     case 'kafka_server_broker_topic_metrics_bytesinpersec_rate':              // Linechart
+// //     case 'kafka_server_replica_fetcher_manager_failedpartitionscount_value':  // Linechart
+// //     case 'kafka_server_replica_fetcher_manager_maxlag_value':                 // Linechart
+// //     case 'kafka_server_replica_manager_offlinereplicacount':                  // Linechart
+// //     case 'kafka_server_broker_topic_metrics_bytesinpersec_rate':              // Linechart
+// //     case 'kafka_server_broker_topic_metrics_bytesoutpersec_rate':             // Linechart
+// //     case 'kafka_server_broker_topic_metrics_messagesinpersec_rate':           // Linechart
+// //     case 'kafka_server_broker_topic_metrics_replicationbytesinpersec_rate':   // Linechart
+// //     case 'kafka_server_replica_manager_underreplicatedpartitions':            // Linechart
+// //     case 'kafka_server_replica_manager_failedisrupdatespersec':               // Linechart
+// //     case 'scrape_duration_seconds':                                           // Linechart
+// //     case 'scrape_samples_scraped':                                            // Linechart
+// //     case 'kafka_coordinator_group_metadata_manager_numgroups':                // Piechart
+// //     case 'kafka_coordinator_group_metadata_manager_numgroupsdead':            // Piechart 
+// //     case 'kafka_coordinator_group_metadata_manager_numgroupsempty':           // Piechart
+// //       return data.data?.result
+// //     case 'kafka_server_request_handler_avg_idle_percent':                     // Linechart
+// //       return [data.data?.result[4]]
+// //     case 'kafka_jvm_heap_usage':                                              // Histogram
+// //     case 'kafka_jvm_non_heap_usage':                                          // Histogram
+// //       return data.data?.result[3]?.values;
+// //     default:
+// //       return
+// //   }
+// // };
 
-//------------------------------------------------------------------------------------------------------------//
-//Method to get histogram 
-const getHistogram = async (metric : String, timeFrame : String, numOfBins : number) : Promise<Results> => {
-  const data = await queryData(metric, timeFrame); // data = [...[time,values]] 
+// // //------------------------------------------------------------------------------------------------------------//
+// // //Method to get histogram 
+// // const getHistogram = async (metric : String, timeFrame : String, numOfBins : number) : Promise<Results> => {
+// //   const data = await queryData(metric, timeFrame); // data = [...[time,values]] 
 
-  if (!data) return []
+// //   if (!data) return []
 
-  data.sort((a : Values, b: Values) => Number(a[1]) - Number(b[1])); //sort the data base on values
-  const minValue = Number(data[0][1])
-  const maxValue = Number(data[data.length - 1][1])
-  const binRange = (maxValue - minValue) / numOfBins;
-  const histogram = {}
-  let currBin = Math.round(minValue + binRange);
-  data.forEach((num : Values[]):void => {
-    if (Number(num[1]) <= currBin) {
-      if (!histogram[currBin]) histogram[currBin] = 1
-      else histogram[currBin] += 1
-    }
-    else currBin += Math.round(binRange)
-  })
-  const results = [
-    {
-      metric: {
-        topic: metric
-      },
-      values: Object.entries(histogram)
-    }
-  ]
+// //   data.sort((a : Values, b: Values) => Number(a[1]) - Number(b[1])); //sort the data base on values
+// //   const minValue = Number(data[0][1])
+// //   const maxValue = Number(data[data.length - 1][1])
+// //   const binRange = (maxValue - minValue) / numOfBins;
+// //   const histogram = {}
+// //   let currBin = Math.round(minValue + binRange);
+// //   data.forEach((num : Values[]):void => {
+// //     if (Number(num[1]) <= currBin) {
+// //       if (!histogram[currBin]) histogram[currBin] = 1
+// //       else histogram[currBin] += 1
+// //     }
+// //     else currBin += Math.round(binRange)
+// //   })
+// //   const results = [
+// //     {
+// //       metric: {
+// //         topic: metric
+// //       },
+// //       values: Object.entries(histogram)
+// //     }
+// //   ]
 
-  return results
-}
+// //   return results
+// // }
 
-//------------------------------------------------------------------------------------------------------------//
-//Method to get piechart 
-const getPieChart = async (metricsArr : String[]) : Promise<Results> => {
-  const results = await (metricsArr.map(async (metric) => {
-    const data = await queryData(metric, '30s'); // Results array of objects with metric and values keys
-    const timeValueArr = data[0]?.values[data[0].values.length - 1] // [time, value] at values.length - 1
-    return {
-      metric: { topic: metric },
-      values: [timeValueArr]
-    }
-  }))
-  return await Promise.all(results)
-}
+// //------------------------------------------------------------------------------------------------------------//
+// //Method to get piechart 
+// const getPieChart = async (metricsArr : String[]) : Promise<Results> => {
+//   const results = await (metricsArr.map(async (metric) => {
+//     const data = await queryData(metric, '30s'); // Results array of objects with metric and values keys
+//     const timeValueArr = data[0]?.values[data[0].values.length - 1] // [time, value] at values.length - 1
+//     return {
+//       metric: { topic: metric },
+//       values: [timeValueArr]
+//     }
+//   }))
+//   return await Promise.all(results)
+// }
 
 //------------------------------------------------------------------------------------------------------------//
 //global error handler
