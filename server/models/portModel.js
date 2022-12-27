@@ -4,14 +4,14 @@ const Schema = mongoose.Schema;
 const bcrypt = require('bcryptjs');
 const SALT_FACTOR = 10;
 
-const MONGO_URI = 'mongodb+srv://iris_admin:OUmpez8B0ifE8ibf@iris.rbjzguc.mongodb.net/?retryWrites=true&w=majority';
+const MONGO_URI = process.env.MONGO_URI;
 
 mongoose.connect(MONGO_URI, {
   // options for the connect method to parse the URI
   useNewUrlParser: true,
   useUnifiedTopology: true,
   // sets the name of the DB that our collections are part of
-  dbName: 'IRIS'
+  dbName: process.env.DB_NAME
 })
 .then(() => console.log('Connected to Mongo DB.'))
 .catch(err => console.log('Error connecting to MongoDB :', err));

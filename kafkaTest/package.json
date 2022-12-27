@@ -1,0 +1,18 @@
+{
+  "name": "kafkatest",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start:consumer": "nodemon ./consumer/index.js",
+    "start:producer": "nodemon ./producer/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "avsc": "^5.7.7",
+    "kafkajs": "^2.2.3"
+  }
+}
