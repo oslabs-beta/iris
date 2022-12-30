@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { Router } from 'express'
-import path from 'path'
 
+import { updateChart, deleteChart } from './chartCache'
 import dbController from '../controllers/database'
 import portController from '../controllers/portController.js'
 
@@ -10,11 +10,6 @@ const router = Router()
 router.get('/health', (req, res) => {
   res.sendStatus(200)
 })
-
-// Send index.html at app load
-router.get('/', (req: Request, res: Response): void => {
-  res.status(200).sendFile(path.resolve(__dirname, '../index.html'));
-});
 
 //------------------------------------------------------------------------------------------------------------//
 //Post request to frontend to show historical data for each Metric Chart
@@ -25,8 +20,9 @@ router.post('/historicalData', dbController.getHistoricalData)
 router.post('/delete',
   (req : Request, res : Response) : void  => {
     const { chartID } = req.body;
-    delete chartsData[chartID]
-    res.status(200).json('ChartID was removed')
+    const { metric, timeFrame } = deleteChart(chartID)
+    if (metric == '' || timeFrame == '') res.status(500).json('ERROR: Failed to remove chart')
+    res.status(200).json(`SUCCESS: Chart with metric: ${metric} and time frame: ${timeFrame} removed`)
   }
 )
 
@@ -51,11 +47,9 @@ router.post('/delete',
 //------------------------------------------------------------------------------------------------------------//
 // Reassign metric and timeframe based on OnChange event from frontEnd
 router.post('/', (req : Request, res : Response) : void => {
-  const metric = req.body.metric;
-  const timeFrame = req.body.timeFrame;
-  const chartID = req.body.chartID
-  const updatedChart = {}
-  updatedChart[chartID] = { metric: metric, timeFrame: timeFrame }
-  chartsData = Object.assign(chartsData, updatedChart)
-  res.status(200).send('Metric and timeFrame changed')
+  const { metric, timeFrame, chartID } = req.body
+  const updatedChart = updateChart(chartID, metric, timeFrame)
+  res.status(200).send(`SUCCESS: Metric updated to ${updatedChart.metric}. Time frame updated to ${updatedChart.timeFrame}`)
 })
+
+export default router;
