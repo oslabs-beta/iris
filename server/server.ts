@@ -1,3 +1,4 @@
+import { SocketConfig, ServerError } from './types'
 
 import { Socket } from "socket.io-client"
 import { Request, Response } from 'express'
@@ -28,19 +29,6 @@ app.use('/', router)
 
 //------------------------------------------------------------------------------------------------------------//
 // creating Socket.io Connection
-
-type CORS = {
-  origin: string[],
-  methods?: string[],
-  allowedHeaders?: string[],
-  credentials?: Boolean, 
-  ExposeHeaders?: string[],
-}
-
-type SocketConfig = {
-  cors: CORS
-}
-
 const IOConfig : SocketConfig = {
   cors: {
     origin: ["*"],
@@ -114,17 +102,7 @@ io.on('connect_error', (err : Error) : void => {
 dbWriteInterval(30000) 
 
 //------------------------------------------------------------------------------------------------------------//
-//global error handler
-type ServerError = { 
-  log: String,
-  status: number,
-  message: Message,
-}
-
-type Message = {
-  err: String
-}
-
+// Global error handler
 app.use((err: ServerError, req: Request, res: Response, next: NextFunction) => {
   const defaultErr = {
     log: 'Express error handler caught unknown middleware error',
