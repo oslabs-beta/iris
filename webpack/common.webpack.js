@@ -1,7 +1,7 @@
 const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-module.exports = {
+const commonConfig = {
   entry: {
     app: './client/index.js'
   },
@@ -32,8 +32,9 @@ module.exports = {
   },
 
   output: {
-    filename: 'bundle.js',
-    path: path.resolve(__dirname, 'build'),
+    publicPath: ``,
+    path: path.resolve(__dirname, '..dist/assets'),
+    filename: '[name].[contenthash]].js',
     clean: true
   },
 
@@ -43,7 +44,7 @@ module.exports = {
 
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, 'index.html'),
+      template: path.resolve(__dirname, '../index.html'),
       filename: 'index.html'
     }), 
     // "@babel/plugin-transform-modules-commonjs"
@@ -85,3 +86,5 @@ module.exports = {
   }
 
 }
+
+module.exports = commonConfig

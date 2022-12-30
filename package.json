@@ -4,12 +4,13 @@
   "description": "A monitoring suite that provides insights on health metrics of your Kafka broker",
   "main": "webpack.config.js",
   "scripts": {
-    "dev": "NODE_ENV=development nodemon server/server.ts & NODE_ENV=development webpack serve --open",
+    "dev": "NODE_ENV=development nodemon server/server.ts & NODE_ENV=development webpack serve --config=./webpack/development.webpack.js --open",
     "dev:server": "NODE_ENV=development nodemon server/server.ts",
     "dev:client": "NODE_ENV=development webpack serve",
-    "start": "nodemon server/server.ts",
-    "start:consumer": "nodemon .kafkaTest/consumer/index.js",
-    "start:producer": "nodemon .kafkaTest/producer/index.js",
+    "start": "node server/server.ts",
+    "start:consumer": "node .kafkaTest/consumer/index.js",
+    "start:producer": "node .kafkaTest/producer/index.js",
+    "build": "npx webpack build --config=./webpack/production.webpack.js",
     "test": "NODE_ENV=development jest"
   },
   "repository": {

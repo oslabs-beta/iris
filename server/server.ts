@@ -25,13 +25,6 @@ const app = express();
 app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-//------------------------------------------------------------------------------------------------------------//
-
-
-// Send index.html at app load
-app.get('/', (req: Request, res: Response): void => {
-  res.status(200).sendFile(path.resolve(__dirname, '../index.html'));
-});
 
 //------------------------------------------------------------------------------------------------------------//
 //Define default chart value
