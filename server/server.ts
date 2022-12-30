@@ -8,6 +8,7 @@ import path from 'path'
 import http from 'http'
 import cors from 'cors'
 import dotenv from 'dotenv'
+import { createClient } from 'redis'
 
 import dbController from './controllers/database'
 import portController from './controllers/portController.js'
@@ -16,6 +17,19 @@ import getHistogram from './controllers/charts/getHistogram'
 import getPieChart from './controllers/charts/getPieChart'
 
 dotenv.config()
+
+const redisPort = 6379
+const client = createClient({
+  socket: {
+    host: 'localhost',
+    port: redisPort
+  }
+})
+client.on('error', () => {
+  console.log('Error connecting to Redis')
+})
+
+client.connect().then(() => console.log('Connected to Redis on port', redisPort))
 
 // import writeCSV from "./latencyTest/writeCSV.js"
 
@@ -90,7 +104,7 @@ io.on('connection', async (socket : Socket) : Promise<void> => {
     'kafka_coordinator_group_metadata_manager_numgroupsdead',
     'kafka_coordinator_group_metadata_manager_numgroupsempty'
   ])
-  socket.emit('pieChart', pieChartData);
+  socket.emit('pieChart', JSON.stringify(pieChartData));
 
   //Line chart connection
   for (const [chartID, query] of Object.entries(chartsData)) {
@@ -104,14 +118,14 @@ io.on('connection', async (socket : Socket) : Promise<void> => {
     // Query and emit data for JVM_HEAP_USAGE (HISTOGRAM) and JVM_NON_HEAP_USAGE (HISTOGRAM)
     const JVMHeapUsage = await getHistogram('kafka_jvm_heap_usage', '1h', 20)
     const JVMNonHeapUsage = await getHistogram('kafka_jvm_non_heap_usage', '1h', 20);
-    socket.emit('kafka_jvm_heap_usage', JVMHeapUsage)
-    socket.emit('kafka_jvm_non_heap_usage', JVMNonHeapUsage)
+    socket.emit('kafka_jvm_heap_usage', JSON.stringify(JVMHeapUsage))
+    socket.emit('kafka_jvm_non_heap_usage', JSON.stringify(JVMNonHeapUsage))
 
     const pieChartData = await getPieChart(['kafka_coordinator_group_metadata_manager_numgroups',
       'kafka_coordinator_group_metadata_manager_numgroupsdead',
       'kafka_coordinator_group_metadata_manager_numgroupsempty'
     ])
-    socket.emit('pieChart', pieChartData);
+    socket.emit('pieChart', JSON.stringify(pieChartData));
 
 
     //caching the data to fix latency problem
@@ -120,11 +134,11 @@ io.on('connection', async (socket : Socket) : Promise<void> => {
     for (const [chartID, query] of Object.entries(chartsData)) {
       const key = JSON.stringify(`${query.metric}+${query.timeFrame}`) // 'kafka_coordinator_group_metadata_manager_numgroups+5m'
       if (queryObj[key]) {
-        socket.emit(chartID, queryObj[key]) //Broadcast data from query on topic of chartID
+        socket.emit(chartID, JSON.stringify(queryObj[key])) //Broadcast data from query on topic of chartID
       } else {
         const data = await queryData(query.metric, query.timeFrame)
         queryObj[key] = data //setting data as value for key
-        socket.emit(chartID, data) //Broadcast data from query on topic of chartID
+        socket.emit(chartID, JSON.stringify(data)) //Broadcast data from query on topic of chartID
       }
     }
   }, 5000) // socket.emit will send the data every n second. 

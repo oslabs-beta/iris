@@ -30,7 +30,8 @@ function BarChart(props) {
     console.log('socket connected')
   });
 
-  socket.on(chartID, (data) => {
+  socket.on(chartID, async (res) => {
+    const data = await JSON.parse(res)
     const [binArray, countArr, colorArr, linRegressArr] = convertKafkatoChart(data)
 
     const newObj = {

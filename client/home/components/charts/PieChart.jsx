@@ -23,7 +23,8 @@ function PieChart(props) {
   //   console.log('socket connected')
   // });
 
-  socket.on(chartID, (data) => { // data => array of 3  [ {metric, value} ,  {metric, value} ,  {metric, value} ]
+  socket.on(chartID, async (res) => { // data => array of 3  [ {metric, value} ,  {metric, value} ,  {metric, value} ]
+    const data = JSON.parse(res)
     const [binArray, countArr, colorArr] = convertKafkatoChart(data)
 
     const newObj = {

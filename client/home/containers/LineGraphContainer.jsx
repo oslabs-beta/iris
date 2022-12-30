@@ -19,7 +19,8 @@ function LineGraphContainer(props) {
     console.log('socket connected')
   });
 
-  socket.on(chartID, (data) => {
+  socket.on(chartID, async (res) => {
+    const data = JSON.parse(res)
     setChartData(data)
   });
 
