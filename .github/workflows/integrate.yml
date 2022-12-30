@@ -32,5 +32,5 @@ jobs:
       run: npm test
     - run: npm run build --if-present
 
-publish:
-  needs: build
+# publish:
+#   needs: build
