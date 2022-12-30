@@ -9,17 +9,13 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 
 import chartCache from "./routes/chartCache"
-import dbController from './controllers/database'
-import portController from './controllers/portController.js'
+import dbWriteInterval from "./controllers/database/dbWriteInterval"
 import queryData from './controllers/util/queryData'
 import getHistogram from './controllers/charts/getHistogram'
 import getPieChart from './controllers/charts/getPieChart'
 import router from './routes'
 
 dotenv.config()
-
-// import path from 'path'
-// import writeCSV from "./latencyTest/writeCSV.js"
 
 const PORT = process.env.PORT || 8000
 
@@ -92,7 +88,6 @@ io.on('connection', async (socket : Socket) : Promise<void> => {
     ])
     socket.emit('pieChart', pieChartData);
 
-
     //caching the data to fix latency problem
     const queryObj = {}
     //query and emit data for linecharts
@@ -115,33 +110,8 @@ io.on('connect_error', (err : Error) : void => {
   console.log(`ERROR: connect_error due to ${err.message}`);
 });
 
-//------------------------------------------------------------------------------------------------------------//
-//*THIS BLOCKS ARE FOR ADDING METRICS DATA TO THE DATABASE */
-// Query data from API endpoint and write data to database
-// Existing database is not overwritten and does not present conflicts 
-// LastTimeStamp variable tracked to check the last time data was queried and written
-let lastTimeStamp = 0;
-// setInterval to query data and store in backend every 15s.
-setInterval(async () : Promise<void> => {
-  const start = Date.now();
-  await Promise.allSettled([
-    dbController.add_failedpartitionscount_value(lastTimeStamp),
-    dbController.add_maxlag_value(lastTimeStamp),
-    dbController.add_bytesoutpersec_rate(lastTimeStamp),
-    dbController.add_messagesinpersec_rate(lastTimeStamp),
-    dbController.add_replicationbytesinpersec_rate(lastTimeStamp),
-    dbController.add_underreplicatedpartitions(lastTimeStamp),
-    dbController.add_failedisrupdatespersec(lastTimeStamp),
-    dbController.add_scrapedurationseconds(lastTimeStamp),
-    dbController.add_scrape_samples_scraped(lastTimeStamp),
-    dbController.add_requesthandleraverageidlepercent(lastTimeStamp)
-  ])
-  // writeCSV(path.resolve(__dirname, './latencyTest/PromiseAll_AWS.csv'), {
-  //   'id': lastTimeStamp,
-  //   'duration(s)': Date.now() - start,
-  // })
-  lastTimeStamp = await dbController.add_bytesinpersec_rate(lastTimeStamp)
-}, 30000)// 1 minute set interval
+// Data written on 30 sec interval
+dbWriteInterval(30000) 
 
 //------------------------------------------------------------------------------------------------------------//
 //global error handler
@@ -162,7 +132,7 @@ app.use((err: ServerError, req: Request, res: Response, next: NextFunction) => {
     message: { err: 'An error occurred' },
   };
   const errorObj = Object.assign({}, defaultErr, err);
-  console.log(errorObj.log);
+  console.log('ERROR: ', errorObj.log);
   return res.status(errorObj.status).json(errorObj.message);
 });
 
@@ -171,4 +141,4 @@ app.use((err: ServerError, req: Request, res: Response, next: NextFunction) => {
 //PORT listening
 server.listen(PORT, () => console.log('Listening on Port', PORT))
 
-module.exports = app;
+export default app;
