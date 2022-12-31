@@ -35,7 +35,7 @@
     "aws-sdk": "^2.1188.0",
     "babel-loader": "^8.2.5",
     "bcryptjs": "^2.4.3",
-    "chartjs": "^0.3.24",
+    "chart.js": "^4.1.1",
     "config": "^3.3.8",
     "cors": "^2.8.5",
     "css-loader": "^6.7.1",
