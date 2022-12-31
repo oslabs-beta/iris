@@ -11,7 +11,7 @@
     "start:consumer": "node .kafkaTest/consumer/index.js",
     "start:producer": "node .kafkaTest/producer/index.js",
     "build": "npx webpack build --config=./webpack/production.webpack.js",
-    "test": "NODE_ENV=development jest"
+    "test": "NODE_ENV=development npx jest"
   },
   "repository": {
     "type": "git",
