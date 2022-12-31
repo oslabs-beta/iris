@@ -1,6 +1,6 @@
-import type {Config} from 'jest';
+// import type {Config} from 'jest';
 
-const config: Config = {
+const config = {
   preset: 'ts-jest',
   verbose: true,
   collectCoverage: true,
@@ -29,4 +29,4 @@ const config: Config = {
   }
 };
 
-export default config;
+module.exports = config;

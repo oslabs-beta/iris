@@ -11,7 +11,7 @@
     "start:consumer": "node .kafkaTest/consumer/index.js",
     "start:producer": "node .kafkaTest/producer/index.js",
     "build": "npx webpack build --config=./webpack/production.webpack.js",
-    "test": "NODE_ENV=development jest"
+    "test": "NODE_ENV=development npx jest"
   },
   "repository": {
     "type": "git",
@@ -35,7 +35,7 @@
     "aws-sdk": "^2.1188.0",
     "babel-loader": "^8.2.5",
     "bcryptjs": "^2.4.3",
-    "chartjs": "^0.3.24",
+    "chart.js": "^3.9.1",
     "config": "^3.3.8",
     "cors": "^2.8.5",
     "css-loader": "^6.7.1",
@@ -76,7 +76,6 @@
     "@types/jest": "^29.2.4",
     "@types/node": "^18.7.4",
     "@types/node-fetch": "^2.6.2",
-    "jest": "^28.1.3",
     "jest-environment-jsdom": "^29.3.1",
     "supertest": "^6.3.3",
     "ts-jest": "^29.0.3",
