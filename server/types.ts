@@ -19,3 +19,11 @@ export type ServerError = {
 export type Message = {
   err: String
 }
+
+export type Results = { metric: {}, values: (Values[] | HistogramValues[] | PieValues[])}[]
+
+export type Values = [number, String]
+
+export type HistogramValues = [String, unknown]
+
+export type PieValues = [number, String]
