@@ -1,15 +1,11 @@
 import queryData from '../util/queryData'
-
-type Results = { metric: {}, values: (Values[] | HistogramValues[] | PieValues[])}[]
-type Values = [number, String]
-type HistogramValues = [String, unknown]
-type PieValues = [number, String]
+import { Results, Values } from '../../types'
 
 //Method to get histogram 
 const getHistogram = async (metric : String, timeFrame : String, numOfBins : number) : Promise<Results> => {
   const data = await queryData(metric, timeFrame); // data = [...[time,values]] 
 
-  if (!data) return []
+  if (!data || data.length <= 0) return []
 
   data.sort((a : Values, b: Values) => Number(a[1]) - Number(b[1])); //sort the data base on values
   const minValue = Number(data[0][1])
