@@ -20,7 +20,7 @@ export type Message = {
   err: String
 }
 
-export type Numbers = number | string[] 
+export type Numbers = (number | string[])
 
 export type Results = { metric: {}, values: (Values[] | HistogramValues[] | PieValues[])}[]
 
