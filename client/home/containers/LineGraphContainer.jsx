@@ -1,11 +1,7 @@
-import 'flatpickr/dist/themes/airbnb.css' // removes flatpicker backround
-import React, { Component, useState, useEffect } from 'react';
+import React, { Component, useState } from 'react';
 import LineChart from '../components/charts/LineChart.jsx';
 import io from 'socket.io-client';
 import mock1h from '../dummyData/mockData_1h';
-import e from 'cors';
-import Flatpickr from "react-flatpickr"
-
 
 const socket = io();
 
