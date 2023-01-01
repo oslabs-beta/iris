@@ -1,14 +1,13 @@
 import fetch from 'node-fetch'
+import config from 'config'
 
-import { BASE_PATH } from 'config'
+import { Results } from '../../types'
 
-type Results = { metric: {}, values: (Values[] | HistogramValues[] | PieValues[])}[]
-type Values = [number, String]
-type HistogramValues = [String, unknown]
-type PieValues = [number, String]
+const BASE_PATH = config.get('BASE_PATH')
+const PROM_QUERY = config.get('PROM_QUERY')
 
 const queryData = async (metric : String, timeFrame : String) : Promise<any | Results> => {
-  const res = await fetch(`${BASE_PATH}/api/v1/query?query=${metric}[${timeFrame}]`, { method: 'get' })
+  const res = await fetch(`${BASE_PATH}${PROM_QUERY}${metric}[${timeFrame}]`, { method: 'get' })
   const data = await res.json()
   switch (metric) {
     case 'kafka_server_broker_topic_metrics_bytesinpersec_rate':              // Linechart
