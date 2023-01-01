@@ -42,6 +42,9 @@ const io = require('socket.io')(server, IOConfig)
 // Connecting with Socket.io and sending data socket.emit to the front end
 io.on('connection', async (socket : Socket) : Promise<void> => {
   console.log('SUCCESS: a Socket connected with id' , socket.id)
+
+  socket.emit('load', { load: true});
+
   //Histogram connection
   const JVMHeapUsage = await getHistogram('kafka_jvm_heap_usage', '1h', 20)
   const JVMNonHeapUsage = await getHistogram('kafka_jvm_non_heap_usage', '1h', 20);
@@ -53,6 +56,7 @@ io.on('connection', async (socket : Socket) : Promise<void> => {
     'kafka_coordinator_group_metadata_manager_numgroupsdead',
     'kafka_coordinator_group_metadata_manager_numgroupsempty'
   ])
+
   socket.emit('pieChart', pieChartData);
 
   //Line chart connection
