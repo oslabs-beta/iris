@@ -34,11 +34,7 @@ const add_scrape_samples_scraped = (lastTimeStamp) => {
       // Handle if there are no available data to record and db.query tries to write an empty body
       if (body[body.length - 2] === ')') {
         db.query(body, (err, res) => {
-          if (err) {
-            console.log('dbController.add_scrape_samples_scraped:cannot overwrite data in AWS')
-          } else {
-            console.log('Successfully written to db')
-          }
+          if (err) console.log('ERROR: dbController.add_scrape_samples_scraped cannot overwrite data')
         })
       }
       else {

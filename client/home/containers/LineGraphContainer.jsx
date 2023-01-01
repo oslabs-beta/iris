@@ -1,11 +1,7 @@
-import 'flatpickr/dist/themes/airbnb.css' // removes flatpicker backround
-import React, { Component, useState, useEffect } from 'react';
+import React, { Component, useState } from 'react';
 import LineChart from '../components/charts/LineChart.jsx';
 import io from 'socket.io-client';
 import mock1h from '../dummyData/mockData_1h';
-import e from 'cors';
-import Flatpickr from "react-flatpickr"
-
 
 const socket = io();
 
@@ -15,18 +11,9 @@ function LineGraphContainer(props) {
   const { chartID } = props;
   const [chartData, setChartData] = useState(mock1h.data.result);
 
-  socket.on('connect', () => {
-    console.log('socket connected')
-  });
-
   socket.on(chartID, (data) => {
     setChartData(data)
   });
-
-  // socket.on('connect_error', (err) => {
-  //   console.log(`connect_error due to ${err.message}`);
-  // });
-
 
   async function handleDynamicMetrics(e) {
     // grab metric by pulling value from our select id

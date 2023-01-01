@@ -1,14 +1,14 @@
-import fetch from 'node-fetch';
+import fetch from 'node-fetch'
+import config from 'config'
 
-import { Results } from '../../types';
-import config from 'config';
+import { Results } from '../../types'
 
-const BASE_PATH = config.get('BASE_PATH');
-const PROM_QUERY = config.get('PROM_QUERY');
+const BASE_PATH = config.get('BASE_PATH')
+const PROM_QUERY = config.get('PROM_QUERY')
 
 const queryData = async (metric : String, timeFrame : String) : Promise<any | Results> => {
-  const res = await fetch(`${BASE_PATH}${PROM_QUERY}${metric}[${timeFrame}]`, { method: 'get' });
-  const data = await res.json();
+  const res = await fetch(`${BASE_PATH}${PROM_QUERY}${metric}[${timeFrame}]`, { method: 'get' })
+  const data = await res.json()
   switch (metric) {
     case 'kafka_server_broker_topic_metrics_bytesinpersec_rate':              // Linechart
     case 'kafka_server_replica_fetcher_manager_failedpartitionscount_value':  // Linechart
