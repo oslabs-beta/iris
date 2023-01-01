@@ -35,11 +35,7 @@ const add_maxlag_value = (lastTimeStamp) => {
       // Handle if there are no available data to record and db.query tries to write an empty body
       if (body[body.length - 2] === ')') {
         db.query(body, (err, res) => {
-          if (err) {
-            console.log('Error in dbController.add_maxlag_value: cannot overwrite data in AWS')
-          } else {
-            console.log('Successfully written to db')
-          }
+          if (err) console.log('ERROR: dbController.add_maxlag_value cannot overwrite data')
         })
       }
       else {

@@ -30,6 +30,7 @@ const dbWriteInterval = (time: number): void => {
     //   'duration(s)': Date.now() - start,
     // })
     lastTimeStamp = await dbController.add_bytesinpersec_rate(lastTimeStamp)
+    console.log('SUCCESS: Data written to database')
   }, time)
 }
 

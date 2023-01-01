@@ -41,7 +41,7 @@ const io = require('socket.io')(server, IOConfig)
 //------------------------------------------------------------------------------------------------------------//
 // Connecting with Socket.io and sending data socket.emit to the front end
 io.on('connection', async (socket : Socket) : Promise<void> => {
-  console.log('SUCCESS: a Socket connected with id' , socket.id)
+  console.log('SUCCESS: Socket ID connection:' , socket.id)
 
   socket.emit('load', { load: true});
 
@@ -63,7 +63,7 @@ io.on('connection', async (socket : Socket) : Promise<void> => {
   for (const [chartID, query] of Object.entries(chartCache)) {
     const data = await queryData(query.metric, query.timeFrame)
     socket.emit(chartID, data) //Broadcast data from query on topic of chartID
-    socket.on("disconnect", () : void => console.log("ALERT: a Socket disconnected for linecharts"))
+    socket.on("disconnect", () : void => console.log("ALERT: Socket disconnection"))
   }
   
   // setInterval is for sending data to the frontend every X seconds.
