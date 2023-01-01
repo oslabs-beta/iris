@@ -15,18 +15,9 @@ function LineGraphContainer(props) {
   const { chartID } = props;
   const [chartData, setChartData] = useState(mock1h.data.result);
 
-  socket.on('connect', () => {
-    console.log('socket connected')
-  });
-
   socket.on(chartID, (data) => {
     setChartData(data)
   });
-
-  // socket.on('connect_error', (err) => {
-  //   console.log(`connect_error due to ${err.message}`);
-  // });
-
 
   async function handleDynamicMetrics(e) {
     // grab metric by pulling value from our select id
