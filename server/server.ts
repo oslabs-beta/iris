@@ -14,6 +14,7 @@ import dbWriteInterval from "./controllers/database/dbWriteInterval"
 import queryData from './controllers/util/queryData'
 import getHistogram from './controllers/charts/getHistogram'
 import getPieChart from './controllers/charts/getPieChart'
+import getNumbers from './controllers/charts/getNumbers'
 import router from './routes'
 
 dotenv.config()
@@ -44,14 +45,22 @@ io.on('connection', async (socket : Socket) : Promise<void> => {
   console.log('SUCCESS: Socket ID connection:' , socket.id)
 
   socket.emit('load', { load: true});
+  
+  // Number connection
+  const numbers = await getNumbers([
+    'kafka_controller_globaltopiccount',
+    'kafka_controller_globalpartitioncount',
+    'kafka_server_broker_topic_metrics_bytesinpersec_rate'
+  ]);
+  socket.emit('numbers', numbers)
 
-  //Histogram connection
+  // Histogram connection
   const JVMHeapUsage = await getHistogram('kafka_jvm_heap_usage', '1h', 20)
   const JVMNonHeapUsage = await getHistogram('kafka_jvm_non_heap_usage', '1h', 20);
   socket.emit('kafka_jvm_heap_usage', JVMHeapUsage)
   socket.emit('kafka_jvm_non_heap_usage', JVMNonHeapUsage)
   
-  //Piechart connection
+  // Piechart connection
   const pieChartData = await getPieChart(['kafka_coordinator_group_metadata_manager_numgroups',
     'kafka_coordinator_group_metadata_manager_numgroupsdead',
     'kafka_coordinator_group_metadata_manager_numgroupsempty'
@@ -59,7 +68,7 @@ io.on('connection', async (socket : Socket) : Promise<void> => {
 
   socket.emit('pieChart', pieChartData);
 
-  //Line chart connection
+  // Line chart connection
   for (const [chartID, query] of Object.entries(chartCache)) {
     const data = await queryData(query.metric, query.timeFrame)
     socket.emit(chartID, data) //Broadcast data from query on topic of chartID
@@ -68,6 +77,14 @@ io.on('connection', async (socket : Socket) : Promise<void> => {
   
   // setInterval is for sending data to the frontend every X seconds.
   setInterval(async () : Promise<void> => {
+    // Number connection
+    const numbers = await getNumbers([
+      'kafka_controller_globaltopiccount',
+      'kafka_controller_globalpartitioncount',
+      'kafka_server_broker_topic_metrics_bytesinpersec_rate'
+    ]);
+    socket.emit('numbers', numbers)
+
     // Query and emit data for JVM_HEAP_USAGE (HISTOGRAM) and JVM_NON_HEAP_USAGE (HISTOGRAM)
     const JVMHeapUsage = await getHistogram('kafka_jvm_heap_usage', '1h', 20)
     const JVMNonHeapUsage = await getHistogram('kafka_jvm_non_heap_usage', '1h', 20);
