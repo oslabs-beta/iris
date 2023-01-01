@@ -3,52 +3,53 @@ import fetch from 'node-fetch';
 import { Results } from '../../types'
 import queryData from './queryData';
 
-jest.mock('node-fetch');
+const { Response } = jest.requireActual('node-fetch');
+jest.mock('node-fetch', () => jest.fn());
 
 const mockFetch = fetch as jest.MockedFunction<typeof fetch>
 
-const goodResponse = [
-  [ 1672452359.169, "250132352" ],
-  [ 1672452374.171, "210368896" ],
-  [ 1672452389.171, "244971904" ],
-  [ 1672452404.172, "205235648" ],
-  [ 1672452419.171, "238790080" ],
-  [ 1672452434.173, "273393088" ],
-  [ 1672452449.173, "233595736" ],
-  [ 1672452464.169, "267150168" ],
-  [ 1672452479.17, "224334016" ],
-  [ 1672452494.17, "258937024" ],
-  [ 1672452509.171, "212927808" ],
-  [ 1672452524.171, "247530816" ],
-  [ 1672452539.174, "282133824" ],
-  [ 1672452554.172, "236030536" ],
-  [ 1672452569.172, "269584968" ],
-  [ 1672452584.178, "237275728" ],
-  [ 1672452599.175, "206929080" ],
-  [ 1672452614.169, "241532088" ],
-  [ 1672452629.171, "211184800" ],
-  [ 1672452644.171, "244739232" ]
-]
+const goodResponse = {
+  data: {
+    result: true
+  }
+}
+const idlePercentResponse = {
+  data: {
+    result: [0, 0, 0, 0, true]
+  }
+}
+
+const heapUsageResponse = {
+  data: {
+    result: [0, 0, 0, { values: true }]
+  }
+}
+
 const emptyResponse = []
 const nullResponse = null
 
-describe('Testing queryData', () => {
-  it('Returns an empty array when fetch response is null', async () => {
-    (mockFetch as jest.Mock).mockResolvedValue(goodResponse)
-    const result: Results = await queryData('test', '0m')
-    expect(result[0].values.length).toBe(3);
-  })
-  
-  it('Returns an empty array when fetch response is null', async () => {
-    (mockFetch as jest.Mock).mockResolvedValue(nullResponse)
+describe('Testing queryData', () => {  
+  it('Returns null when metric does not exist', async () => {
+    (mockFetch as unknown as jest.Mock).mockResolvedValue(new Response(JSON.stringify(nullResponse)))
     const result = await queryData('test', '0m')
-    expect(result).toStrictEqual([])
+    expect(result).toBe(null)
   })
 
-  it('Returns an empty array when fetch response is empty', async () => {
-    (mockFetch as jest.Mock).mockResolvedValue(emptyResponse)
-    const result = await queryData('test', '0m')
-    expect(result).toStrictEqual([])
+  it('Returns correct response if metric matches', async () => {
+    (mockFetch as unknown as jest.Mock).mockResolvedValue(new Response(JSON.stringify(goodResponse)))
+    let result = await queryData('kafka_server_broker_topic_metrics_bytesinpersec_rate', '0m')
+    expect(result).toBe(true)
   })
 
+  it('Returns correct response for avg idle percent', async () => {
+    (mockFetch as unknown as jest.Mock).mockResolvedValue(new Response(JSON.stringify(idlePercentResponse)))
+    let result = await queryData('kafka_server_request_handler_avg_idle_percent', '0m')
+    expect(result[0]).toBe(true)
+  })
+
+  it('Returns correct response for heap usage', async () => {
+    (mockFetch as unknown as jest.Mock).mockResolvedValue(new Response(JSON.stringify(heapUsageResponse)))
+    let result = await queryData('kafka_jvm_non_heap_usage', '0m')
+    expect(result).toBe(true)
+  })
 })
