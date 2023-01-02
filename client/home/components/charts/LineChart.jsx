@@ -1,6 +1,6 @@
 import React, { Component, useState, useEffect } from 'react';
-import { Line, Bar, Pie } from 'react-chartjs-2';
-import Chart from 'chart.js/auto';
+import { Line } from 'react-chartjs-2';
+// import Chart from 'chart.js/auto';
 import mock1h from '../../dummyData/mockData_1h';
 import mock6h from '../../dummyData/mockData_6h';
 
@@ -21,6 +21,52 @@ function LineChart(props) {
       }
     ],
   });
+
+  const [options, setOptions] = useState({ 
+    animation: false,
+    maintainAspectRatio: true, 
+    responsive: true,
+    spanGaps: true,
+    normalized: true,
+    layout: {
+      padding: {
+        right: 30,
+        left: 30,
+        bottom: 30
+      }
+    },
+    elements: {
+      point:{
+          radius: 0
+      }
+    },
+    scales: {
+      x: {
+        ticks: {
+          sampleSize: 5
+        }
+      },
+      y: {
+        ticks: {
+          sampleSize: 5
+        }
+      }
+    },
+    plugins: {
+      legend: {
+        labels: {
+          font : {
+            family: 'Trebuchet MS',
+          },
+        },
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: chartData[0].metric.__name__,
+      },
+    } 
+  })
 
   // function to generate random colors for our chartjs lines
   function getRandomColor() {
@@ -80,6 +126,7 @@ function LineChart(props) {
       lineChartData.push({
         label: topic,
         data: metricsArr,
+        // parsing: false,
         borderColor: getRandomColor()
       });
       // reset for next topic
@@ -99,44 +146,30 @@ function LineChart(props) {
       datasets: lineChartData, // this is an array of 3 subarrays -> subarray [line data]
     });
 
+    setOptions({ 
+      ...options,
+      plugins: {
+        legend: {
+          labels: {
+            font : {
+              family: 'Trebuchet MS',
+            },
+          },
+          position: 'top',
+        },
+        title: {
+          display: true,
+          text: chartData[0].metric.__name__,
+        },
+      } 
+    })
+
   }, [props])
 
   return (
     <>
       <Line id='lineGraph' 
-        options={
-          { 
-            animation: false,
-            maintainAspectRatio: true, 
-            responsive: true,
-            layout: {
-              padding: {
-                right: 30,
-                left: 30,
-                bottom: 30
-              }
-            },
-            elements: {
-              point:{
-                  radius: 0
-              }
-            },
-            plugins: {
-              legend: {
-                labels: {
-                  font : {
-                    family: 'Trebuchet MS',
-                  },
-                },
-                position: 'top',
-              },
-              title: {
-                display: true,
-                text: 'TOP SECRET: ITAR RESTRICTED DATA',
-              },
-            } 
-          }
-        } 
+        options={options} 
         data={chartMetric} 
       />
     </>

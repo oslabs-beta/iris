@@ -31,26 +31,12 @@ function PieChart(props) {
       datasets: [{
         label: chartID,
         data: countArr,
+        parsing: false,
         backgroundColor: colorArr,
       }]
     };
     setPieData(newObj);
   });
-
-  socket.on('connect_error', (err) => {
-    console.log(`connect_error due to ${err.message}`);
-  });
-
-  /////////////////////////
-  // tester code until we figure out how data comes in
-  function getRandomColor() {
-    let letters = '0123456789ABCDEF'.split('');
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-  }
 
   function convertKafkatoChart(data) {
     // if kafkadata is null
@@ -58,8 +44,6 @@ function PieChart(props) {
 
     // we need to convert our unix timestamps to regular time stamps
     // need to create an array to house our metrics, correlated to specific time stamp
-    // console.log('data:', data)
-    const results = data; // results here is an array
     const topicData = {};
     topicData[data[0].metric.topic] = data[0].values
     const binArray = [];
@@ -67,13 +51,14 @@ function PieChart(props) {
     const colorArr = ['rgb(52,153,204,0.7)', '#eb8686', '#86eb9d'];
 
     for (let i = 0; i < data.length; i++) {
+      const splitName = data[i].metric.topic.split('_')
+      const topicName = splitName[splitName.length-1]
       // parsing metric topic
-      binArray.push(data[i].metric.topic)
+      binArray.push(topicName)
 
       // parsing values
       let values = data[i].values[0];
       countArr.push(Number(values[1]))
-      // colorArr.push(getRandomColor())
     }
 
     return [binArray, countArr, colorArr]
@@ -89,9 +74,10 @@ function PieChart(props) {
             responsive: true,
             plugins: {
               legend: {
-                position: 'top',
+                position: 'right',
               },
               title: {
+                position: 'top',
                 display: true,
                 text: 'Hourly Distribution',
               },
