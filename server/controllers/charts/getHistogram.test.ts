@@ -1,7 +1,7 @@
 import getHistogram from "./getHistogram";
 import queryData from "../util/queryData";
 
-import { Results } from '../../types'
+import { BarChart } from '../../types'
 
 jest.mock('../util/queryData');
 
@@ -27,28 +27,36 @@ const goodResponse = [
   [ 1672452599.175, "206929080" ],
   [ 1672452614.169, "241532088" ],
   [ 1672452629.171, "211184800" ],
-  [ 1672452644.171, "244739232" ]
+  [ 1672452644.171, "244739232" ],
 ]
 const emptyResponse = []
 const nullResponse = null
 
 describe('Testing getHistogram', () => {
-  it('Returns an empty array when queryData response is null', async () => {
+  it('Returns correct data response when queryData response is good', async () => {
     (mockQueryData as jest.Mock).mockResolvedValue(goodResponse)
-    const result: Results = await getHistogram('test', '0', 3)
-    expect(result[0].values.length).toBe(3);
+    const result: BarChart = await getHistogram('test', '0', 20)
+    expect(result.labels.length).toBe(19);
+    expect(result.datasets.length).toBe(1);
+    expect(result.datasets[0].data.length).toBe(19);
+    expect(result.datasets[0].backgroundColor.length).toBe(19);
   })
   
   it('Returns an empty array when queryData response is null', async () => {
     (mockQueryData as jest.Mock).mockResolvedValue(nullResponse)
-    const result = await getHistogram('test', '0', 0)
-    expect(result).toStrictEqual([])
+    const result: BarChart = await getHistogram('test', '0', 0)
+    expect(result.labels.length).toBe(0);
+    expect(result.datasets.length).toBe(1);
+    expect(result.datasets[0].data.length).toBe(0);
+    expect(result.datasets[0].backgroundColor.length).toBe(0);
   })
 
   it('Returns an empty array when queryData response is empty', async () => {
-    (mockQueryData as jest.Mock).mockResolvedValue(emptyResponse)
-    const result = await getHistogram('test', '0', 0)
-    expect(result).toStrictEqual([])
+    (mockQueryData as jest.Mock).mockResolvedValue(emptyResponse);
+    const result: BarChart = await getHistogram('test', '0', 0);
+    expect(result.labels.length).toBe(0);
+    expect(result.datasets.length).toBe(1);
+    expect(result.datasets[0].data.length).toBe(0);
+    expect(result.datasets[0].backgroundColor.length).toBe(0);
   })
-
 })
