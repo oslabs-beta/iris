@@ -8,6 +8,8 @@ const socket = io();
 
 function BarChart(props) {
   const { chartID } = props;
+
+  const [title, setTitle] = useState('Hourly Distribution')
   const [barData, setBarData] = useState({
     // labels will be for date -> most likely going to do a cache arr as date.time
     labels: [0],
@@ -31,6 +33,8 @@ function BarChart(props) {
   });
 
   socket.on(chartID, (data) => {
+    if (data[0].metric.topic !== title) setTitle(data[0].metric.topic)
+
     const [binArray, countArr, colorArr, linRegressArr] = convertKafkatoChart(data)
 
     const newObj = {
@@ -38,6 +42,7 @@ function BarChart(props) {
       datasets: [{
         label: chartID, // label not showing up here
         data: countArr,
+        // parsing: false,
         backgroundColor: colorArr,
         order: 1,
       },
@@ -57,20 +62,6 @@ function BarChart(props) {
   //   console.log(`connect_error due to ${err.message}`);
   // });
 
-  /////////////////////////
-  // tester code until we figure out how data comes in
-  // function getRandomColor() {
-  //   // let letters = '0123456789ABCDEF'.split('');
-  //   // let color = '#';
-  //   // for (let i = 0; i < 6; i++) {
-  //   //   color += letters[Math.floor(Math.random() * 16)];
-  //   // }
-
-  //   let color = 'rgb(52,153,204,'
-  //   color += String(Math.random()*0.50+0.30) + ')'
-  //   return color;
-  // }
-
   function convertKafkatoChart(data) {
     // if kafkadata is null
     if (!data) return [[], []];
@@ -85,7 +76,7 @@ function BarChart(props) {
     const colorArr = [];
     const linRegressArr = [];
     topicData[data[0].metric.topic].forEach(element => {
-      binArray.push(Number(element[0]))
+      binArray.push((Number(element[0])/1000000).toExponential(2))
       countArr.push(Number(element[1]))
       // colorArr.push(getRandomColor())
       colorArr.push('rgb(52,153,204,0.5)')
@@ -96,26 +87,43 @@ function BarChart(props) {
 
     return [binArray, countArr, colorArr, linRegressArr]
   }
+  
+  const options = { 
+    animation: false,
+    maintainAspectRatio: false, 
+    responsive: true,
+    scales: {
+      x: {
+        ticks: {
+            font: {
+                size: 10,
+            }
+        }
+      },
+      y: {
+        ticks: {
+            font: {
+                size: 10,
+            }
+        }
+      }
+    },
+    plugins: {
+      legend: {
+        position: 'top',
+        display: false
+      },
+      title: {
+        display: true,
+        text: `${title}, Hourly Distribution (MB)`,
+      },
+    }
+  }
 
   return (
     <div id='barGraph'>
       <Bar id='barGraph' 
-        options={
-          { 
-            animation: false,
-            maintainAspectRatio: false, 
-            responsive: true,
-            plugins: {
-              legend: {
-                position: 'top',
-              },
-              title: {
-                display: true,
-                text: 'Hourly Distribution',
-              },
-            }
-          }
-        }
+        options={options}
         data={barData} 
       />
     </div>
