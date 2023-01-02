@@ -29,3 +29,13 @@ export type Values = [number, String]
 export type HistogramValues = [String, unknown]
 
 export type PieValues = [number, String]
+
+export type Dataset = {
+  data: Number[],
+  backgroundColor: String[],
+}
+
+export type BarChart = {
+  labels: String[],
+  datasets: Dataset[]
+}

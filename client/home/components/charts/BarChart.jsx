@@ -33,29 +33,8 @@ function BarChart(props) {
   });
 
   socket.on(chartID, (data) => {
-    if (data[0].metric.topic !== title) setTitle(data[0].metric.topic)
-
-    const [binArray, countArr, colorArr, linRegressArr] = convertKafkatoChart(data)
-
-    const newObj = {
-      labels: binArray,
-      datasets: [{
-        label: chartID, // label not showing up here
-        data: countArr,
-        // parsing: false,
-        backgroundColor: colorArr,
-        order: 1,
-      },
-      {
-        label: 'Average', // label not showing up here //fuck you Walter you fucking name it label'S'!!!!!
-        data: linRegressArr,
-        backgroundColor: 'rgb(52,153,204)',
-        borderColor: 'rgb(52,153,204)',
-        type: 'line',
-        pointRadius: 0
-      }]
-    };
-    setBarData(newObj);
+    if (data.metric !== title) setTitle(data.metric)
+    setBarData(data);
   });
 
   // socket.on('connect_error', (err) => {
