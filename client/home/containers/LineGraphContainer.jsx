@@ -1,15 +1,24 @@
-import React, { Component, useState } from 'react';
+import React, { useState } from 'react';
 import LineChart from '../components/charts/LineChart.jsx';
 import io from 'socket.io-client';
-import mock1h from '../dummyData/mockData_1h';
 
 const socket = io();
 
-function LineGraphContainer(props) {
+function LineGraphContainer({ chartID }) {
   // Exposed props.chartID when creating chart at Page Level Component
   // Use dummy value of '1' for unit testing
-  const { chartID } = props;
-  const [chartData, setChartData] = useState(mock1h.data.result);
+  const [chartData, setChartData] = useState({
+    metric: '',
+    chartData: {
+      labels: [],
+      datasets: [
+        {
+          data: [],
+          borderColor: "gray"
+        }
+      ],
+    }
+  });
 
   socket.on(chartID, (data) => {
     setChartData(data)
@@ -27,7 +36,7 @@ function LineGraphContainer(props) {
       alert("Must Choose a Metric and Timeframe")
       return;
     }
-    if (metrics !== '' && timeFrame === '') {
+    else if (metrics !== '' && timeFrame === '') {
       reqBody = {
         metric: metrics,
         timeFrame: '5m',
@@ -49,45 +58,34 @@ function LineGraphContainer(props) {
       }
     }
 
-    await fetch('/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(reqBody)
-    })
-      .then((formattedData) => {
-        
+    try {
+      await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(reqBody)
       })
-      .catch(err => {
-        console.log('Error thrown in POST request in graphContainer: ', err)
-      })
-
-    // breakout of function
-    return;
+    } catch(err) {
+      console.log('Error thrown in POST request in graphContainer: ', err)
+    }
   }
 
-  function handleChartDelete(e) {
+  async function handleChartDelete(e) {
     // need to target the chart with chartID 
     // more like deleting graphContainer
     const chartToDelete = e.target.parentNode.parentNode.parentNode
     // remove from DOM
     chartToDelete.remove();
 
-    console.log(JSON.stringify({ chartID: chartID }));
-
-    // fetch request with POST to backend so backend can process the socket.off    
-    fetch('/delete', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chartID: chartID })
-    })
-      .then(res => res.json())
-      .then((data) => {
-
+    try {
+      // fetch request with POST to backend so backend can process the socket.off    
+      await fetch('/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chartID: chartID })
       })
-      .catch(err => {
-        console.log('Error thrown in POST request  in graphContainer: ', err)
-      })
-    // no return;
+    } catch(err) {
+      console.log('Error thrown in POST request  in graphContainer: ', err)
+    }
   }
 
   // return our render
@@ -145,7 +143,7 @@ function LineGraphContainer(props) {
       </div>
 
 
-      <LineChart chartData={chartData} />
+      <LineChart metric={chartData.metric} chartData={chartData.chartData} />
 
     </div>
   )
