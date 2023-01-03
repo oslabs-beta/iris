@@ -31,11 +31,21 @@ export type HistogramValues = [String, unknown]
 export type PieValues = [number, String]
 
 export type Dataset = {
+  label?: String,
   data: Number[],
-  backgroundColor: String[],
+  backgroundColor?: String[],
+  borderColor?: String,
 }
 
 export type BarChart = {
   labels: String[],
   datasets: Dataset[]
+}
+
+export type LineChart = {
+  metric?: String,
+  chartData: {
+    labels: String[],
+    datasets: Dataset[]
+  }
 }

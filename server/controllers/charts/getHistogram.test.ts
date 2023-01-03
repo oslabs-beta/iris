@@ -39,7 +39,7 @@ describe('Testing getHistogram', () => {
     expect(result.labels.length).toBe(19);
     expect(result.datasets.length).toBe(1);
     expect(result.datasets[0].data.length).toBe(19);
-    expect(result.datasets[0].backgroundColor.length).toBe(19);
+    expect(result.datasets[0].backgroundColor?.length).toBe(19);
   })
   
   it('Returns an empty array when queryData response is null', async () => {
@@ -48,7 +48,7 @@ describe('Testing getHistogram', () => {
     expect(result.labels.length).toBe(0);
     expect(result.datasets.length).toBe(1);
     expect(result.datasets[0].data.length).toBe(0);
-    expect(result.datasets[0].backgroundColor.length).toBe(0);
+    expect(result.datasets[0].backgroundColor?.length).toBe(0);
   })
 
   it('Returns an empty array when queryData response is empty', async () => {
@@ -57,6 +57,6 @@ describe('Testing getHistogram', () => {
     expect(result.labels.length).toBe(0);
     expect(result.datasets.length).toBe(1);
     expect(result.datasets[0].data.length).toBe(0);
-    expect(result.datasets[0].backgroundColor.length).toBe(0);
+    expect(result.datasets[0].backgroundColor?.length).toBe(0);
   })
 })

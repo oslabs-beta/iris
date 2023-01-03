@@ -15,6 +15,7 @@ import queryData from './controllers/util/queryData'
 import getHistogram from './controllers/charts/getHistogram'
 import getPieChart from './controllers/charts/getPieChart'
 import getNumbers from './controllers/charts/getNumbers'
+import getLineChart from './controllers/charts/getLineChart'
 import router from './routes'
 
 dotenv.config()
@@ -70,7 +71,7 @@ io.on('connection', async (socket : Socket) : Promise<void> => {
 
   // Line chart connection
   for (const [chartID, query] of Object.entries(chartCache)) {
-    const data = await queryData(query.metric, query.timeFrame)
+    const data = await getLineChart(query.metric, query.timeFrame)
     socket.emit(chartID, data) //Broadcast data from query on topic of chartID
     socket.on("disconnect", () : void => console.log("ALERT: Socket disconnection"))
   }
@@ -105,7 +106,7 @@ io.on('connection', async (socket : Socket) : Promise<void> => {
       if (queryObj[key]) {
         socket.emit(chartID, queryObj[key]) //Broadcast data from query on topic of chartID
       } else {
-        const data = await queryData(query.metric, query.timeFrame)
+        const data = await getLineChart(query.metric, query.timeFrame)
         queryObj[key] = data //setting data as value for key
         socket.emit(chartID, data) //Broadcast data from query on topic of chartID
       }
