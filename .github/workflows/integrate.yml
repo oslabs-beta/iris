@@ -11,6 +11,7 @@ on:
 
 jobs:
   build:
+    name: Build
 
     runs-on: ${{matrix.os}}     
 
@@ -32,5 +33,26 @@ jobs:
       run: npm run test
     - run: npm run build --if-present
 
-# publish:
-#   needs: build
+  analyze:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        language:
+          - javascript
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
