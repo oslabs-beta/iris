@@ -11,12 +11,12 @@ import dotenv from 'dotenv'
 
 import chartCache from "./routes/chartCache"
 import dbWriteInterval from "./controllers/database/dbWriteInterval"
-import queryData from './controllers/util/queryData'
 import getHistogram from './controllers/charts/getHistogram'
 import getPieChart from './controllers/charts/getPieChart'
 import getNumbers from './controllers/charts/getNumbers'
 import getLineChart from './controllers/charts/getLineChart'
 import router from './routes'
+import db from '../server/models'
 
 dotenv.config()
 
@@ -28,6 +28,17 @@ app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use('/', router)
+
+//------------------------------------------------------------------------------------------------------------//
+// Data written on 30 sec interval
+db.sequelize.sync()
+  .then(() => {
+    console.log('SUCCESS: Synced to database')
+  })
+  .catch((err) => {
+    console.log('ERROR: Failed to sync to db, ', err.message)
+  })
+dbWriteInterval(10000) 
 
 //------------------------------------------------------------------------------------------------------------//
 // creating Socket.io Connection
@@ -119,9 +130,6 @@ io.on('connection', async (socket : Socket) : Promise<void> => {
 io.on('connect_error', (err : Error) : void => {
   console.log(`ERROR: connect_error due to ${err.message}`);
 });
-
-// Data written on 30 sec interval
-dbWriteInterval(30000) 
 
 //------------------------------------------------------------------------------------------------------------//
 // Global error handler
