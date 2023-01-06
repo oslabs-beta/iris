@@ -2,23 +2,22 @@
 /* eslint-disable no-underscore-dangle */
 const fetch = require('node-fetch');
 const { BASE_PATH, PROM_QUERY } = require('config');
+const metricKeys = require('./metricKeys')
 const { dbModel } = require('../../models');
 
-const add_bytesoutpersec_rate = async (lastTimeStamp) => {
+const dbAdd = async (metric, intvl, lastTimeStamp) => {
   try {
-    const res = await fetch(`${BASE_PATH}${PROM_QUERY}kafka_server_broker_topic_metrics_bytesoutpersec_rate[5m]`);
+    const res = await fetch(`${BASE_PATH}${PROM_QUERY}${metric}[${intvl}]`);
     const data = await res.json();
     const results = data.data.result;
-    const sqlArr = []; // Array of {key, identifier, metric, time, value}
+
     let time;
+    const sqlArr = []; // Array of {key, identifier, metric, time, value}
     results.forEach((result) => {
-      let identifier;
-      let metric;
-      let value;
-      let key;
-      if (result.metric.topic) {
-        identifier = result.metric.topic;
-        metric = result.metric.__name__;
+      if (result.metric[metricKeys[metric]]) {
+        const identifier = result.metric[metricKeys[metric]]
+        let value;
+        let key;
         result.values.forEach((val) => {
           time = val[0];
           if (time > lastTimeStamp) {
@@ -39,10 +38,13 @@ const add_bytesoutpersec_rate = async (lastTimeStamp) => {
     if (sqlArr.length > 0) {
       // Validate against data in db to prevent error
       await dbModel.bulkCreate(sqlArr, { validate: true });
+      return time;
     }
   } catch (err) {
-    console.log('ERROR: add_bytesoutpersec_rate', err);
+    console.log(`ERROR: Writing ${metric} to database`, err);
   }
+
+  return lastTimeStamp;
 };
 
-module.exports = add_bytesoutpersec_rate
+module.exports = dbAdd;
