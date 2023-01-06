@@ -38,7 +38,7 @@ db.sequelize.sync()
   .catch((err) => {
     console.log('ERROR: Failed to sync to db, ', err.message)
   })
-dbWriteInterval(10000) 
+dbWriteInterval(30000) 
 
 //------------------------------------------------------------------------------------------------------------//
 // creating Socket.io Connection
